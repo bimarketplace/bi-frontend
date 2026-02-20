@@ -23,3 +23,7 @@ body {
   color: var(--foreground);
   font-family: var(--font-inter);
 }
+
+.offcanvas-overlay {
+  background-color: rgba(0, 0, 0, 0.15);
+}

@@ -11,7 +11,7 @@ declare module 'next-auth' {
   }
 }
 
-const BACKEND_ACCESS_TOKEN_LIFETIME = 45 * 60; // 45 minutes
+const BACKEND_ACCESS_TOKEN_LIFETIME = 55 * 60; // 55 minutes, slightly less than backend 60m
 const BACKEND_REFRESH_TOKEN_LIFETIME = 6 * 24 * 60 * 60; // 6 days
 
 const getCurrentEpochTime = () => {
@@ -29,9 +29,11 @@ const SIGN_IN_HANDLERS: Record<string, (user: any, account: any) => Promise<bool
         return false;
       }
       const tokenType = account?.access_token ? 'access_token' : 'id_token';
-      const googleUrl = process.env.DJANGO_BACKEND_URL?.replace('/api/', '/') + 'google/' || 'http://localhost:8000/google/';
-      console.log('Google sign-in: sending token to backend', { 
-        url: googleUrl, 
+      const baseUrl = process.env.DJANGO_BACKEND_URL?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+      const googleUrl = `${baseUrl}/google/`;
+
+      console.log('Google sign-in: sending token to backend', {
+        url: googleUrl,
         tokenType,
         tokenLength: token.length,
       });
@@ -68,12 +70,17 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const loginUrl = process.env.DJANGO_BACKEND_URL?.replace('/api/', '/') + 'auth/login/' || 'http://localhost:8000/auth/login/';
+          const baseUrl = process.env.DJANGO_BACKEND_URL?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+          const loginUrl = `${baseUrl}/auth/login/`;
+
           console.log('Credentials login: sending to', { url: loginUrl });
           const response = await axios({
             method: 'post',
             url: loginUrl,
-            data: credentials,
+            data: {
+              email: credentials?.username,
+              password: credentials?.password,
+            },
           });
           const data = response.data;
           console.log('Credentials login: backend response', { status: response.status, data });
@@ -122,9 +129,13 @@ export const authOptions: NextAuthOptions = {
       if (user && account) {
         let backendResponse = account.provider === 'credentials' ? user : account.meta;
         const response = backendResponse as any;
+        console.log('JWT Callback: processing backend response', { provider: account.provider, keys: Object.keys(response) });
+
         token.user = response.user;
-        token.access_token = response.access;
-        token.refresh_token = response.refresh;
+        // Handle different token field names from backend
+        token.access_token = response.access || response.access_token || response.token;
+        token.refresh_token = response.refresh || response.refresh_token;
+
         token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
         return token;
       }
@@ -132,15 +143,17 @@ export const authOptions: NextAuthOptions = {
       // Refresh token if expired
       if (getCurrentEpochTime() > (token.ref as number)) {
         try {
-          const refreshUrl = process.env.DJANGO_BACKEND_URL?.replace('/api/', '/') + 'auth/token/refresh/' || 'http://localhost:8000/auth/token/refresh/';
+          const baseUrl = process.env.DJANGO_BACKEND_URL?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+          const refreshUrl = `${baseUrl}/auth/token/refresh/`;
+
           console.log('Token refresh: sending to', { url: refreshUrl });
           const response = await axios({
             method: 'post',
             url: refreshUrl,
             data: { refresh: token.refresh_token },
           });
-          token.access_token = response.data.access;
-          token.refresh_token = response.data.refresh || token.refresh_token;
+          token.access_token = response.data.access || response.data.access_token || response.data.token;
+          token.refresh_token = response.data.refresh || response.data.refresh_token || token.refresh_token;
           token.ref = getCurrentEpochTime() + BACKEND_ACCESS_TOKEN_LIFETIME;
           console.log('Token refresh: success');
           return token;
@@ -161,6 +174,8 @@ export const authOptions: NextAuthOptions = {
       } else if (token) {
         session.user = token.user as any;
         session.access_token = token.access_token as string;
+        // Optionally pass refresh_token if needed by the frontend
+        // session.refresh_token = token.refresh_token as string;
       }
       return session;
     },
