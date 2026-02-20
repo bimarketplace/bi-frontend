@@ -12,7 +12,7 @@ import {
     Message01Icon,
     Share01Icon,
     SentIcon,
-    ChatLabelIcon,
+    Message02Icon,
     UserIcon,
     WhatsappIcon
 } from "hugeicons-react";
@@ -165,7 +165,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                     unoptimized
                                 />
                                 <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl font-black text-xl shadow-xl border border-white/50">
-                                    ${parseFloat(product.price).toFixed(2)}
+                                    ₦{parseFloat(product.price).toLocaleString()}
                                 </div>
                             </div>
 
@@ -197,38 +197,38 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                     </div>
 
                                     <div className="flex gap-2 ml-auto">
-                                        <button
+                                        <button 
                                             onClick={() => handleVote(1)}
                                             className="h-14 px-6 gap-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-900 rounded-2xl flex items-center justify-center transition-all font-bold border border-zinc-100"
                                         >
                                             <ThumbsUpIcon size={20} />
                                             <span>{product.vote_score}</span>
                                         </button>
-                                        <button
+                                        <button 
                                             onClick={() => handleVote(-1)}
                                             className="h-14 w-14 bg-zinc-50 hover:bg-red-50 hover:text-red-500 text-zinc-400 rounded-2xl flex items-center justify-center transition-all border border-zinc-100"
                                         >
                                             <ThumbsDownIcon size={20} />
                                         </button>
-                                        <button
+                                        <button 
                                             onClick={handleShare}
-                                            className="h-14 px-6 gap-2 bg-black text-white hover:bg-zinc-800 rounded-2xl flex items-center justify-center transition-all font-bold shadow-lg shadow-black/10"
+                                            className="h-14 px-6 gap-2 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 rounded-2xl flex items-center justify-center transition-all font-bold"
                                         >
                                             <Share01Icon size={20} />
-                                            <span>{product.share_count} Shares</span>
+                                            <span>{product.share_count}</span>
                                         </button>
                                     </div>
                                 </div>
 
                                 {product.whatsapp_link && (
-                                    <a
-                                        href={product.whatsapp_link}
+                                    <a 
+                                        href={`${product.whatsapp_link}${encodeURIComponent(`\n\nProduct Link: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-[#25D366] text-white rounded-[20px] font-black text-lg hover:scale-[1.02] transition-all shadow-xl shadow-green-200"
+                                        className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-black text-white rounded-[20px] font-black text-lg hover:scale-[1.02] transition-all shadow-xl shadow-black/10"
                                     >
-                                        <WhatsappIcon size={24} />
-                                        Contact Seller on WhatsApp
+                                        <WhatsappIcon size={24} className="text-[#25D366]" />
+                                        Purchase & Inquire
                                     </a>
                                 )}
                             </div>
@@ -240,7 +240,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         <div className="bg-white rounded-[32px] border border-gray-100 shadow-xl shadow-zinc-200/50 flex flex-col max-h-[800px]">
                             <div className="p-8 border-b border-zinc-50">
                                 <h2 className="text-2xl font-black text-zinc-900 flex items-center gap-3">
-                                    <ChatLabelIcon size={28} />
+                                    <Message02Icon size={28} />
                                     Discussion
                                     <span className="text-sm font-bold bg-zinc-100 text-zinc-500 px-3 py-1 rounded-full ml-2">
                                         {product.comments.length}

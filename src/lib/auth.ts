@@ -43,3 +43,31 @@ export const verifyEmail = async (key: string) => {
         throw error;
     }
 };
+
+export const fetchUserProfile = async (token: string) => {
+    try {
+        const response = await axios.get(`${API_URL}/auth/user/`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Fetch Profile Error:', error);
+        throw error;
+    }
+};
+
+export const updateProfile = async (userData: any, token: string) => {
+    try {
+        const response = await axios.patch(`${API_URL}/auth/user/`, userData, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Update Profile Error:', error);
+        throw error;
+    }
+};

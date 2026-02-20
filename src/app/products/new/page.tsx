@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createProduct } from "@/lib/products";
 import { toast } from "react-hot-toast";
@@ -15,10 +15,13 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
+import { fetchUserProfile } from "@/lib/auth";
+
 export default function CreateProductPage() {
     const { data: session } = useSession();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [isCheckingProfile, setIsCheckingProfile] = useState(true);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
@@ -28,6 +31,29 @@ export default function CreateProductPage() {
         product_type: 'physical', // Match backend TextChoices
         image: null as File | null
     });
+
+    useEffect(() => {
+        const checkProfile = async () => {
+            if (!session?.access_token) return;
+            try {
+                const profile = await fetchUserProfile((session as any).access_token);
+                if (!profile.whatsapp_number || !profile.bio) {
+                    toast.error("Please complete your profile (WhatsApp and Bio) before listing a product.");
+                    router.push('/profile');
+                }
+            } catch (error) {
+                console.error("Profile check error:", error);
+            } finally {
+                setIsCheckingProfile(false);
+            }
+        };
+
+        if (session) {
+            checkProfile();
+        } else if (typeof window !== 'undefined') {
+            setIsCheckingProfile(false);
+        }
+    }, [session, router]);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -62,6 +88,14 @@ export default function CreateProductPage() {
             setIsLoading(false);
         }
     };
+
+    if (isCheckingProfile) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+                <div className="w-12 h-12 border-4 border-zinc-200 border-t-black rounded-full animate-spin"></div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-zinc-50 pt-32 pb-20 px-4">
@@ -149,7 +183,7 @@ export default function CreateProductPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-zinc-900 mb-2 uppercase tracking-wider">Price (USD)</label>
+                                <label className="block text-sm font-bold text-zinc-900 mb-2 uppercase tracking-wider">Price (NGN)</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400">
                                         <Dollar01Icon size={20} />

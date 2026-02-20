@@ -188,7 +188,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-zinc-900 mb-2 uppercase tracking-wider">Price (USD)</label>
+                                <label className="block text-sm font-bold text-zinc-900 mb-2 uppercase tracking-wider">Price (NGN)</label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400">
                                         <Dollar01Icon size={20} />

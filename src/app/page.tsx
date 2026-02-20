@@ -65,7 +65,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         </div>
         <div className="price">
-          <p className="text-sm font-bold text-gray-900">${parseFloat(product.price).toFixed(2)}</p>
+          <p className="text-sm font-bold text-gray-900">₦{parseFloat(product.price).toLocaleString()}</p>
         </div>
       </div>
 
