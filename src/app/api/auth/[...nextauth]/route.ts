@@ -29,7 +29,7 @@ const SIGN_IN_HANDLERS: Record<string, (user: any, account: any) => Promise<bool
         return false;
       }
       const tokenType = account?.access_token ? 'access_token' : 'id_token';
-      const baseUrl = process.env.DJANGO_BACKEND_URL?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+      const baseUrl = process.env.DJANGO_BACKEND_URL?.replace(/\/api\/?$/, '');
       const googleUrl = `${baseUrl}/google/`;
 
       console.log('Google sign-in: sending token to backend', {
