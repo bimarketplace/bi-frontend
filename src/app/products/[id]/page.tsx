@@ -164,18 +164,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                     className="object-cover"
                                     unoptimized
                                 />
-                                <div className="absolute top-6 right-6 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl font-black text-xl shadow-xl border border-white/50">
+                                <div className="absolute text-black top-6 right-6 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl font-black text-xl shadow-xl border border-white/50">
                                     ₦{parseFloat(product.price).toLocaleString()}
                                 </div>
                             </div>
 
                             <div className="p-8 md:p-10">
                                 <div className="flex items-center gap-3 mb-6">
-                                    <span className="px-4 py-1.5 bg-zinc-100 text-zinc-600 rounded-full text-xs font-bold uppercase tracking-widest">
+                                    {/* <span className="px-4 py-1.5 bg-zinc-100 text-zinc-600 rounded-full text-xs font-bold uppercase tracking-widest">
                                         {product.product_type === 'service' ? 'Service / Freelance' : 'Physical Product'}
-                                    </span>
-                                    <span className="text-zinc-300">•</span>
-                                    <span className="text-zinc-500 text-sm font-medium">Listed {new Date().toLocaleDateString()}</span>
+                                    </span> */}
+                                    {/* <span className="text-zinc-300">•</span> */}
+                                    <span className="px-4 py-4 bg-zinc-100 text-zinc-600 rounded-full text-xs font-bold uppercase tracking-widest">Listed {new Date().toLocaleDateString()}</span>
                                 </div>
 
                                 <h1 className="text-4xl font-black text-zinc-900 mb-6 tracking-tight">{product.name}</h1>
