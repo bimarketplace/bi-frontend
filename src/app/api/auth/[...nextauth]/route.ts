@@ -29,7 +29,7 @@ const SIGN_IN_HANDLERS: Record<string, (user: any, account: any) => Promise<bool
         return false;
       }
       const tokenType = account?.access_token ? 'access_token' : 'id_token';
-      const baseUrl = process.env.DJANGO_BACKEND_URL?.replace(/\/api\/?$/, '');
+      const baseUrl = (process.env.DJANGO_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
       const googleUrl = `${baseUrl}/google/`;
 
       console.log('Google sign-in: sending token to backend', {
@@ -39,7 +39,19 @@ const SIGN_IN_HANDLERS: Record<string, (user: any, account: any) => Promise<bool
       });
       const response = await axios.post(googleUrl, { access_token: token });
       console.log('Google sign-in: backend response', { status: response.status, data: response.data });
-      account.meta = response.data;
+      let data = response.data;
+      if (data && !data.user && (data.access || data.access_token)) {
+        try {
+          const userUrl = `${baseUrl}/auth/user/`;
+          const userResponse = await axios.get(userUrl, {
+            headers: { Authorization: `Bearer ${data.access || data.access_token}` }
+          });
+          data.user = userResponse.data;
+        } catch (e) {
+          console.error('Failed to fetch user profile during google sign-in', e);
+        }
+      }
+      account.meta = data;
       return true;
     } catch (error: any) {
       console.error('Google sign-in error:', {
@@ -70,7 +82,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const baseUrl = process.env.DJANGO_BACKEND_URL?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+          const baseUrl = (process.env.DJANGO_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
           const loginUrl = `${baseUrl}/auth/login/`;
 
           console.log('Credentials login: sending to', { url: loginUrl });
@@ -82,8 +94,21 @@ export const authOptions: NextAuthOptions = {
               password: credentials?.password,
             },
           });
-          const data = response.data;
+          let data = response.data;
           console.log('Credentials login: backend response', { status: response.status, data });
+
+          if (data && !data.user && (data.access || data.access_token)) {
+            try {
+              const userUrl = `${baseUrl}/auth/user/`;
+              const userResponse = await axios.get(userUrl, {
+                headers: { Authorization: `Bearer ${data.access || data.access_token}` }
+              });
+              data.user = userResponse.data;
+            } catch (e) {
+              console.error('Failed to fetch user profile during login', e);
+            }
+          }
+
           if (data) return data;
         } catch (error: any) {
           console.error('Credentials login error:', {
@@ -143,7 +168,7 @@ export const authOptions: NextAuthOptions = {
       // Refresh token if expired
       if (getCurrentEpochTime() > (token.ref as number)) {
         try {
-          const baseUrl = process.env.DJANGO_BACKEND_URL?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+          const baseUrl = (process.env.DJANGO_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
           const refreshUrl = `${baseUrl}/auth/token/refresh/`;
 
           console.log('Token refresh: sending to', { url: refreshUrl });
@@ -172,10 +197,15 @@ export const authOptions: NextAuthOptions = {
       if (token?.error) {
         session.error = token.error as string;
       } else if (token) {
-        session.user = token.user as any;
+        const tokenUser = (token.user as any) || {};
+
+        session.user = {
+          ...session.user,
+          ...tokenUser,
+          name: tokenUser.name || [tokenUser.first_name, tokenUser.last_name].filter(Boolean).join(' ') || tokenUser.username,
+        } as any;
+
         session.access_token = token.access_token as string;
-        // Optionally pass refresh_token if needed by the frontend
-        // session.refresh_token = token.refresh_token as string;
       }
       return session;
     },
