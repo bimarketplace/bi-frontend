@@ -96,27 +96,22 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         try {
             await shareProduct(product!.id);
 
-            // Dynamically import html-to-image
             let file: File | null = null;
 
             try {
-                const htmlToImage = await import('html-to-image');
-                const element = document.getElementById("share-card-container");
+                if (product!.image_url) {
+                    // Fetch the original image directly
+                    const response = await fetch(product!.image_url, { mode: 'cors' });
+                    const blob = await response.blob();
 
-                if (element) {
-                    const blob = await htmlToImage.toBlob(element, {
-                        backgroundColor: "#ffffff",
-                        pixelRatio: 1.5, // optimal ratio for WhatsApp size vs quality
-                        style: { transform: 'none' },
-                        cacheBust: true, // prevents cross-origin caching bugs
-                    });
+                    // Determine extension based on content type
+                    const contentType = response.headers.get('content-type') || 'image/jpeg';
+                    const extension = contentType.split('/')[1] || 'jpeg';
 
-                    if (blob) {
-                        file = new File([blob], `product-${product!.id}.jpeg`, { type: 'image/jpeg' });
-                    }
+                    file = new File([blob], `product-${product!.id}.${extension}`, { type: contentType });
                 }
             } catch (imageError) {
-                console.warn("Could not generate share image, falling back to text only:", imageError);
+                console.warn("Could not download product image for share, falling back to text only:", imageError);
             }
 
             const currentUrl = window.location.href;
@@ -370,27 +365,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                 </form>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-            {/* Hidden Share Card for screenshot generation */}
-            <div className="fixed top-[-9999px] left-[-9999px]">
-                <div id="share-card-container" className="w-[600px] bg-white rounded-3xl p-8 border border-gray-100 flex flex-col gap-6 font-sans text-black">
-                    <div className="flex items-center gap-4">
-                        <span className="text-[28px] font-extrabold tracking-tighter italic text-black">BIMARKETPLACE</span>
-                    </div>
-                    {product.image_url ? (
-                        <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden">
-                            <img src={product.image_url} alt={product.name} crossOrigin="anonymous" className="w-full h-full object-cover" />
-                        </div>
-                    ) : null}
-                    <div>
-                        <h1 className="text-3xl font-black text-zinc-900 mb-2 leading-tight">{product.name}</h1>
-                        <p className="text-2xl font-bold text-zinc-500">₦{parseFloat(product.price).toLocaleString()}</p>
-                    </div>
-                    <div className="pt-6 border-t border-gray-100 flex justify-between items-center text-zinc-500 font-bold">
-                        <span>By {product.seller.username}</span>
-                        <span>bimarketplace.org</span>
                     </div>
                 </div>
             </div>
