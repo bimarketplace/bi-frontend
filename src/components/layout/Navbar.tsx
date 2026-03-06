@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
     Search01Icon,
@@ -51,6 +51,23 @@ export default function Navbar() {
     const { data: session } = useSession();
     const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
     const [resendStatus, setResendStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+    const [isScrollingDown, setIsScrollingDown] = useState(false);
+    const [lastScrollY, setLastScrollY] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 50) {
+                setIsScrollingDown(true);
+            } else if (currentScrollY < lastScrollY) {
+                setIsScrollingDown(false);
+            }
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [lastScrollY]);
 
     const user = session?.user;
     const isLoggedIn = !!session;
@@ -133,7 +150,7 @@ export default function Navbar() {
                                 </Link>
                             </div>
                         ) : (
-                            <Link href="/profile" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+                            <Link href="/profile" className="hidden sm:flex items-center gap-4 hover:opacity-80 transition-opacity">
                                 <Avatar name={user?.name || (user as any)?.username || user?.email || ""} />
                             </Link>
                         )}
@@ -141,7 +158,7 @@ export default function Navbar() {
                             {isLoggedIn && (
                                 <Link
                                     href="/products/new"
-                                    className="w-10 h-10 bg-black text-white rounded-full flex items-center justify-center hover:bg-zinc-800 transition-all hover:scale-110 shadow-lg shadow-black/10 mr-2"
+                                    className="hidden sm:flex w-10 h-10 bg-black text-white rounded-full items-center justify-center hover:bg-zinc-800 transition-all hover:scale-110 shadow-lg shadow-black/10 mr-2"
                                     title="Add Product"
                                 >
                                     <PlusSignIcon size={22} strokeWidth={3} />
@@ -229,6 +246,24 @@ export default function Navbar() {
                     </footer>
                 </div>
             </div>
+
+            {/* Mobile Floating Action Button (FAB) */}
+            {isLoggedIn && (
+                <div
+                    className={`fixed bottom-[24px] left-1/2 -translate-x-1/2 z-[60] sm:hidden transition-all duration-300 ease-in-out ${isScrollingDown
+                        ? 'opacity-0 translate-y-10 pointer-events-none'
+                        : 'opacity-100 translate-y-0'
+                        }`}
+                >
+                    <Link
+                        href="/products/new"
+                        className="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:scale-110 active:scale-95 transition-transform"
+                        title="Add Product"
+                    >
+                        <PlusSignIcon size={28} strokeWidth={3} />
+                    </Link>
+                </div>
+            )}
         </>
     );
 }

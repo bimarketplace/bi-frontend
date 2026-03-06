@@ -56,6 +56,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     const [loading, setLoading] = useState(true);
     const [commentText, setCommentText] = useState("");
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+    const [isSharing, setIsSharing] = useState(false);
 
     useEffect(() => {
         const getProduct = async () => {
@@ -90,22 +91,68 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     };
 
     const handleShare = async () => {
+        setIsSharing(true);
+        const toastId = toast.loading("Preparing share image...");
         try {
             await shareProduct(product!.id);
-            if (navigator.share) {
-                await navigator.share({
-                    title: product!.name,
-                    text: product!.description,
-                    url: window.location.href,
+
+            // Dynamically import html-to-image
+            const htmlToImage = await import('html-to-image');
+            const element = document.getElementById("share-card-container");
+            let file: File | null = null;
+
+            if (element) {
+                const blob = await htmlToImage.toBlob(element, {
+                    backgroundColor: "#ffffff",
+                    pixelRatio: 2,
+                    style: {
+                        transform: 'none',  // Ensure container transforms don't mess up rendering
+                    }
                 });
-            } else {
-                await navigator.clipboard.writeText(window.location.href);
-                toast.success("Link copied to clipboard!");
+
+                if (blob) {
+                    file = new File([blob], `product-${product!.id}.png`, { type: 'image/png' });
+                }
             }
+
+            const shareData: any = {
+                title: product!.name,
+                text: `${product!.name}\n${product!.description}\n\nCheck out this product on BIMARKETPLACE!`,
+                url: window.location.href,
+            };
+
+            if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
+                shareData.files = [file];
+            }
+
+            if (navigator.share) {
+                await navigator.share(shareData);
+                toast.success("Shared successfully!", { id: toastId });
+            } else {
+                await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                if (file) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(file);
+                    link.download = `product-${product!.id}.png`;
+                    link.click();
+                    URL.revokeObjectURL(link.href);
+                    toast.success("Link copied & image downloaded!", { id: toastId });
+                } else {
+                    toast.success("Link copied to clipboard!", { id: toastId });
+                }
+            }
+
             const updatedProduct = await fetchProductById(product!.id);
             setProduct(updatedProduct);
-        } catch (error) {
+        } catch (error: any) {
             console.error("Share error:", error);
+            if (error.name !== "AbortError") {
+                toast.error("Failed to share", { id: toastId });
+            } else {
+                toast.dismiss(toastId);
+            }
+        } finally {
+            setIsSharing(false);
         }
     };
 
@@ -197,31 +244,36 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                     </div>
 
                                     <div className="flex gap-2 ml-auto">
-                                        <button 
+                                        <button
                                             onClick={() => handleVote(1)}
                                             className="h-14 px-6 gap-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-900 rounded-2xl flex items-center justify-center transition-all font-bold border border-zinc-100"
                                         >
                                             <ThumbsUpIcon size={20} />
                                             <span>{product.vote_score}</span>
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={() => handleVote(-1)}
                                             className="h-14 w-14 bg-zinc-50 hover:bg-red-50 hover:text-red-500 text-zinc-400 rounded-2xl flex items-center justify-center transition-all border border-zinc-100"
                                         >
                                             <ThumbsDownIcon size={20} />
                                         </button>
-                                        <button 
+                                        <button
                                             onClick={handleShare}
-                                            className="h-14 px-6 gap-2 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 rounded-2xl flex items-center justify-center transition-all font-bold"
+                                            disabled={isSharing}
+                                            className="h-14 px-6 gap-2 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 rounded-2xl flex items-center justify-center transition-all font-bold disabled:opacity-50"
                                         >
-                                            <Share01Icon size={20} />
+                                            {isSharing ? (
+                                                <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+                                            ) : (
+                                                <Share01Icon size={20} />
+                                            )}
                                             <span>{product.share_count}</span>
                                         </button>
                                     </div>
                                 </div>
 
                                 {product.whatsapp_link && (
-                                    <a 
+                                    <a
                                         href={`${product.whatsapp_link}${encodeURIComponent(`\n\nProduct Link: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
@@ -300,6 +352,27 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                 </form>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            {/* Hidden Share Card for screenshot generation */}
+            <div className="fixed top-[-9999px] left-[-9999px]">
+                <div id="share-card-container" className="w-[600px] bg-white rounded-3xl p-8 border border-gray-100 flex flex-col gap-6 font-sans text-black">
+                    <div className="flex items-center gap-4">
+                        <span className="text-[28px] font-extrabold tracking-tighter italic text-black">BIMARKETPLACE</span>
+                    </div>
+                    {product.image_url ? (
+                        <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden">
+                            <img src={product.image_url} alt={product.name} crossOrigin="anonymous" className="w-full h-full object-cover" />
+                        </div>
+                    ) : null}
+                    <div>
+                        <h1 className="text-3xl font-black text-zinc-900 mb-2 leading-tight">{product.name}</h1>
+                        <p className="text-2xl font-bold text-zinc-500">₦{parseFloat(product.price).toLocaleString()}</p>
+                    </div>
+                    <div className="pt-6 border-t border-gray-100 flex justify-between items-center text-zinc-500 font-bold">
+                        <span>By {product.seller.username}</span>
+                        <span>bimarketplace.org</span>
                     </div>
                 </div>
             </div>
