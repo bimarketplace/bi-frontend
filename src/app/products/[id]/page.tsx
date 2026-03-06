@@ -104,16 +104,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 const element = document.getElementById("share-card-container");
 
                 if (element) {
-                    // Use Promise.race to enforce a 2-second timeout to prevent Safari
-                    // from dropping the user-gesture token required for navigator.share()
-                    const blob = await Promise.race([
-                        htmlToImage.toBlob(element, {
-                            backgroundColor: "#ffffff",
-                            pixelRatio: 2,
-                            style: { transform: 'none' }
-                        }),
-                        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000))
-                    ]);
+                    const blob = await htmlToImage.toBlob(element, {
+                        backgroundColor: "#ffffff",
+                        pixelRatio: 1.5, // optimal ratio for WhatsApp size vs quality
+                        style: { transform: 'none' },
+                        cacheBust: true, // prevents cross-origin caching bugs
+                    });
 
                     if (blob) {
                         file = new File([blob], `product-${product!.id}.jpeg`, { type: 'image/jpeg' });
@@ -123,19 +119,31 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 console.warn("Could not generate share image, falling back to text only:", imageError);
             }
 
+            const currentUrl = window.location.href;
+            const fullText = `${product!.name}\n${product!.description}\n\nCheck it out on BIMARKETPLACE: ${currentUrl}`;
+
             const shareData: any = {
                 title: product!.name,
-                text: `${product!.name}\n${product!.description}\n\nCheck out this product on BIMARKETPLACE!`,
-                url: window.location.href,
             };
 
             if (file && navigator.canShare && navigator.canShare({ files: [file] })) {
                 shareData.files = [file];
+                shareData.text = fullText;
+                // CRITICAL FOR WHATSAPP: Do NOT include `url` when passing `files`. 
+                // If `url` is present, WhatsApp prioritizes it as a Link preview and silently discards the Image file.
+            } else {
+                shareData.text = fullText;
+                shareData.url = currentUrl;
             }
 
             if (navigator.share) {
-                await navigator.share(shareData);
-                toast.success("Shared successfully!", { id: toastId });
+                try {
+                    await navigator.share(shareData);
+                    toast.success("Shared successfully!", { id: toastId });
+                } catch (shareErr: any) {
+                    // Fallback to clipboard if share drops out
+                    throw shareErr;
+                }
             } else {
                 await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
                 if (file) {
