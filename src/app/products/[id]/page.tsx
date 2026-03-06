@@ -94,24 +94,37 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         setIsSharing(true);
         const toastId = toast.loading("Preparing share image...");
         try {
-            await shareProduct(product!.id);
+            // FIRE AND FORGET: Do not await this, or Mobile OS gesture timeout will expire!
+            shareProduct(product!.id).catch(console.error);
 
             let file: File | null = null;
 
             try {
                 if (product!.image_url) {
-                    // Fetch the original image directly
-                    const response = await fetch(product!.image_url, { mode: 'cors' });
+                    // FORCE HTTPS to prevent 'Mixed Content' network block errors in production
+                    const secureImageUrl = product!.image_url.replace(/^http:\/\//i, 'https://');
+
+                    // Fetch the original image directly with a strict 800ms timeout
+                    // Mobile browsers (Safari/Chrome) revoke the Share gesture if we wait too long
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 800);
+
+                    const response = await fetch(secureImageUrl, {
+                        mode: 'cors',
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+
                     const blob = await response.blob();
 
-                    // Determine extension based on content type
                     const contentType = response.headers.get('content-type') || 'image/jpeg';
-                    const extension = contentType.split('/')[1] || 'jpeg';
+                    let extension = contentType.split('/')[1] || 'jpeg';
+                    if (extension === 'svg+xml') extension = 'svg';
 
                     file = new File([blob], `product-${product!.id}.${extension}`, { type: contentType });
                 }
             } catch (imageError) {
-                console.warn("Could not download product image for share, falling back to text only:", imageError);
+                console.warn("Could not download product image (or took too long). Falling back to text only.");
             }
 
             const currentUrl = window.location.href;
@@ -153,8 +166,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 }
             }
 
-            const updatedProduct = await fetchProductById(product!.id);
-            setProduct(updatedProduct);
+            // Update UI state asynchronously to avoid blocking the OS Share dialog
+            fetchProductById(product!.id).then(setProduct).catch(console.error);
         } catch (error: any) {
             console.error("Share error:", error);
             if (error.name !== "AbortError") {
