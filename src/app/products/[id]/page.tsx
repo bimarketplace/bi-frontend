@@ -97,22 +97,30 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             await shareProduct(product!.id);
 
             // Dynamically import html-to-image
-            const htmlToImage = await import('html-to-image');
-            const element = document.getElementById("share-card-container");
             let file: File | null = null;
 
-            if (element) {
-                const blob = await htmlToImage.toBlob(element, {
-                    backgroundColor: "#ffffff",
-                    pixelRatio: 2,
-                    style: {
-                        transform: 'none',  // Ensure container transforms don't mess up rendering
-                    }
-                });
+            try {
+                const htmlToImage = await import('html-to-image');
+                const element = document.getElementById("share-card-container");
 
-                if (blob) {
-                    file = new File([blob], `product-${product!.id}.png`, { type: 'image/png' });
+                if (element) {
+                    // Use Promise.race to enforce a 2-second timeout to prevent Safari
+                    // from dropping the user-gesture token required for navigator.share()
+                    const blob = await Promise.race([
+                        htmlToImage.toBlob(element, {
+                            backgroundColor: "#ffffff",
+                            pixelRatio: 2,
+                            style: { transform: 'none' }
+                        }),
+                        new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000))
+                    ]);
+
+                    if (blob) {
+                        file = new File([blob], `product-${product!.id}.jpeg`, { type: 'image/jpeg' });
+                    }
                 }
+            } catch (imageError) {
+                console.warn("Could not generate share image, falling back to text only:", imageError);
             }
 
             const shareData: any = {
@@ -133,7 +141,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 if (file) {
                     const link = document.createElement('a');
                     link.href = URL.createObjectURL(file);
-                    link.download = `product-${product!.id}.png`;
+                    link.download = `product-${product!.id}.jpeg`;
                     link.click();
                     URL.revokeObjectURL(link.href);
                     toast.success("Link copied & image downloaded!", { id: toastId });
@@ -210,6 +218,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                     fill
                                     className="object-cover"
                                     unoptimized
+                                    priority
+                                    loading="eager"
                                 />
                                 <div className="absolute text-black top-6 right-6 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl font-black text-xl shadow-xl border border-white/50">
                                     ₦{parseFloat(product.price).toLocaleString()}
