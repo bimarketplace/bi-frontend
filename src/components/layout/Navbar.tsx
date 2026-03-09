@@ -4,7 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-    Search01Icon,
+    // Search01Icon,
     Menu01Icon,
     Alert01Icon,
     Logout01Icon,
@@ -164,7 +164,7 @@ export default function Navbar() {
                                     <PlusSignIcon size={22} strokeWidth={3} />
                                 </Link>
                             )}
-                            <Search01Icon size={22} className="text-gray-500 cursor-pointer hover:text-gray-900 transition-colors" />
+                            {/* <Search01Icon size={22} className="text-gray-500 cursor-pointer hover:text-gray-900 transition-colors" /> */}
                             <button onClick={toggleOffcanvas} className="focus:outline-none group">
                                 <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-gray-900 transition-colors" />
                             </button>
@@ -200,9 +200,9 @@ export default function Navbar() {
                                 My Profile & Listings
                             </Link>
                         )}
-                        <Link href="/products" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 rounded-xl transition-all font-bold">
+                        {/* <Link href="/products" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 rounded-xl transition-all font-bold">
                             All Products
-                        </Link>
+                        </Link> */}
 
                         <div className="border-t border-zinc-100 my-6"></div>
 

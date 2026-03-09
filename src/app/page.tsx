@@ -131,23 +131,40 @@ export default function Home() {
     getProducts();
   }, []);
 
+  const [search, setSearch] = useState("");
+
+  const filteredProducts = products.filter((product) =>
+  product.name.toLowerCase().includes(search.toLowerCase()) ||
+  product.description.toLowerCase().includes(search.toLowerCase()) ||
+  product.seller?.username?.toLowerCase().includes(search.toLowerCase())
+);
+
   return (
     <div className="min-h-screen bg-zinc-50 font-sans">
       {/* Main Content with padding for fixed header */}
       <main className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[125px]' : 'pt-20'} pb-16 px-4 sm:px-8`}>
+      <div className="my-6 flex justify-center">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full max-w-md px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black"
+          />
+        </div>
         <div className="max-w-6xl mx-auto mt-10">
           {loading ? (
             // Loading state
             <div className="flex justify-center items-center py-16">
               <div className="w-12 h-12 border-4 border-zinc-200 border-t-black rounded-full animate-spin"></div>
             </div>
-          ) : products.length === 0 ? (
+          ) : filteredProducts.length === 0 ? (
             // Empty state
             <EmptyState message="No products found" />
           ) : (
             // Products grid
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
-              {products.map((product) => (
+              {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
