@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { ThumbsUpIcon, ThumbsDownIcon, Message01Icon } from "hugeicons-react";
+import { ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search01Icon } from "hugeicons-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
@@ -143,15 +143,20 @@ export default function Home() {
     <div className="min-h-screen bg-zinc-50 font-sans">
       {/* Main Content with padding for fixed header */}
       <main className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[125px]' : 'pt-20'} pb-16 px-4 sm:px-8`}>
-      <div className="my-6 flex justify-center">
+      <div className="my-8 flex justify-center">
+        <div className="relative w-full max-w-lg group">
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-all duration-300">
+            <Search01Icon size={20} />
+          </div>
           <input
             type="text"
-            placeholder="Search products..."
+            placeholder="Search products, sellers or keywords..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full max-w-md px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black"
+            className="w-full pl-12 pr-4 py-3.5 bg-white rounded-2xl border border-gray-200/60 focus:outline-none focus:ring-[6px] focus:ring-black/5 focus:border-black/30 transition-all duration-500 placeholder:text-gray-400 font-medium shadow-sm hover:shadow-md"
           />
         </div>
+      </div>
         <div className="max-w-6xl mx-auto mt-10">
           {loading ? (
             // Loading state
