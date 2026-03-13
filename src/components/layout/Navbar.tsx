@@ -164,7 +164,6 @@ export default function Navbar() {
                                     <PlusSignIcon size={22} strokeWidth={3} />
                                 </Link>
                             )}
-                            {/* <Search01Icon size={22} className="text-gray-500 cursor-pointer hover:text-gray-900 transition-colors" /> */}
                             <button onClick={toggleOffcanvas} className="focus:outline-none group">
                                 <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-gray-900 transition-colors" />
                             </button>

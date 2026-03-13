@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search01Icon } from "hugeicons-react";
+import { ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search01Icon, GridIcon } from "hugeicons-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
@@ -50,35 +50,52 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const router = useRouter();
+  const { columns } = useGrid();
+
+  // Define responsive styles based on grid columns
+  const isCompact = columns >= 2;
+  const isMini = columns === 3;
 
   return (
     <div
       onClick={() => router.push(`/products/${product.id}`)}
-      className="card w-[360px] rounded-[12px] bg-white p-[20px] border border-gray-200/40 cursor-pointer hover:scale-[1.02] transition-transform duration-200 flex flex-col h-full"
+      className={`card w-full rounded-[12px] bg-white border border-gray-200/40 cursor-pointer hover:scale-[1.02] transition-all duration-200 flex flex-col h-full shadow-sm overflow-hidden ${
+        isMini ? 'p-2' : isCompact ? 'p-3' : 'p-[20px]'
+      }`}
     >
-      <div className="product-profile flex justify-between items-center">
-        <div className="name-seller-price flex items-center">
-          <Avatar name={product.seller?.username || 'Unknown'} />
-          <div className="ml-3">
-            <h2 className="text-sm font-semibold text-gray-800 line-clamp-1">{product.name}</h2>
-            <p className="text-xs text-gray-600 mt-1">{product.seller?.username || 'Unknown Seller'}</p>
+      <div className={`product-profile flex justify-between items-start ${isMini ? 'flex-col' : 'items-center'}`}>
+        <div className="name-seller-price flex items-center min-w-0 flex-1">
+          {!isMini && <Avatar name={product.seller?.username || 'Unknown'} size={isCompact ? 'sm' : 'md'} />}
+          <div className={!isMini ? 'ml-3 min-w-0' : 'min-w-0'}>
+            <h2 className={`font-semibold text-gray-800 truncate ${isMini ? 'text-[10px]' : isCompact ? 'text-xs' : 'text-sm'}`}>
+              {product.name}
+            </h2>
+            {!isMini && (
+              <p className="text-[10px] text-gray-500 mt-0.5 truncate">{product.seller?.username || 'Unknown Seller'}</p>
+            )}
           </div>
         </div>
-        <div className="price">
-          <p className="text-sm font-bold text-gray-900">₦{parseFloat(product.price).toLocaleString()}</p>
+        <div className={`price shrink-0 ${isMini ? 'mt-1' : 'ml-2'}`}>
+          <p className={`font-bold text-gray-900 ${isMini ? 'text-[11px]' : isCompact ? 'text-xs' : 'text-sm'}`}>
+            ₦{parseFloat(product.price).toLocaleString()}
+          </p>
         </div>
       </div>
 
-      <div className="product-info my-4 h-[40px] overflow-hidden">
-        <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.description}</p>
-      </div>
+      {!isMini && (
+        <div className={`product-info overflow-hidden ${isCompact ? 'my-2 h-[32px]' : 'my-4 h-[40px]'}`}>
+          <p className={`text-gray-600 line-clamp-2 ${isCompact ? 'text-[10px]' : 'text-sm'}`}>
+            {product.description}
+          </p>
+        </div>
+      )}
 
-      <div className="relative w-full aspect-[320/185]">
+      <div className={`relative w-full aspect-[320/185] ${isMini ? 'mt-2' : 'mt-0'}`}>
         <Image
           src={product.image_url || "/assets/images/sale-fast.png"}
           alt={product.name || "Product image"}
           fill
-          className="rounded-[12px] object-cover"
+          className="rounded-[8px] object-cover"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.src = "/assets/images/placeholder.png";
@@ -86,18 +103,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
         />
       </div>
 
-      <div className="product-actions flex gap-6 mt-auto pt-4 border-t border-gray-200">
-        <div className="flex items-center gap-2 text-gray-400">
-          <ThumbsUpIcon size={18} />
-          <span className="text-xs font-medium">{product.vote_score || 0}</span>
+      <div className={`product-actions flex items-center border-t border-gray-100 ${
+        isMini ? 'gap-2 mt-2 pt-2 justify-between' : isCompact ? 'gap-3 mt-3 pt-3' : 'gap-6 mt-auto pt-4'
+      }`}>
+        <div className="flex items-center gap-1 text-gray-400">
+          <ThumbsUpIcon size={isMini ? 12 : 16} />
+          <span className={`${isMini ? 'text-[9px]' : 'text-xs'} font-medium`}>{product.vote_score || 0}</span>
         </div>
-        <div className="flex items-center gap-2 text-gray-400">
-          <ThumbsDownIcon size={18} />
-          <span className="text-xs font-medium">0</span>
-        </div>
-        <div className="flex items-center gap-2 text-gray-400">
-          <Message01Icon size={18} />
-          <span className="text-xs font-medium">{product.comments?.length || 0}</span>
+        {!isMini && (
+          <div className="flex items-center gap-1 text-gray-400">
+            <ThumbsDownIcon size={16} />
+            <span className="text-xs font-medium">0</span>
+          </div>
+        )}
+        <div className="flex items-center gap-1 text-gray-400">
+          <Message01Icon size={isMini ? 12 : 16} />
+          <span className={`${isMini ? 'text-[9px]' : 'text-xs'} font-medium`}>{product.comments?.length || 0}</span>
         </div>
       </div>
     </div>
@@ -105,11 +126,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
 };
 
 import { fetchProducts } from "@/lib/products";
+import { useGrid } from "@/context/GridContext";
 
 export default function Home() {
   const { data: session } = useSession();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { columns, toggleColumns } = useGrid();
 
   const user = session?.user;
   const isLoggedIn = !!session;
@@ -143,8 +166,8 @@ export default function Home() {
     <div className="min-h-screen bg-zinc-50 font-sans">
       {/* Main Content with padding for fixed header */}
       <main className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[125px]' : 'pt-20'} pb-16 px-4 sm:px-8`}>
-      <div className="my-8 flex justify-center">
-        <div className="relative w-full max-w-lg group">
+      <div className="my-8 flex justify-center items-center gap-3 w-full max-w-lg mx-auto">
+        <div className="relative flex-1 group">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-all duration-300">
             <Search01Icon size={20} />
           </div>
@@ -156,6 +179,16 @@ export default function Home() {
             className="w-full pl-12 pr-4 py-3.5 bg-white rounded-2xl border border-gray-200/60 focus:outline-none focus:ring-[6px] focus:ring-black/5 focus:border-black/30 transition-all duration-500 placeholder:text-gray-400 font-medium shadow-sm hover:shadow-md"
           />
         </div>
+        
+        {/* Mobile-only Grid Toggle */}
+        <button 
+          onClick={toggleColumns}
+          className="sm:hidden p-3.5 bg-white rounded-2xl border border-gray-200/60 text-gray-500 hover:text-black hover:border-black/30 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
+          title="Toggle layout"
+        >
+          <GridIcon size={20} />
+          <span className="text-[11px] font-extrabold">{columns}</span>
+        </button>
       </div>
         <div className="max-w-6xl mx-auto mt-10">
           {loading ? (
@@ -168,7 +201,11 @@ export default function Home() {
             <EmptyState message="No products found" />
           ) : (
             // Products grid
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+            <div className={`grid gap-5 justify-items-center transition-all duration-300 ${
+              columns === 1 ? 'grid-cols-1' : 
+              columns === 2 ? 'grid-cols-2' : 
+              'grid-cols-3'
+            } md:grid-cols-2 lg:grid-cols-3 w-full`}>
               {filteredProducts.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

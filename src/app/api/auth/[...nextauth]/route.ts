@@ -67,7 +67,7 @@ const SIGN_IN_HANDLERS: Record<string, (user: any, account: any) => Promise<bool
 
 const SIGN_IN_PROVIDERS = Object.keys(SIGN_IN_HANDLERS);
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: 'jwt',
