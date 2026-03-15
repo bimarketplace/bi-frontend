@@ -11,8 +11,13 @@ export interface ProductCreateData {
 }
 
 export const fetchProducts = async () => {
-    const response = await axios.get(`${API_URL}/api/products/`);
-    return response.data;
+    const response = await fetch(`${API_URL}/api/products/`, {
+        next: { revalidate: 60 } // Cache for 60 seconds
+    });
+    if (!response.ok) {
+        throw new Error('Failed to fetch products');
+    }
+    return response.json();
 };
 
 export const createProduct = async (data: ProductCreateData, token: string) => {
