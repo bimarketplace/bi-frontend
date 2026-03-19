@@ -45,6 +45,7 @@ interface Product {
     share_count: number;
     whatsapp_link?: string;
     comments: Comment[];
+    user_vote: number;
     product_type: string;
 }
 
@@ -61,7 +62,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     useEffect(() => {
         const getProduct = async () => {
             try {
-                const data = await fetchProductById(parseInt(id));
+                const data = await fetchProductById(parseInt(id), (session as any)?.access_token);
                 setProduct(data);
             } catch (error) {
                 console.error("Fetch error:", error);
@@ -73,20 +74,60 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         };
 
         if (id) getProduct();
-    }, [id, router]);
+    }, [id, router, session]);
 
     const handleVote = async (value: number) => {
         if (!session?.access_token) {
             toast.error("Please sign in to access this feature");
             return;
         }
+
+        if (!product) return;
+
+        // Store original state for potential revert
+        const originalProduct = { ...product };
+
+        // Calculate optimistic update
+        let newVoteScore = product.vote_score;
+        let newUserVote = 0;
+
+        if (product.user_vote === value) {
+            // Unvoting (returning to 0)
+            newVoteScore -= value;
+            newUserVote = 0;
+        } else if (product.user_vote === 0) {
+            // Initial voting from neutral
+            newVoteScore += value;
+            newUserVote = value;
+        } else {
+            // Reversing the vote (e.g. from 1 to -1)
+            newVoteScore += (value * 2);
+            newUserVote = value;
+        }
+
+        // Apply optimistic UI change
+        setProduct({
+            ...product,
+            vote_score: newVoteScore,
+            user_vote: newUserVote
+        });
+
         try {
-            await castVote(product!.id, value, (session as any).access_token);
-            const updatedProduct = await fetchProductById(product!.id);
+            await castVote(product.id, value, (session as any).access_token);
+            // Re-fetch in background to ensure sync with actual DB state
+            const updatedProduct = await fetchProductById(product.id, (session as any).access_token);
             setProduct(updatedProduct);
-            toast.success(value > 0 ? "Upvoted!" : "Downvoted!");
+            
+            // Show toast based on final outcome
+            if (newUserVote === 0) {
+                toast.success("Vote removed");
+            } else {
+                toast.success(value > 0 ? "Upvoted!" : "Downvoted!");
+            }
         } catch (error) {
-            toast.error("Failed to cast vote");
+            // Revert on failure
+            setProduct(originalProduct);
+            toast.error("Failed to cast vote. Retrying...");
         }
     };
 
@@ -96,6 +137,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         try {
             // FIRE AND FORGET: Do not await this, or Mobile OS gesture timeout will expire!
             shareProduct(product!.id).catch(console.error);
+
+            // Optimistic update
+            setProduct(prev => prev ? { ...prev, share_count: (prev.share_count || 0) + 1 } : null);
 
             let file: File | null = null;
 
@@ -167,7 +211,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             }
 
             // Update UI state asynchronously to avoid blocking the OS Share dialog
-            fetchProductById(product!.id).then(setProduct).catch(console.error);
+            fetchProductById(product!.id, (session as any)?.access_token).then(setProduct).catch(console.error);
         } catch (error: any) {
             console.error("Share error:", error);
             if (error.name !== "AbortError") {
@@ -272,16 +316,24 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                     <div className="flex gap-2 ml-auto">
                                         <button
                                             onClick={() => handleVote(1)}
-                                            className="h-14 px-6 gap-2 bg-zinc-50 hover:bg-zinc-100 text-zinc-900 rounded-2xl flex items-center justify-center transition-all font-bold border border-zinc-100"
+                                            className={`h-14 px-6 gap-2 rounded-2xl flex items-center justify-center transition-all font-bold border ${
+                                                product.user_vote === 1 
+                                                ? "bg-green-50 text-green-600 border-green-200 shadow-sm" 
+                                                : "bg-zinc-50 hover:bg-zinc-100 text-zinc-900 border-zinc-100"
+                                            }`}
                                         >
-                                            <ThumbsUpIcon size={20} />
+                                            <ThumbsUpIcon size={20} fill={product.user_vote === 1 ? "currentColor" : "none"} />
                                             <span>{product.vote_score}</span>
                                         </button>
                                         <button
                                             onClick={() => handleVote(-1)}
-                                            className="h-14 w-14 bg-zinc-50 hover:bg-red-50 hover:text-red-500 text-zinc-400 rounded-2xl flex items-center justify-center transition-all border border-zinc-100"
+                                            className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-all border ${
+                                                product.user_vote === -1 
+                                                ? "bg-red-50 text-red-600 border-red-200 shadow-sm" 
+                                                : "bg-zinc-50 hover:bg-red-50 hover:text-red-500 text-zinc-400 border-zinc-100"
+                                            }`}
                                         >
-                                            <ThumbsDownIcon size={20} />
+                                            <ThumbsDownIcon size={20} fill={product.user_vote === -1 ? "currentColor" : "none"} />
                                         </button>
                                         <button
                                             onClick={handleShare}

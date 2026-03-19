@@ -63,8 +63,9 @@ export const updateProduct = async (id: number, data: Partial<ProductCreateData>
     return response.data;
 };
 
-export const fetchProductById = async (id: number) => {
-    const response = await axios.get(`${API_URL}/api/products/${id}/`);
+export const fetchProductById = async (id: number, token?: string) => {
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+    const response = await axios.get(`${API_URL}/api/products/${id}/`, { headers });
     return response.data;
 };
 
