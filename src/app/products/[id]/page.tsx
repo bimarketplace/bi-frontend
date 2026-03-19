@@ -77,7 +77,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
     const handleVote = async (value: number) => {
         if (!session?.access_token) {
-            toast.error("Please sign in to vote");
+            toast.error("Please sign in to access this feature");
             return;
         }
         try {
@@ -183,7 +183,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     const handleCommentSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!session?.access_token) {
-            toast.error("Please sign in to comment");
+            toast.error("Please sign in to access this feature");
             return;
         }
         if (!commentText.trim()) return;

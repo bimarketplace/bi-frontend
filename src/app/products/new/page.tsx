@@ -70,7 +70,7 @@ export default function CreateProductPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!session?.access_token) {
-            toast.error("You must be logged in");
+            toast.error("Please sign in to access this feature");
             return;
         }
 

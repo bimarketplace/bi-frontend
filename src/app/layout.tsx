@@ -12,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BIMARKETPLACE",
+  title: "BI",
   description: "Marketplace for your products",
   manifest: "/manifest.json",
 };
