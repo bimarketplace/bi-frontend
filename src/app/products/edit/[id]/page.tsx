@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { fetchProducts, updateProduct } from "@/lib/products";
+import { fetchCategories, Category } from "@/lib/categories";
 import { toast } from "react-hot-toast";
 import {
     ArrowLeft02Icon,
@@ -22,13 +23,15 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     const [isLoading, setIsLoading] = useState(false);
     const [isFetching, setIsFetching] = useState(true);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     const [formData, setFormData] = useState({
         name: '',
         price: '',
         description: '',
         product_type: 'physical',
-        image: null as File | null
+        image: null as File | null,
+        category: '' as string | number
     });
 
     useEffect(() => {
@@ -42,7 +45,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         price: product.price,
                         description: product.description,
                         product_type: product.product_type || 'physical',
-                        image: null
+                        image: null,
+                        category: product.category?.id || ''
                     });
                     setImagePreview(product.image_url);
                 } else {
@@ -59,6 +63,18 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
         if (id) getProduct();
     }, [id, router]);
+
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                const data = await fetchCategories();
+                setCategories(data);
+            } catch (error) {
+                console.error("Failed to load categories:", error);
+            }
+        };
+        loadCategories();
+    }, []);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -184,6 +200,23 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                 >
                                     <option value="physical">Physical Product</option>
                                     <option value="service">Service / Freelance</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-zinc-900 mb-2 uppercase tracking-wider">Category</label>
+                                <select
+                                    required
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className="w-full px-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white focus:border-black transition-all font-bold text-sm appearance-none cursor-pointer"
+                                >
+                                    <option value="">Select a Category</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 

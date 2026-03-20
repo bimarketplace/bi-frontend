@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createProduct } from "@/lib/products";
+import { fetchCategories, Category } from "@/lib/categories";
 import { toast } from "react-hot-toast";
 import {
     ArrowLeft02Icon,
@@ -23,13 +24,15 @@ export default function CreateProductPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [isCheckingProfile, setIsCheckingProfile] = useState(true);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     const [formData, setFormData] = useState({
         name: '',
         price: '',
         description: '',
         product_type: 'physical', // Match backend TextChoices
-        image: null as File | null
+        image: null as File | null,
+        category: '' as string | number
     });
 
     useEffect(() => {
@@ -54,6 +57,18 @@ export default function CreateProductPage() {
             setIsCheckingProfile(false);
         }
     }, [session, router]);
+    
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                const data = await fetchCategories();
+                setCategories(data);
+            } catch (error) {
+                console.error("Failed to load categories:", error);
+            }
+        };
+        loadCategories();
+    }, []);
 
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -70,7 +85,7 @@ export default function CreateProductPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!session?.access_token) {
-            toast.error("You must be logged in");
+            toast.error("Please sign in to access this feature");
             return;
         }
 
@@ -179,6 +194,23 @@ export default function CreateProductPage() {
                                 >
                                     <option value="physical">Physical Product</option>
                                     <option value="service">Service / Freelance</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-zinc-900 mb-2 uppercase tracking-wider">Category</label>
+                                <select
+                                    required
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    className="w-full px-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white focus:border-black transition-all font-bold text-sm appearance-none cursor-pointer"
+                                >
+                                    <option value="">Select a Category</option>
+                                    {categories.map((cat) => (
+                                        <option key={cat.id} value={cat.id}>
+                                            {cat.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 

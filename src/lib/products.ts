@@ -8,6 +8,7 @@ export interface ProductCreateData {
     description: string;
     product_type?: string;
     image?: File | null;
+    category?: string | number | null;
 }
 
 export const fetchProducts = async () => {
@@ -27,6 +28,7 @@ export const createProduct = async (data: ProductCreateData, token: string) => {
     formData.append('description', data.description);
     if (data.product_type) formData.append('product_type', data.product_type);
     if (data.image) formData.append('image', data.image);
+    if (data.category) formData.append('category', data.category.toString());
 
     const response = await axios.post(`${API_URL}/api/products/`, formData, {
         headers: {
@@ -53,6 +55,7 @@ export const updateProduct = async (id: number, data: Partial<ProductCreateData>
     if (data.description) formData.append('description', data.description);
     if (data.product_type) formData.append('product_type', data.product_type);
     if (data.image) formData.append('image', data.image);
+    if (data.category) formData.append('category', data.category.toString());
 
     const response = await axios.patch(`${API_URL}/api/products/${id}/`, formData, {
         headers: {
@@ -63,8 +66,9 @@ export const updateProduct = async (id: number, data: Partial<ProductCreateData>
     return response.data;
 };
 
-export const fetchProductById = async (id: number) => {
-    const response = await axios.get(`${API_URL}/api/products/${id}/`);
+export const fetchProductById = async (id: number, token?: string) => {
+    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+    const response = await axios.get(`${API_URL}/api/products/${id}/`, { headers });
     return response.data;
 };
 

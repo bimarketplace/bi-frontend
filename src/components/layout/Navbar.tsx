@@ -72,6 +72,13 @@ export default function Navbar() {
     const isLoggedIn = !!session;
     const isVerified = (user as any)?.is_verified ?? (user as any)?.email_verified ?? true;
 
+    // Handle session expiry/refresh failure
+    useEffect(() => {
+        if (session?.error === 'RefreshAccessTokenError') {
+            signOut({ callbackUrl: '/auth/login?error=session_expired' });
+        }
+    }, [session]);
+
     const handleResendEmail = async () => {
         if (!user?.email) return;
         setResendStatus('loading');

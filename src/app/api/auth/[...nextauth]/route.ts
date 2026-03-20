@@ -194,9 +194,7 @@ const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token?.error) {
-        session.error = token.error as string;
-      } else if (token) {
+      if (token) {
         const tokenUser = (token.user as any) || {};
 
         session.user = {
@@ -206,6 +204,7 @@ const authOptions: NextAuthOptions = {
         } as any;
 
         session.access_token = token.access_token as string;
+        session.error = token.error as string;
       }
       return session;
     },

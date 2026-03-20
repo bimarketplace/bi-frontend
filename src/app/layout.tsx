@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import Navbar from "@/components/layout/Navbar";
 import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
+import InstallPrompt from '@/components/layout/InstallPrompt';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -11,7 +12,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BIMARKETPLACE",
+  title: "BI",
   description: "Marketplace for your products",
   manifest: "/manifest.json",
 };
@@ -34,6 +35,7 @@ export default function RootLayout({
           <Navbar />
           {children}
           <WhatsAppFloat />
+          <InstallPrompt />
         </Providers>
       </body>
     </html>
