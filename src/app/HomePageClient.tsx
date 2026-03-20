@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
 import { useGrid } from "@/context/GridContext";
+import { Category } from "@/lib/categories";
 
 // Simple Alert icon component
 const AlertIcon = () => (
@@ -42,6 +43,10 @@ export interface Product {
   share_count: number;
   comments: any[];
   whatsapp_link?: string;
+  category?: {
+    id: number;
+    name: string;
+  };
 }
 
 // Product card component with proper typing
@@ -126,20 +131,25 @@ const ProductCard = ({ product }: ProductCardProps) => {
   );
 };
 
-export default function HomePageClient({ initialProducts }: { initialProducts: Product[] }) {
+export default function HomePageClient({ initialProducts, categories }: { initialProducts: Product[], categories: Category[] }) {
   const { data: session } = useSession();
   const { columns, toggleColumns } = useGrid();
   const [search, setSearch] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
   const user = session?.user;
   const isLoggedIn = !!session;
   const isVerified = (user as any)?.is_verified ?? (user as any)?.email_verified ?? true;
 
-  const filteredProducts = initialProducts.filter((product) =>
-    product.name?.toLowerCase().includes(search.toLowerCase()) ||
-    product.description?.toLowerCase().includes(search.toLowerCase()) ||
-    product.seller?.username?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProducts = initialProducts.filter((product) => {
+    const matchesSearch = product.name?.toLowerCase().includes(search.toLowerCase()) ||
+      product.description?.toLowerCase().includes(search.toLowerCase()) ||
+      product.seller?.username?.toLowerCase().includes(search.toLowerCase());
+    
+    const matchesCategory = selectedCategoryId === null || product.category?.id === selectedCategoryId;
+    
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="min-h-screen bg-zinc-50 font-sans">
@@ -166,6 +176,45 @@ export default function HomePageClient({ initialProducts }: { initialProducts: P
             <GridIcon size={20} />
             <span className="text-[11px] font-extrabold">{columns}</span>
           </button>
+        </div>
+
+        {/* Categories Bar */}
+        <div className="max-w-6xl mx-auto mb-8">
+          <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+            <button
+              onClick={() => setSelectedCategoryId(null)}
+              className={`whitespace-nowrap px-6 py-2 rounded-full font-medium transition-all duration-300 border ${
+                selectedCategoryId === null
+                  ? "bg-black text-white border-black shadow-md"
+                  : "bg-white text-gray-600 border-gray-100 hover:border-gray-300"
+              }`}
+            >
+              All Products
+            </button>
+            {categories?.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategoryId(category.id)}
+                className={`flex items-center gap-2 whitespace-nowrap px-6 py-2 rounded-full font-medium transition-all duration-300 border ${
+                  selectedCategoryId === category.id
+                    ? "bg-black text-white border-black shadow-md"
+                    : "bg-white text-gray-600 border-gray-100 hover:border-gray-300"
+                }`}
+              >
+                {category.image_url && (
+                  <div className="relative w-4 h-4 rounded-full overflow-hidden">
+                    <Image
+                      src={category.image_url}
+                      alt={category.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+                {category.name}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="max-w-6xl mx-auto mt-10">
           {initialProducts.length === 0 ? (
