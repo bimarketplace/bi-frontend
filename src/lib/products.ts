@@ -2,6 +2,39 @@ import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
+export interface Product {
+    id: number;
+    seller: {
+        id: number;
+        username: string;
+        email?: string;
+        whatsapp_number?: string;
+        bio?: string;
+        avatar?: string | null;
+        avatar_url?: string | null;
+    };
+    name: string;
+    price: string;
+    description: string;
+    product_type?: string;
+    category?: {
+        id: number;
+        name: string;
+    } | null;
+    image_url?: string;
+    vote_score?: number;
+    share_count?: number;
+    comments?: any[];
+    whatsapp_link?: string;
+}
+
+export interface PaginatedProductsResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: Product[];
+}
+
 export interface ProductCreateData {
     name: string;
     price: string;
@@ -11,14 +44,65 @@ export interface ProductCreateData {
     category?: string | number | null;
 }
 
-export const fetchProducts = async () => {
-    const response = await fetch(`${API_URL}/api/products/`, {
+export const fetchProductsPage = async (url?: string): Promise<PaginatedProductsResponse> => {
+    const endpoint = url || `${API_URL}/api/products/`;
+    const response = await fetch(endpoint, {
         next: { revalidate: 60 } // Cache for 60 seconds
     });
     if (!response.ok) {
         throw new Error('Failed to fetch products');
     }
-    return response.json();
+
+    const payload = await response.json();
+
+    if (Array.isArray(payload)) {
+        return {
+            count: payload.length,
+            next: null,
+            previous: null,
+            results: payload,
+        };
+    }
+
+    if (Array.isArray((payload as any).results)) {
+        return {
+            count: (payload as any).count ?? (payload as any).results.length,
+            next: (payload as any).next ?? null,
+            previous: (payload as any).previous ?? null,
+            results: (payload as any).results,
+        };
+    }
+
+    if (Array.isArray((payload as any).data)) {
+        return {
+            count: (payload as any).count ?? (payload as any).data.length,
+            next: (payload as any).next ?? null,
+            previous: (payload as any).previous ?? null,
+            results: (payload as any).data,
+        };
+    }
+
+    if (Array.isArray((payload as any).products)) {
+        return {
+            count: (payload as any).count ?? (payload as any).products.length,
+            next: (payload as any).next ?? null,
+            previous: (payload as any).previous ?? null,
+            results: (payload as any).products,
+        };
+    }
+
+    console.warn('Unexpected products payload format:', payload);
+    return {
+        count: 0,
+        next: null,
+        previous: null,
+        results: [],
+    };
+};
+
+export const fetchProducts = async (): Promise<Product[]> => {
+    const page = await fetchProductsPage();
+    return page.results;
 };
 
 export const createProduct = async (data: ProductCreateData, token: string) => {

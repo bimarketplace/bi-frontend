@@ -261,7 +261,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <div className="max-w-7xl mx-auto">
                 <Link
                     href="/"
-                    className="flex items-center gap-2 text-zinc-500 hover:text-black mb-8 font-semibold transition-colors w-fit"
+                    className="flex items-center gap-2 text-zinc-500 hover:text-primary-950 mb-8 font-semibold transition-colors w-fit"
                 >
                     <ArrowLeft02Icon size={20} />
                     Back to Feed
@@ -281,7 +281,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                     priority
                                     loading="eager"
                                 />
-                                <div className="absolute text-black top-6 right-6 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl font-black text-xl shadow-xl border border-white/50">
+                                <div className="absolute text-primary-950 top-6 right-6 bg-white/95 backdrop-blur-md px-6 py-3 rounded-2xl font-black text-xl shadow-xl border border-white/50">
                                     ₦{parseFloat(product.price).toLocaleString()}
                                 </div>
                             </div>
@@ -341,7 +341,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                             className="h-14 px-6 gap-2 bg-zinc-100 text-zinc-900 hover:bg-zinc-200 rounded-2xl flex items-center justify-center transition-all font-bold disabled:opacity-50"
                                         >
                                             {isSharing ? (
-                                                <div className="w-5 h-5 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
+                                                <div className="w-5 h-5 border-2 border-primary-600/20 border-t-black rounded-full animate-spin"></div>
                                             ) : (
                                                 <Share01Icon size={20} />
                                             )}
@@ -355,7 +355,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                         href={`${product.whatsapp_link}${encodeURIComponent(`\n\nProduct Link: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-black text-white rounded-[20px] font-black text-lg hover:scale-[1.02] transition-all shadow-xl shadow-black/10"
+                                        className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-primary-600 text-white rounded-[20px] font-black text-lg hover:scale-[1.02] transition-all shadow-xl shadow-primary-900/10"
                                     >
                                         <WhatsappIcon size={24} className="text-[#25D366]" />
                                         Purchase & Inquire
@@ -414,12 +414,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                         onChange={(e) => setCommentText(e.target.value)}
                                         placeholder="Add a comment..."
                                         rows={2}
-                                        className="w-full pl-6 pr-20 py-4 bg-white border border-zinc-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-black/5 focus:border-black transition-all font-medium text-sm resize-none shadow-sm"
+                                        className="w-full pl-6 pr-20 py-4 bg-white border border-zinc-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:border-primary-600 transition-all font-medium text-sm resize-none shadow-sm"
                                     />
                                     <button
                                         type="submit"
                                         disabled={isSubmittingComment || !commentText.trim()}
-                                        className="absolute right-4 bottom-4 w-10 h-10 bg-black text-white rounded-xl flex items-center justify-center hover:bg-zinc-800 transition-all disabled:opacity-30 shadow-md"
+                                        className="absolute right-4 bottom-4 w-10 h-10 bg-primary-600 text-white rounded-xl flex items-center justify-center hover:bg-zinc-800 transition-all disabled:opacity-30 shadow-md"
                                     >
                                         {isSubmittingComment ? (
                                             <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>

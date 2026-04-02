@@ -12,7 +12,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
         <div className="min-h-screen bg-zinc-50 flex flex-col justify-center items-center p-4">
             <div className="w-full max-w-md">
                 <div className="text-center mb-10">
-                    <Link href="/" className="text-[20px] font-bold text-black tracking-tighter">
+                    <Link href="/" className="text-[20px] font-bold text-primary-950 tracking-tighter">
                         BIMARKETPLACE
                     </Link>
                     <h2 className="text-2xl font-semibold text-gray-900 mt-6">{title}</h2>

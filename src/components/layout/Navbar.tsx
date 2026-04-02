@@ -13,7 +13,7 @@ import {
 import { resendEmail } from "@/lib/auth";
 
 // Shared Avatar component
-export const Avatar = ({ name, size = "md" }: { name: string, size?: "sm" | "md" | "lg" | "xl" }) => {
+export const Avatar = ({ name, size = "md", className = "" }: { name: string, size?: "sm" | "md" | "lg" | "xl", className?: string }) => {
     const getInitials = (name: string) => {
         if (!name) return "?";
         return name
@@ -33,7 +33,7 @@ export const Avatar = ({ name, size = "md" }: { name: string, size?: "sm" | "md"
     };
 
     return (
-        <div className={`${sizeClasses[size]} rounded-full bg-zinc-900 flex items-center justify-center text-white font-black border border-zinc-700 shadow-inner shrink-0 leading-none`}>
+        <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-black border border-primary-400 shadow-inner shrink-0 leading-none ${className}`}>
             {getInitials(name)}
         </div>
     );
@@ -99,7 +99,7 @@ export default function Navbar() {
         <>
             {/* Email Verification Banner */}
             {isLoggedIn && !isVerified && (
-                <div className="fixed top-0 left-0 w-full bg-black text-white py-2 px-4 z-[60] flex items-center justify-center gap-3">
+                <div className="fixed top-0 left-0 w-full bg-primary-600 text-white py-2 px-4 z-[60] flex items-center justify-center gap-3">
                     {resendStatus === 'success' ? (
                         <div className="flex items-center gap-2 text-green-400 animate-in fade-in duration-300">
                             <CheckmarkCircle01Icon size={18} />
@@ -127,7 +127,7 @@ export default function Navbar() {
             <header className={`fixed top-0 left-0 w-full py-4 px-4 sm:px-8 z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
                 <div className="w-full flex justify-between items-center mx-auto px-[20px] py-[12px]">
                     <div className="flex items-center gap-8">
-                        <Link href="/" className="text-[18px] text-black font-extrabold tracking-tighter italic hover:opacity-80 transition-opacity">
+                        <Link href="/" className="text-[18px] text-primary-950 font-extrabold tracking-tighter italic hover:text-primary-600 transition-colors">
                             BIMARKETPLACE
                         </Link>
 
@@ -148,10 +148,10 @@ export default function Navbar() {
                     <div className="flex items-center gap-6">
                         {!isLoggedIn ? (
                             <div className="hidden sm:flex items-center gap-6">
-                                <Link href="/auth/login" className="text-[14px] font-semibold text-gray-600 hover:text-black transition-colors">
+                                <Link href="/auth/login" className="text-[14px] font-semibold text-gray-600 hover:text-primary-600 transition-colors">
                                     Sign In
                                 </Link>
-                                <Link href="/auth/signup" className="px-5 py-2.5 bg-black text-white text-[14px] font-bold rounded-[10px] hover:bg-zinc-800 transition-all hover:scale-[1.02] shadow-md shadow-black/5">
+                                <Link href="/auth/signup" className="px-5 py-2.5 bg-primary-600 text-white text-[14px] font-bold rounded-[10px] hover:bg-primary-700 transition-all hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(16,185,129,0.39)]">
                                     Register
                                 </Link>
                             </div>
@@ -164,14 +164,14 @@ export default function Navbar() {
                             {isLoggedIn && (
                                 <Link
                                     href="/products/new"
-                                    className="hidden sm:flex w-10 h-10 bg-black text-white rounded-full items-center justify-center hover:bg-zinc-800 transition-all hover:scale-110 shadow-lg shadow-black/10 mr-2"
+                                    className="hidden sm:flex w-10 h-10 bg-primary-600 text-white rounded-full items-center justify-center hover:bg-primary-700 transition-all hover:scale-110 shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] mr-2"
                                     title="Add Product"
                                 >
                                     <PlusSignIcon size={22} strokeWidth={3} />
                                 </Link>
                             )}
                             <button onClick={toggleOffcanvas} className="focus:outline-none group">
-                                <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-gray-900 transition-colors" />
+                                <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-primary-600 transition-colors" />
                             </button>
                         </div>
                     </div>
@@ -181,7 +181,7 @@ export default function Navbar() {
             {/* Offcanvas Overlay */}
             {isOffcanvasOpen && (
                 <div
-                    className="fixed inset-0 bg-black/5 backdrop-blur-sm z-40 transition-opacity"
+                    className="fixed inset-0 bg-primary-600/5 backdrop-blur-sm z-40 transition-opacity"
                     onClick={closeOffcanvas}
                 />
             )}
@@ -197,11 +197,11 @@ export default function Navbar() {
                     </div>
 
                     <nav className="space-y-4 flex-1">
-                        <Link href="/" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 rounded-xl transition-all font-bold">
+                        <Link href="/" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
                             Home Feed
                         </Link>
                         {isLoggedIn && (
-                            <Link href="/profile" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 rounded-xl transition-all font-bold">
+                            <Link href="/profile" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
                                 My Profile & Listings
                             </Link>
                         )}
@@ -213,10 +213,10 @@ export default function Navbar() {
 
                         {!isLoggedIn ? (
                             <>
-                                <Link href="/auth/login" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-900 font-bold hover:bg-zinc-50 rounded-xl transition-all">
+                                <Link href="/auth/login" onClick={closeOffcanvas} className="block py-3 px-4 text-primary-950 font-bold hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all">
                                     Sign In
                                 </Link>
-                                <Link href="/auth/signup" onClick={closeOffcanvas} className="block py-3 px-4 bg-black text-white rounded-xl transition-all text-center font-bold mt-4 shadow-lg shadow-black/10">
+                                <Link href="/auth/signup" onClick={closeOffcanvas} className="block py-3 px-4 bg-primary-600 text-white rounded-xl transition-all text-center font-bold mt-4 shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] hover:bg-primary-700">
                                     Get Started
                                 </Link>
                             </>
@@ -262,7 +262,7 @@ export default function Navbar() {
                 >
                     <Link
                         href="/products/new"
-                        className="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:scale-110 active:scale-95 transition-transform"
+                        className="w-14 h-14 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full flex items-center justify-center shadow-[0_8px_30px_rgba(16,185,129,0.4)] hover:scale-110 active:scale-95 transition-transform"
                         title="Add Product"
                     >
                         <PlusSignIcon size={28} strokeWidth={3} />

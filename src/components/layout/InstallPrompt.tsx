@@ -78,10 +78,10 @@ export default function InstallPrompt() {
 
   return (
     <div className="fixed bottom-6 left-4 right-4 md:left-auto md:right-8 md:w-[400px] z-[100] animate-in slide-in-from-bottom-10 duration-500">
-      <div className="relative bg-white/90 backdrop-blur-2xl px-6 py-6 rounded-[32px] border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-black/[0.05]">
+      <div className="relative bg-white/90 backdrop-blur-2xl px-6 py-6 rounded-[32px] border border-white/50 shadow-[0_20px_50px_rgba(0,0,0,0.1)] ring-1 ring-primary-600/[0.05]">
         <button 
           onClick={handleDismiss}
-          className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-black hover:bg-zinc-100 rounded-full transition-all"
+          className="absolute top-4 right-4 p-2 text-zinc-400 hover:text-primary-950 hover:bg-zinc-100 rounded-full transition-all"
           aria-label="Dismiss"
         >
           <Cancel01Icon size={20} />
@@ -128,7 +128,7 @@ export default function InstallPrompt() {
             </div>
             <button
               onClick={handleDismiss}
-              className="w-full py-3.5 bg-black text-white rounded-2xl font-black text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-xl shadow-black/10 flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-primary-600 text-white rounded-2xl font-black text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 flex items-center justify-center gap-2"
             >
               Okay, I got it
             </button>
@@ -143,7 +143,7 @@ export default function InstallPrompt() {
             </button>
             <button
               onClick={handleInstallClick}
-              className="flex-[1.5] py-3.5 bg-black text-white rounded-2xl font-black text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-xl shadow-black/10 flex items-center justify-center gap-2"
+              className="flex-[1.5] py-3.5 bg-primary-600 text-white rounded-2xl font-black text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 flex items-center justify-center gap-2"
             >
               <Download01Icon size={20} />
               Install Now

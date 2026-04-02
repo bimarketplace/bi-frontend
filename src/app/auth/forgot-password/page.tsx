@@ -15,7 +15,7 @@ export default function ForgotPasswordPage() {
                 subtitle="We've sent a password reset link to your email address"
             >
                 <div className="text-center space-y-6">
-                    <div className="mx-auto w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center text-black mb-4">
+                    <div className="mx-auto w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center text-primary-950 mb-4">
                         <Mail01Icon size={32} />
                     </div>
                     <p className="text-sm text-gray-600">
@@ -23,13 +23,13 @@ export default function ForgotPasswordPage() {
                     </p>
                     <button
                         onClick={() => setIsSubmitted(false)}
-                        className="w-full border border-gray-200 text-black rounded-[12px] py-3 text-sm font-semibold hover:bg-gray-50 transition-colors"
+                        className="w-full border border-gray-200 text-primary-950 rounded-[12px] py-3 text-sm font-semibold hover:bg-gray-50 transition-colors"
                     >
                         Try again
                     </button>
                     <Link
                         href="/auth/login"
-                        className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-black transition-colors"
+                        className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-primary-950 transition-colors"
                     >
                         <ArrowLeft01Icon size={18} />
                         Back to login
@@ -55,7 +55,7 @@ export default function ForgotPasswordPage() {
                             <input
                                 type="email"
                                 required
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all text-sm"
+                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
                                 placeholder="name@example.com"
                             />
                         </div>
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
 
                     <button
                         type="submit"
-                        className="w-full bg-black text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-black/10 mt-2"
+                        className="w-full bg-primary-600 text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10 mt-2"
                     >
                         Reset password
                     </button>
@@ -71,7 +71,7 @@ export default function ForgotPasswordPage() {
 
                 <Link
                     href="/auth/login"
-                    className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-black transition-colors"
+                    className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-primary-950 transition-colors"
                 >
                     <ArrowLeft01Icon size={18} />
                     Back to login

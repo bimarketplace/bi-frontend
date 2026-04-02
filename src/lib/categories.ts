@@ -14,5 +14,25 @@ export const fetchCategories = async (): Promise<Category[]> => {
     if (!response.ok) {
         throw new Error('Failed to fetch categories');
     }
-    return response.json();
+
+    const payload = await response.json();
+
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+
+    if (Array.isArray((payload as any).categories)) {
+        return (payload as any).categories;
+    }
+
+    if (Array.isArray((payload as any).results)) {
+        return (payload as any).results;
+    }
+
+    if (Array.isArray((payload as any).data)) {
+        return (payload as any).data;
+    }
+
+    console.warn('Unexpected categories payload format:', payload);
+    return [];
 };

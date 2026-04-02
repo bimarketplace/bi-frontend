@@ -47,7 +47,7 @@ function VerifyEmailContent() {
             {status === 'loading' && (
                 <>
                     <div className="mb-6">
-                        <Loading03Icon className="animate-spin text-black" size={48} />
+                        <Loading03Icon className="animate-spin text-primary-950" size={48} />
                     </div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-2">Verifying your email</h2>
                     <p className="text-gray-500">Please wait while we confirm your account...</p>
@@ -66,7 +66,7 @@ function VerifyEmailContent() {
                     </p>
                     <Link
                         href="/auth/login"
-                        className="w-full bg-black text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-black/10"
+                        className="w-full bg-primary-600 text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10"
                     >
                         Sign in now
                     </Link>
@@ -85,13 +85,13 @@ function VerifyEmailContent() {
                     <div className="flex flex-col gap-3 w-full">
                         <Link
                             href="/auth/signup"
-                            className="w-full bg-black text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors"
+                            className="w-full bg-primary-600 text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors"
                         >
                             Back to Register
                         </Link>
                         <Link
                             href="/"
-                            className="text-sm font-medium text-gray-600 hover:text-black transition-colors"
+                            className="text-sm font-medium text-gray-600 hover:text-primary-950 transition-colors"
                         >
                             Go Home
                         </Link>
@@ -110,7 +110,7 @@ export default function VerifyEmailPage() {
         >
             <Suspense fallback={
                 <div className="flex justify-center py-20">
-                    <Loading03Icon className="animate-spin text-black" size={32} />
+                    <Loading03Icon className="animate-spin text-primary-950" size={32} />
                 </div>
             }>
                 <VerifyEmailContent />

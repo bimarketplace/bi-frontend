@@ -83,7 +83,7 @@ function LoginContent() {
                             required
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                            className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all text-sm"
+                            className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
                             placeholder="name@example.com"
                         />
                     </div>
@@ -94,7 +94,7 @@ function LoginContent() {
                         <label className="block text-sm font-medium text-gray-700">Password</label>
                         <Link
                             href="/auth/forgot-password"
-                            className="text-xs font-semibold text-black hover:underline"
+                            className="text-xs font-semibold text-primary-950 hover:underline"
                         >
                             Forgot password?
                         </Link>
@@ -108,7 +108,7 @@ function LoginContent() {
                             required
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            className="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all text-sm"
+                            className="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
                             placeholder="••••••••"
                         />
                         <button
@@ -124,7 +124,7 @@ function LoginContent() {
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full bg-black text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-black/10 mt-2 disabled:opacity-50 flex justify-center items-center gap-2"
+                    className="w-full bg-primary-600 text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10 mt-2 disabled:opacity-50 flex justify-center items-center gap-2"
                 >
                     {isLoading ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -134,7 +134,7 @@ function LoginContent() {
 
             <p className="text-center text-sm text-gray-600">
                 Don't have an account?{' '}
-                <Link href="/auth/signup" className="font-semibold text-black hover:underline">
+                <Link href="/auth/signup" className="font-semibold text-primary-950 hover:underline">
                     Create account
                 </Link>
             </p>

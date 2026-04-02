@@ -61,7 +61,7 @@ export default function SignupPage() {
                         Registration successful! Please check your inbox and verify your email to get started.
                         Redirecting to login...
                     </p>
-                    <Link href="/auth/login" className="text-sm font-semibold text-black underline">
+                    <Link href="/auth/login" className="text-sm font-semibold text-primary-950 underline">
                         Go to login now
                     </Link>
                 </div>
@@ -105,7 +105,7 @@ export default function SignupPage() {
                                 required
                                 value={formData.username}
                                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all text-sm"
+                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
                                 placeholder="johndoe"
                             />
                         </div>
@@ -122,7 +122,7 @@ export default function SignupPage() {
                                 required
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all text-sm"
+                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
                                 placeholder="name@example.com"
                             />
                         </div>
@@ -139,7 +139,7 @@ export default function SignupPage() {
                                 required
                                 value={formData.password1}
                                 onChange={(e) => setFormData({ ...formData, password1: e.target.value, password2: e.target.value })}
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-black/5 focus:border-black transition-all text-sm"
+                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
                                 placeholder="••••••••"
                             />
                         </div>
@@ -147,15 +147,15 @@ export default function SignupPage() {
 
                     <p className="text-[11px] text-gray-500 leading-relaxed px-1">
                         By creating an account, you agree to our{' '}
-                        <Link href="/terms" className="underline hover:text-black transition-colors">Terms of Service</Link>{' '}
+                        <Link href="/terms" className="underline hover:text-primary-950 transition-colors">Terms of Service</Link>{' '}
                         and{' '}
-                        <Link href="/privacy" className="underline hover:text-black transition-colors">Privacy Policy</Link>.
+                        <Link href="/privacy" className="underline hover:text-primary-950 transition-colors">Privacy Policy</Link>.
                     </p>
 
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full bg-black text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-black/10 mt-2 disabled:opacity-50 flex justify-center items-center gap-2"
+                        className="w-full bg-primary-600 text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10 mt-2 disabled:opacity-50 flex justify-center items-center gap-2"
                     >
                         {isLoading ? (
                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -168,7 +168,7 @@ export default function SignupPage() {
 
                 <p className="text-center text-sm text-gray-600">
                     Already have an account?{' '}
-                    <Link href="/auth/login" className="font-semibold text-black hover:underline">
+                    <Link href="/auth/login" className="font-semibold text-primary-950 hover:underline">
                         Sign in
                     </Link>
                 </p>

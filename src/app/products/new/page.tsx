@@ -117,7 +117,7 @@ export default function CreateProductPage() {
             <div className="max-w-3xl mx-auto">
                 <Link
                     href="/profile"
-                    className="flex items-center gap-2 text-zinc-500 hover:text-black mb-8 font-semibold transition-colors w-fit"
+                    className="flex items-center gap-2 text-zinc-500 hover:text-primary-950 mb-8 font-semibold transition-colors w-fit"
                 >
                     <ArrowLeft02Icon size={20} />
                     Back to Profile
@@ -133,7 +133,7 @@ export default function CreateProductPage() {
                         {/* Image Upload Area */}
                         <div>
                             <label className="block text-sm font-bold text-zinc-900 mb-4 uppercase tracking-wider">Product Image</label>
-                            <label className="relative group cursor-pointer block rounded-[24px] overflow-hidden aspect-video bg-zinc-50 border-2 border-dashed border-zinc-200 hover:border-black transition-all">
+                            <label className="relative group cursor-pointer block rounded-[24px] overflow-hidden aspect-video bg-zinc-50 border-2 border-dashed border-zinc-200 hover:border-primary-600 transition-all">
                                 {imagePreview ? (
                                     <>
                                         <Image
@@ -142,7 +142,7 @@ export default function CreateProductPage() {
                                             fill
                                             className="object-cover"
                                         />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-primary-600/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-[12px] font-bold text-sm flex items-center gap-2">
                                                 <ImageAdd01Icon size={20} />
                                                 Change Image
@@ -150,7 +150,7 @@ export default function CreateProductPage() {
                                         </div>
                                     </>
                                 ) : (
-                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400 group-hover:text-black transition-colors">
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center text-zinc-400 group-hover:text-primary-950 transition-colors">
                                         <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-zinc-50">
                                             <ImageAdd01Icon size={32} />
                                         </div>
@@ -180,7 +180,7 @@ export default function CreateProductPage() {
                                         placeholder="Name of your item"
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white focus:border-black transition-all font-medium text-sm"
+                                        className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-medium text-sm"
                                     />
                                 </div>
                             </div>
@@ -190,7 +190,7 @@ export default function CreateProductPage() {
                                 <select
                                     value={formData.product_type}
                                     onChange={(e) => setFormData({ ...formData, product_type: e.target.value })}
-                                    className="w-full px-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white focus:border-black transition-all font-bold text-sm appearance-none cursor-pointer"
+                                    className="w-full px-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-bold text-sm appearance-none cursor-pointer"
                                 >
                                     <option value="physical">Physical Product</option>
                                     <option value="service">Service / Freelance</option>
@@ -203,7 +203,7 @@ export default function CreateProductPage() {
                                     required
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full px-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white focus:border-black transition-all font-bold text-sm appearance-none cursor-pointer"
+                                    className="w-full px-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-bold text-sm appearance-none cursor-pointer"
                                 >
                                     <option value="">Select a Category</option>
                                     {categories.map((cat) => (
@@ -227,7 +227,7 @@ export default function CreateProductPage() {
                                         placeholder="0.00"
                                         value={formData.price}
                                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                        className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white focus:border-black transition-all font-medium text-sm"
+                                        className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-medium text-sm"
                                     />
                                 </div>
                             </div>
@@ -245,7 +245,7 @@ export default function CreateProductPage() {
                                     placeholder="Tell potential buyers about your item..."
                                     value={formData.description}
                                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-black/5 focus:bg-white focus:border-black transition-all font-medium text-sm resize-none"
+                                    className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[16px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-medium text-sm resize-none"
                                 />
                             </div>
                         </div>
@@ -253,7 +253,7 @@ export default function CreateProductPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-black text-white rounded-[18px] py-5 font-black text-lg hover:bg-zinc-800 transition-all hover:scale-[1.02] shadow-xl shadow-black/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 mt-4"
+                            className="w-full bg-primary-600 text-white rounded-[18px] py-5 font-black text-lg hover:bg-zinc-800 transition-all hover:scale-[1.02] shadow-xl shadow-primary-900/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 mt-4"
                         >
                             {isLoading ? (
                                 <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>
