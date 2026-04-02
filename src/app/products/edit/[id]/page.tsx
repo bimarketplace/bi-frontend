@@ -48,7 +48,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         image: null,
                         category: product.category?.id || ''
                     });
-                    setImagePreview(product.image_url);
+                    setImagePreview(product.image_url || null);
                 } else {
                     toast.error("Product not found");
                     router.push('/profile');

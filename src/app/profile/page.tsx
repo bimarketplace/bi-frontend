@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { fetchProducts, deleteProduct } from "@/lib/products";
+import { fetchProducts, deleteProduct, Product } from "@/lib/products";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -21,18 +21,7 @@ import { toast } from "react-hot-toast";
 import { updateProfile, fetchUserProfile } from "@/lib/auth";
 import { Avatar, CloseIcon } from "@/components/layout/Navbar";
 
-interface Product {
-  id: number;
-  name: string;
-  seller: {
-    username: string;
-  };
-  price: string;
-  description: string;
-  image_url: string;
-  vote_score: number;
-  comments: any[];
-}
+
 
 const EmptyState = () => (
   <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[24px] border border-gray-100 shadow-sm px-6">
