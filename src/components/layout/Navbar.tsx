@@ -3,6 +3,7 @@
 import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
     Menu01Icon,
     Alert01Icon,
@@ -43,6 +44,8 @@ export const Avatar = ({ name, size = "md", variant = "primary", className = "" 
             {getInitials(name)}
         </div>
     );
+    
+   
 };
 
 // Shared Close icon
@@ -101,6 +104,11 @@ export default function Navbar() {
     const toggleOffcanvas = () => setIsOffcanvasOpen(!isOffcanvasOpen);
     const closeOffcanvas = () => setIsOffcanvasOpen(false);
 
+    const phoneNumber = "2349124848282";
+    const message = "Hello BIMARKETPLACE Customer Service, I need assistance.";
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
     return (
         <>
             {/* Email Verification Banner */}
@@ -133,8 +141,14 @@ export default function Navbar() {
             <header className={`fixed top-0 left-0 w-full py-4 px-4 sm:px-8 z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
                 <div className="w-full flex justify-between items-center mx-auto px-[20px] py-[12px]">
                     <div className="flex items-center gap-8">
-                        <Link href="/" className="text-[18px] text-primary-950 font-extrabold tracking-tighter italic hover:text-primary-600 transition-colors">
-                            BIMARKETPLACE
+                        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                            <Image 
+                                src="/assets/images/bi.png" 
+                                alt="BIMARKETPLACE" 
+                                width={200} 
+                                height={120} 
+                                className="h-8 w-auto object-contain"
+                            />
                         </Link>
 
                         {isLoggedIn && (
@@ -203,8 +217,8 @@ export default function Navbar() {
                     </div>
 
                     <nav className="space-y-4 flex-1">
-                        <Link href="/" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
-                            Home Feed
+                        <Link href={whatsappUrl} onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            Contact Support
                         </Link>
                         {isLoggedIn && (
                             <Link href="/profile" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">

@@ -88,6 +88,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
       {/* Content Area */}
       <div className="flex-1 p-3 flex flex-col gap-2">
+
+        {/* Gig Title / Name */}
+        <h3 className="text-[15px] font-normal text-gray-900 line-clamp-2 leading-snug hover:underline">
+          {product.name}
+        </h3>
+
         {/* Seller Info */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -104,15 +110,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
               {product.seller?.username || 'Seller'}
             </span>
           </div>
-          <span className="text-[12px] font-medium text-gray-600">
-            Level 2
-          </span>
         </div>
-
-        {/* Gig Title / Name */}
-        <h3 className="text-[15px] font-normal text-gray-900 line-clamp-2 leading-snug hover:underline">
-          {product.name}
-        </h3>
 
         {/* Rating */}
         <div className="flex items-center gap-1">
@@ -234,29 +232,76 @@ export default function HomePageClient({ initialProducts, categories, initialNex
   return (
     <div className="min-h-screen bg-white font-sans">
       <main className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[125px]' : 'pt-20'} pb-16 px-4 sm:px-8`}>
-        <div className="my-8 flex justify-center items-center gap-3 w-full max-w-lg mx-auto">
-          <div className="relative flex-1 group">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-primary-600 transition-all duration-300">
-              <Search01Icon size={20} />
-            </div>
-            <input
-              type="text"
-              placeholder="Search products, sellers or keywords..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-4 py-3.5 bg-white rounded-2xl border border-primary-100 focus:outline-none focus:ring-[6px] focus:ring-primary-500/10 focus:border-primary-400 transition-all duration-500 placeholder:text-gray-400 font-medium shadow-[0_4px_20px_-4px_rgba(16,185,129,0.1)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)]"
+        {/* Hero Section */}
+        <section className="max-w-6xl mx-auto mt-8 mb-8 px-0 shadow-sm relative overflow-hidden rounded-[20px]">
+          <div className="relative aspect-[16/11] sm:aspect-[24/5] w-full bg-zinc-900 flex items-center p-6 sm:p-12 overflow-hidden transition-all duration-500 group">
+            {/* Background Image */}
+            <Image 
+              src="/assets/images/search_banner.jpg"
+              alt="Search Banner"
+              fill
+              className="object-cover opacity-80"
+              priority
             />
+            <div className="absolute inset-0 bg-black/40" />
+
+            {/* Content Container */}
+            <div className="relative z-10 w-full max-w-3xl">
+              <h1 className="text-xl sm:text-3xl font-extrabold text-white mb-5 tracking-tight max-w-2xl leading-tight">
+                Find your favourite vendors <br /> Hire professionals
+              </h1>
+
+              {/* Search Bar Container */}
+              <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all">
+                <input
+                  type="text"
+                  placeholder="Search for any service..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="flex-1 px-4 py-2 sm:py-2.5 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent sm:text-base"
+                />
+                <button 
+                  className="bg-[#008000] text-white p-2 sm:p-2.5 rounded-md sm:rounded-lg hover:bg-zinc-800 transition-all flex items-center justify-center aspect-square"
+                  aria-label="Search"
+                >
+                  <Search01Icon size={20} />
+                </button>
+              </div>
+
+              {/* Quick Links / Trusted Labels (matching image) */}
+              {/* <div className="flex flex-wrap gap-3 items-center">
+                <span className="text-white/80 text-sm font-bold mr-2 hidden sm:inline-block">Popular:</span>
+                {[
+                  "Website Development", 
+                  "Architecture & Interior Design", 
+                  "UGC Videos", 
+                  "Video Editing", 
+                  "Book Publishing"
+                ].map((tag) => (
+                  <button 
+                    key={tag}
+                    onClick={() => setSearch(tag)}
+                    className="px-4 py-2 bg-transparent hover:bg-white/10 text-white text-xs font-bold border border-white/60 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap"
+                  >
+                    {tag}
+                    <ArrowRight01Icon size={14} className="opacity-70 group-hover:opacity-100" />
+                  </button>
+                ))}
+              </div>
+              */}
+            </div>
+
+            {/* Mobile Layout Toggle */}
+            <button 
+              onClick={toggleColumns}
+              className="absolute bottom-4 right-4 p-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 z-20"
+              title="Toggle layout"
+            >
+              <GridIcon size={16} />
+              <span className="text-[10px] font-bold">{columns}</span>
+            </button>
           </div>
-          
-          <button 
-            onClick={toggleColumns}
-            className="sm:hidden p-3.5 bg-white rounded-2xl border border-primary-100 text-gray-500 hover:text-primary-600 hover:border-primary-400 hover:bg-primary-50 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-1.5"
-            title="Toggle layout"
-          >
-            <GridIcon size={20} />
-            <span className="text-[11px] font-extrabold">{columns}</span>
-          </button>
-        </div>
+        </section>
 
         {/* Categories Bar */}
         <div className="max-w-6xl mx-auto mb-12">
@@ -395,7 +440,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
                     columns === 4 ? 'grid-cols-4' :
                     'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
                   } w-full`}>
-                    {Array.from({ length: 3 }).map((_, index) => (
+                    {Array.from({ length: 4 }).map((_, index) => (
                       <div key={`skeleton-${index}`} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                         <div className="h-28 bg-gray-200 rounded-md mb-4" />
                         <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
