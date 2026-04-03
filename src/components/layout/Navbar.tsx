@@ -194,9 +194,20 @@ export default function Navbar() {
                                 </Link>
                             )}
                             <div className="relative">
+                                {/* Mobile: Link to Notifications Page */}
+                                <Link 
+                                    href="/notifications"
+                                    className="sm:hidden relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
+                                    title="Notifications"
+                                >
+                                    <Notification03Icon size={22} />
+                                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                                </Link>
+
+                                {/* Desktop: Toggle Dropdown */}
                                 <button 
                                     onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                                    className="relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
+                                    className="hidden sm:block relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
                                     title="Notifications"
                                 >
                                     <Notification03Icon size={22} />
@@ -234,8 +245,14 @@ export default function Navbar() {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div className="p-3 text-center bg-zinc-50">
-                                                <button className="text-[12px] font-bold text-[#008000] hover:underline">View all activity</button>
+                                            <div className="p-3 text-center bg-zinc-50 border-t border-zinc-100">
+                                                <Link 
+                                                    href="/notifications"
+                                                    onClick={() => setIsNotificationOpen(false)}
+                                                    className="text-[12px] font-bold text-[#008000] hover:underline"
+                                                >
+                                                    View all activity
+                                                </Link>
                                             </div>
                                         </div>
                                     </>

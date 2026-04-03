@@ -226,39 +226,20 @@ export default function HomePageClient({ initialProducts, categories, initialNex
     return () => observer.disconnect();
   }, [nextPageUrl, isFetchingPage, loadMore]);
 
-  // Simulation: Notification When Someone Likes or Purchases
+  // Welcome notification on initial login
   useEffect(() => {
     if (isLoggedIn) {
-      const timer = setTimeout(() => {
-        toast.success("Someone just liked your product!", {
-          icon: '❤️',
-          duration: 5000,
-          style: {
-            borderRadius: '12px',
-            background: '#333',
-            color: '#fff',
-          },
-        });
-      }, 8000);
-
-      const purchaseTimer = setTimeout(() => {
-        toast("New purchase attempt on your item!", {
-          icon: '🛍️',
-          duration: 6000,
-          style: {
-            borderRadius: '12px',
-            background: '#008000',
-            color: '#fff',
-          },
-        });
-      }, 15000);
-
-      return () => {
-        clearTimeout(timer);
-        clearTimeout(purchaseTimer);
-      };
+      toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
+        icon: '👋',
+        duration: 3000,
+        style: {
+          borderRadius: '12px',
+          background: '#008000',
+          color: '#fff',
+        },
+      });
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, user]);
 
 
 
@@ -287,7 +268,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
               </h1>
 
               {/* Search Bar Container */}
-              <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[60px]">
+              <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
                 <input
                   type="text"
                   placeholder="Search for any service..."
@@ -302,28 +283,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
                   <Search02Icon size={20} />
                 </button>
               </div>
-
-              {/* Quick Links / Trusted Labels (matching image) */}
-              {/* <div className="flex flex-wrap gap-3 items-center">
-                <span className="text-white/80 text-sm font-bold mr-2 hidden sm:inline-block">Popular:</span>
-                {[
-                  "Website Development", 
-                  "Architecture & Interior Design", 
-                  "UGC Videos", 
-                  "Video Editing", 
-                  "Book Publishing"
-                ].map((tag) => (
-                  <button 
-                    key={tag}
-                    onClick={() => setSearch(tag)}
-                    className="px-4 py-2 bg-transparent hover:bg-white/10 text-white text-xs font-bold border border-white/60 rounded-full transition-all flex items-center gap-1.5 whitespace-nowrap"
-                  >
-                    {tag}
-                    <ArrowRight01Icon size={14} className="opacity-70 group-hover:opacity-100" />
-                  </button>
-                ))}
-              </div>
-              */}
+                 
             </div>
 
             {/* Mobile Layout Toggle */}
@@ -434,14 +394,8 @@ export default function HomePageClient({ initialProducts, categories, initialNex
           )}
 
           {isInitialLoading ? (
-            <div className={`grid gap-4 justify-items-center ${
-              columns === 1 ? 'grid-cols-1' :
-              columns === 2 ? 'grid-cols-2' :
-              columns === 3 ? 'grid-cols-3' :
-              columns === 4 ? 'grid-cols-4' :
-              'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-            } w-full`}>
-              {Array.from({ length: 6 }).map((_, index) => (
+            <div className={`grid gap-4 justify-items-center grid-cols-2 lg:grid-cols-4 w-full`}>
+              {Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                   <div className="h-28 bg-gray-200 rounded-md mb-4" />
                   <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
@@ -454,13 +408,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
             <EmptyState message="No matching products found" />
           ) : (
             <>
-              <div className={`grid gap-4 justify-items-center transition-all duration-300 ${
-                columns === 1 ? 'grid-cols-1' : 
-                columns === 2 ? 'grid-cols-2' : 
-                columns === 3 ? 'grid-cols-3' :
-                columns === 4 ? 'grid-cols-4' :
-                'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-              } w-full`}>
+              <div className={`grid gap-4 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -468,13 +416,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
 
               <div ref={observerTarget} className="mt-8 w-full flex justify-center pb-8">
                 {isFetchingPage && (
-                  <div className={`grid gap-4 justify-items-center transition-all duration-300 ${
-                    columns === 1 ? 'grid-cols-1' :
-                    columns === 2 ? 'grid-cols-2' :
-                    columns === 3 ? 'grid-cols-3' :
-                    columns === 4 ? 'grid-cols-4' :
-                    'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
-                  } w-full`}>
+                  <div className={`grid gap-4 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
                     {Array.from({ length: 4 }).map((_, index) => (
                       <div key={`skeleton-${index}`} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                         <div className="h-28 bg-gray-200 rounded-md mb-4" />
