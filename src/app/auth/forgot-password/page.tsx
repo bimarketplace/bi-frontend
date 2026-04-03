@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
 
                     <button
                         type="submit"
-                        className="w-full bg-primary-600 text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10 mt-2"
+                        className="w-full bg-[#008000] text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10 mt-2"
                     >
                         Reset password
                     </button>

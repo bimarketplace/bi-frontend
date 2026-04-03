@@ -2,32 +2,45 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-type GridColumns = 1 | 2 | 3;
+type GridColumns = 1 | 2 | 3 | 4;
 
 interface GridContextType {
-  columns: GridColumns;
+  columns: GridColumns | 'auto';
   toggleColumns: () => void;
 }
 
 const GridContext = createContext<GridContextType | undefined>(undefined);
 
 export function GridProvider({ children }: { children: React.ReactNode }) {
-  const [columns, setColumns] = useState<GridColumns>(3);
+  const [mounted, setMounted] = useState(false);
+  const [columns, setColumns] = useState<GridColumns | 'auto'>('auto');
 
   // Initialize from localStorage on mount
   useEffect(() => {
+    setMounted(true);
     const saved = localStorage.getItem("product-grid-columns");
-    if (saved) {
+    if (saved && saved !== 'auto') {
       setColumns(parseInt(saved) as GridColumns);
     }
   }, []);
 
+  if (!mounted) {
+    // Return the same structure but with default values to avoid mismatch
+    return (
+      <GridContext.Provider value={{ columns: 'auto', toggleColumns: () => {} }}>
+        {children}
+      </GridContext.Provider>
+    );
+  }
+
   const toggleColumns = () => {
     setColumns((prev) => {
-      let next: GridColumns;
-      if (prev === 1) next = 2;
+      let next: GridColumns | 'auto';
+      if (prev === 'auto') next = 1;
+      else if (prev === 1) next = 2;
       else if (prev === 2) next = 3;
-      else next = 1;
+      else if (prev === 3) next = 4;
+      else next = 'auto';
       
       localStorage.setItem("product-grid-columns", next.toString());
       return next;

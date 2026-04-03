@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search01Icon, GridIcon } from "hugeicons-react";
+import { ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search01Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon } from "hugeicons-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
@@ -41,8 +41,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { columns } = useGrid();
 
   // Define responsive styles based on grid columns
-  const isCompact = columns >= 2;
-  const isMini = columns === 3;
+  const isCompact = typeof columns === 'number' && columns >= 2;
+  const isMini = typeof columns === 'number' && columns >= 3;
 
   return (
 <div
@@ -66,36 +66,33 @@ const ProductCard = ({ product }: ProductCardProps) => {
     <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/10 to-primary-950/80" />
     
     {/* Price Badge - Floating on Image */}
-    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-4 py-1.5 rounded-2xl font-bold text-lg shadow-lg border border-primary-100 text-primary-700">
+    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-4 py-1.5 rounded-2xl font-black text-lg shadow-lg border border-black/5 text-zinc-950">
       ₦{parseFloat(product.price || "0").toLocaleString()}
     </div>
   </div>
 
   {/* Content Area */}
   <div className="flex-1 p-6 flex flex-col">
-    {/* Seller + Name */}
-    <div className="flex items-center gap-4">
-      {!isMini && (
+    {/* Product Name - Strong and Clear */}
+    <h3 className={`font-black tracking-tight text-gray-950 line-clamp-2 leading-tight mb-4
+      ${isMini ? 'text-base' : isCompact ? 'text-[17px]' : 'text-xl'}`}>
+      {product.name}
+    </h3>
+
+    {/* Seller - Smaller and Beneath */}
+    {!isMini && (
+      <div className="flex items-center gap-2.5">
         <Avatar 
           name={product.seller?.username || 'Unknown'} 
-          size={isCompact ? 'sm' : 'md'} 
-          className="ring-2 ring-white shadow-sm"
+          size="sm" 
+          variant="light"
+          className="ring-1 ring-gray-100"
         />
-      )}
-      
-      <div className="flex-1 min-w-0">
-        <h3 className={`font-semibold tracking-tight text-gray-900 line-clamp-2 leading-tight
-          ${isMini ? 'text-base' : isCompact ? 'text-[17px]' : 'text-xl'}`}>
-          {product.name}
-        </h3>
-        
-        {!isMini && (
-          <p className="text-gray-500 text-sm mt-1 truncate font-medium">
-            {product.seller?.username || 'Unknown Seller'}
-          </p>
-        )}
+        <p className="text-gray-500 text-[13px] truncate font-bold">
+          {product.seller?.username || 'Unknown Seller'}
+        </p>
       </div>
-    </div>
+    )}
 
     {/* Description */}
     {!isMini && (
@@ -125,12 +122,6 @@ const ProductCard = ({ product }: ProductCardProps) => {
             {product.comments?.length || 0}
           </span>
         </div>
-      </div>
-
-      {/* View Indicator */}
-      <div className="flex items-center gap-1.5 text-xs font-medium text-primary-600 group-hover:text-primary-700 transition-colors">
-        View details
-        <span className="text-base transition-transform group-hover:translate-x-0.5">→</span>
       </div>
     </div>
   </div>
@@ -262,39 +253,89 @@ export default function HomePageClient({ initialProducts, categories, initialNex
         </div>
 
         {/* Categories Bar */}
-        <div className="max-w-6xl mx-auto mb-8">
-          <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="max-w-6xl mx-auto mb-12">
+          <div className="flex justify-between items-end mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+              Most popular categories
+            </h2>
+            <div className="hidden sm:flex gap-2">
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('categories-scroll');
+                  if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
+                }}
+                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
+              >
+                <ArrowLeft02Icon size={20} />
+              </button>
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('categories-scroll');
+                  if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
+                }}
+                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
+              >
+                <ArrowRight02Icon size={20} />
+              </button>
+            </div>
+          </div>
+
+          <div 
+            id="categories-scroll"
+            className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth"
+          >
+            {/* All Products Card */}
             <button
               onClick={() => setSelectedCategoryId(null)}
-              className={`whitespace-nowrap px-6 py-2 rounded-full font-medium transition-all duration-300 border ${
-                selectedCategoryId === null
-                  ? "bg-primary-600 text-white border-primary-600 shadow-[0_4px_14px_0_rgba(16,185,129,0.39)]"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700"
-              }`}
+              className={`flex-none w-[280px] p-4 rounded-[20px] border transition-all duration-300 flex items-center gap-4 text-left group
+                ${selectedCategoryId === null
+                  ? "bg-white border-[#008000] shadow-[0_8px_30px_rgba(0,128,0,0.08)]"
+                  : "bg-white border-gray-100 hover:border-gray-200 hover:shadow-md"
+                }`}
             >
-              All Products
+              <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center transition-colors
+                ${selectedCategoryId === null ? "bg-[#008000]/5 text-[#008000]" : "bg-gray-50 text-gray-400"}`}>
+                <GridIcon size={24} />
+              </div>
+              <span className={`font-bold transition-colors ${selectedCategoryId === null ? "text-[#008000]" : "text-gray-800"}`}>
+                All Products
+              </span>
+              <div className={`ml-auto transition-all ${selectedCategoryId === null ? "text-[#008000] translate-x-1" : "text-gray-300 transform group-hover:translate-x-1 group-hover:text-gray-400"}`}>
+                <ArrowRight01Icon size={20} />
+              </div>
             </button>
+
             {normalizedCategories.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategoryId(category.id)}
-                className={`flex items-center gap-2 whitespace-nowrap px-6 py-2 rounded-full font-medium transition-all duration-300 border ${
-                  selectedCategoryId === category.id
-                    ? "bg-primary-600 text-white border-primary-600 shadow-[0_4px_14px_0_rgba(16,185,129,0.39)]"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700"
-                }`}
+                className={`flex-none w-[280px] p-4 rounded-[20px] border transition-all duration-300 flex items-center gap-4 text-left group
+                  ${selectedCategoryId === category.id
+                    ? "bg-white border-[#008000] shadow-[0_8px_30px_rgba(0,128,0,0.08)]"
+                    : "bg-white border-gray-100 hover:border-gray-200 hover:shadow-md"
+                  }`}
               >
-                {category.image_url && (
-                  <div className="relative w-4 h-4 rounded-full overflow-hidden">
-                    <Image
-                      src={category.image_url}
-                      alt={category.name}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
-                {category.name}
+                <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center overflow-hidden transition-colors
+                  ${selectedCategoryId === category.id ? "bg-[#008000]/5" : "bg-gray-50"}`}>
+                  {category.image_url ? (
+                    <div className="relative w-7 h-7">
+                      <Image
+                        src={category.image_url}
+                        alt={category.name}
+                        fill
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    <GridIcon size={24} className={selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-400"} />
+                  )}
+                </div>
+                <span className={`font-bold transition-colors line-clamp-1 ${selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-800"}`}>
+                  {category.name}
+                </span>
+                <div className={`ml-auto transition-all ${selectedCategoryId === category.id ? "text-[#008000] translate-x-1" : "text-gray-300 transform group-hover:translate-x-1 group-hover:text-gray-400"}`}>
+                  <ArrowRight01Icon size={20} />
+                </div>
               </button>
             ))}
           </div>
@@ -307,11 +348,13 @@ export default function HomePageClient({ initialProducts, categories, initialNex
           )}
 
           {isInitialLoading ? (
-            <div className={`grid gap-5 justify-items-center ${
+            <div className={`grid gap-4 justify-items-center ${
               columns === 1 ? 'grid-cols-1' :
               columns === 2 ? 'grid-cols-2' :
-              'grid-cols-3'
-            } md:grid-cols-3 lg:grid-cols-3 w-full`}>
+              columns === 3 ? 'grid-cols-3' :
+              columns === 4 ? 'grid-cols-4' :
+              'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+            } w-full`}>
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                   <div className="h-28 bg-gray-200 rounded-md mb-4" />
@@ -325,11 +368,13 @@ export default function HomePageClient({ initialProducts, categories, initialNex
             <EmptyState message="No matching products found" />
           ) : (
             <>
-              <div className={`grid gap-5 justify-items-center transition-all duration-300 ${
+              <div className={`grid gap-4 justify-items-center transition-all duration-300 ${
                 columns === 1 ? 'grid-cols-1' : 
                 columns === 2 ? 'grid-cols-2' : 
-                'grid-cols-3'
-              } md:grid-cols-3 lg:grid-cols-3 w-full`}>
+                columns === 3 ? 'grid-cols-3' :
+                columns === 4 ? 'grid-cols-4' :
+                'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+              } w-full`}>
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
@@ -337,11 +382,13 @@ export default function HomePageClient({ initialProducts, categories, initialNex
 
               <div ref={observerTarget} className="mt-8 w-full flex justify-center pb-8">
                 {isFetchingPage && (
-                  <div className={`grid gap-5 justify-items-center transition-all duration-300 ${
+                  <div className={`grid gap-4 justify-items-center transition-all duration-300 ${
                     columns === 1 ? 'grid-cols-1' :
                     columns === 2 ? 'grid-cols-2' :
-                    'grid-cols-3'
-                  } md:grid-cols-3 lg:grid-cols-3 w-full`}>
+                    columns === 3 ? 'grid-cols-3' :
+                    columns === 4 ? 'grid-cols-4' :
+                    'grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+                  } w-full`}>
                     {Array.from({ length: 3 }).map((_, index) => (
                       <div key={`skeleton-${index}`} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                         <div className="h-28 bg-gray-200 rounded-md mb-4" />

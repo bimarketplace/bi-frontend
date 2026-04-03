@@ -149,7 +149,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                                             className="object-cover"
                                             unoptimized
                                         />
-                                        <div className="absolute inset-0 bg-primary-600/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <div className="absolute inset-0 bg-[#008000]/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                             <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-[12px] font-bold text-sm flex items-center gap-2">
                                                 <ImageAdd01Icon size={20} />
                                                 Change Image
@@ -259,7 +259,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-primary-600 text-white rounded-[18px] py-5 font-black text-lg hover:bg-zinc-800 transition-all hover:scale-[1.02] shadow-xl shadow-primary-900/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 mt-4"
+                            className="w-full bg-[#008000] text-white rounded-[18px] py-5 font-black text-lg hover:bg-zinc-800 transition-all hover:scale-[1.02] shadow-xl shadow-primary-900/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 mt-4"
                         >
                             {isLoading ? (
                                 <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin"></div>

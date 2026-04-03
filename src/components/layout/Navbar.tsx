@@ -13,7 +13,7 @@ import {
 import { resendEmail } from "@/lib/auth";
 
 // Shared Avatar component
-export const Avatar = ({ name, size = "md", className = "" }: { name: string, size?: "sm" | "md" | "lg" | "xl", className?: string }) => {
+export const Avatar = ({ name, size = "md", variant = "primary", className = "" }: { name: string, size?: "sm" | "md" | "lg" | "xl", variant?: "primary" | "light", className?: string }) => {
     const getInitials = (name: string) => {
         if (!name) return "?";
         return name
@@ -32,8 +32,13 @@ export const Avatar = ({ name, size = "md", className = "" }: { name: string, si
         xl: "w-24 h-24 text-3xl"
     };
 
+    const variantClasses = {
+        primary: "bg-gradient-to-br from-primary-500 to-primary-700 text-white border-primary-400 font-black shadow-inner",
+        light: "bg-[#f5f5f5] text-zinc-900 border-zinc-100 font-extrabold shadow-sm"
+    };
+
     return (
-        <div className={`${sizeClasses[size]} rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center text-white font-black border border-primary-400 shadow-inner shrink-0 leading-none ${className}`}>
+        <div className={`${sizeClasses[size]} ${variantClasses[variant]} rounded-full flex items-center justify-center shrink-0 leading-none ${className}`}>
             {getInitials(name)}
         </div>
     );
@@ -99,7 +104,7 @@ export default function Navbar() {
         <>
             {/* Email Verification Banner */}
             {isLoggedIn && !isVerified && (
-                <div className="fixed top-0 left-0 w-full bg-primary-600 text-white py-2 px-4 z-[60] flex items-center justify-center gap-3">
+                <div className="fixed top-0 left-0 w-full bg-[#008000] text-white py-2 px-4 z-[60] flex items-center justify-center gap-3">
                     {resendStatus === 'success' ? (
                         <div className="flex items-center gap-2 text-green-400 animate-in fade-in duration-300">
                             <CheckmarkCircle01Icon size={18} />
@@ -151,7 +156,7 @@ export default function Navbar() {
                                 <Link href="/auth/login" className="text-[14px] font-semibold text-gray-600 hover:text-primary-600 transition-colors">
                                     Sign In
                                 </Link>
-                                <Link href="/auth/signup" className="px-5 py-2.5 bg-primary-600 text-white text-[14px] font-bold rounded-[10px] hover:bg-primary-700 transition-all hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(16,185,129,0.39)]">
+                                <Link href="/auth/signup" className="px-5 py-2.5 bg-[#008000] text-white text-[14px] font-bold rounded-[10px] hover:bg-primary-700 transition-all hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(0,128,0,0.2)]">
                                     Register
                                 </Link>
                             </div>
@@ -164,7 +169,7 @@ export default function Navbar() {
                             {isLoggedIn && (
                                 <Link
                                     href="/products/new"
-                                    className="hidden sm:flex w-10 h-10 bg-primary-600 text-white rounded-full items-center justify-center hover:bg-primary-700 transition-all hover:scale-110 shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] mr-2"
+                                    className="hidden sm:flex w-10 h-10 bg-[#008000] text-white rounded-full items-center justify-center hover:bg-primary-700 transition-all hover:scale-110 shadow-[0_4px_14px_0_rgba(0,128,0,0.2)] mr-2"
                                     title="Add Product"
                                 >
                                     <PlusSignIcon size={22} strokeWidth={3} />
@@ -181,7 +186,7 @@ export default function Navbar() {
             {/* Offcanvas Overlay */}
             {isOffcanvasOpen && (
                 <div
-                    className="fixed inset-0 bg-primary-600/5 backdrop-blur-sm z-40 transition-opacity"
+                    className="fixed inset-0 bg-[#008000]/5 backdrop-blur-sm z-40 transition-opacity"
                     onClick={closeOffcanvas}
                 />
             )}
@@ -216,7 +221,7 @@ export default function Navbar() {
                                 <Link href="/auth/login" onClick={closeOffcanvas} className="block py-3 px-4 text-primary-950 font-bold hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all">
                                     Sign In
                                 </Link>
-                                <Link href="/auth/signup" onClick={closeOffcanvas} className="block py-3 px-4 bg-primary-600 text-white rounded-xl transition-all text-center font-bold mt-4 shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] hover:bg-primary-700">
+                                <Link href="/auth/signup" onClick={closeOffcanvas} className="block py-3 px-4 bg-[#008000] text-white rounded-xl transition-all text-center font-bold mt-4 shadow-[0_4px_14px_0_rgba(0,128,0,0.2)] hover:bg-primary-700">
                                     Get Started
                                 </Link>
                             </>

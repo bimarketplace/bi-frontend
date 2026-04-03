@@ -34,7 +34,7 @@ const EmptyState = () => (
     </p>
     <Link
       href="/products/new"
-      className="flex items-center gap-2 bg-primary-600 text-white px-8 py-3.5 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.02]"
+      className="flex items-center gap-2 bg-[#008000] text-white px-8 py-3.5 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.02]"
     >
       <PlusSignIcon size={20} />
       Add First Product
@@ -120,7 +120,7 @@ export default function ProfilePage() {
         <div className="text-center">
           <h1 className="text-4xl font-black tracking-tighter mb-4 italic">BIMARKETPLACE</h1>
           <p className="text-zinc-500 mb-8">Please sign in to view your profile</p>
-          <Link href="/auth/login" className="bg-primary-600 text-white px-8 py-3 rounded-[12px] font-bold">
+          <Link href="/auth/login" className="bg-[#008000] text-white px-8 py-3 rounded-[12px] font-bold">
             Sign In
           </Link>
         </div>
@@ -156,7 +156,7 @@ export default function ProfilePage() {
             </div>
             <Link
               href="/products/new"
-              className="bg-primary-600 text-white px-8 py-4 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.05] flex items-center gap-2 shadow-xl shadow-primary-900/10"
+              className="bg-[#008000] text-white px-8 py-4 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.05] flex items-center gap-2 shadow-xl shadow-primary-900/10"
             >
               <PlusSignIcon size={20} />
               Create Product
@@ -222,7 +222,7 @@ export default function ProfilePage() {
       {/* Profile Settings Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-primary-600/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+          <div className="absolute inset-0 bg-[#008000]/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
           <div className="relative bg-white w-full max-w-xl rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="p-8 border-b border-zinc-50 flex justify-between items-center bg-zinc-50/50">
               <h2 className="text-2xl font-black text-zinc-900 flex items-center gap-3">
@@ -275,7 +275,7 @@ export default function ProfilePage() {
                 <button
                   type="submit"
                   disabled={isUpdating}
-                  className="flex-[2] py-4 bg-primary-600 text-white rounded-[18px] font-black text-lg hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-[2] py-4 bg-[#008000] text-white rounded-[18px] font-black text-lg hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isUpdating ? (
                     <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />

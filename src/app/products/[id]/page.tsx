@@ -355,7 +355,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                         href={`${product.whatsapp_link}${encodeURIComponent(`\n\nProduct Link: ${typeof window !== 'undefined' ? window.location.href : ''}`)}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-primary-600 text-white rounded-[20px] font-black text-lg hover:scale-[1.02] transition-all shadow-xl shadow-primary-900/10"
+                                        className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-[#008000] text-white rounded-[20px] font-black text-lg hover:scale-[1.02] transition-all shadow-xl shadow-primary-900/10"
                                     >
                                         <WhatsappIcon size={24} className="text-[#25D366]" />
                                         Purchase & Inquire
@@ -419,7 +419,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                                     <button
                                         type="submit"
                                         disabled={isSubmittingComment || !commentText.trim()}
-                                        className="absolute right-4 bottom-4 w-10 h-10 bg-primary-600 text-white rounded-xl flex items-center justify-center hover:bg-zinc-800 transition-all disabled:opacity-30 shadow-md"
+                                        className="absolute right-4 bottom-4 w-10 h-10 bg-[#008000] text-white rounded-xl flex items-center justify-center hover:bg-zinc-800 transition-all disabled:opacity-30 shadow-md"
                                     >
                                         {isSubmittingComment ? (
                                             <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>

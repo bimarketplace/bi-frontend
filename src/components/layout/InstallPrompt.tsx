@@ -128,7 +128,7 @@ export default function InstallPrompt() {
             </div>
             <button
               onClick={handleDismiss}
-              className="w-full py-3.5 bg-primary-600 text-white rounded-2xl font-black text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 flex items-center justify-center gap-2"
+              className="w-full py-3.5 bg-[#008000] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 flex items-center justify-center gap-2"
             >
               Okay, I got it
             </button>
@@ -143,7 +143,7 @@ export default function InstallPrompt() {
             </button>
             <button
               onClick={handleInstallClick}
-              className="flex-[1.5] py-3.5 bg-primary-600 text-white rounded-2xl font-black text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 flex items-center justify-center gap-2"
+              className="flex-[1.5] py-3.5 bg-[#008000] text-white rounded-2xl font-black text-sm tracking-tight hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 flex items-center justify-center gap-2"
             >
               <Download01Icon size={20} />
               Install Now

@@ -66,7 +66,7 @@ function VerifyEmailContent() {
                     </p>
                     <Link
                         href="/auth/login"
-                        className="w-full bg-primary-600 text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10"
+                        className="w-full bg-[#008000] text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10"
                     >
                         Sign in now
                     </Link>
@@ -85,7 +85,7 @@ function VerifyEmailContent() {
                     <div className="flex flex-col gap-3 w-full">
                         <Link
                             href="/auth/signup"
-                            className="w-full bg-primary-600 text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors"
+                            className="w-full bg-[#008000] text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors"
                         >
                             Back to Register
                         </Link>
