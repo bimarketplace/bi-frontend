@@ -9,7 +9,9 @@ import {
     Alert01Icon,
     Logout01Icon,
     CheckmarkCircle01Icon,
-    PlusSignIcon
+    PlusSignIcon,
+    Notification03Icon,
+    FavouriteIcon
 } from "hugeicons-react";
 import { resendEmail } from "@/lib/auth";
 
@@ -58,6 +60,7 @@ export const CloseIcon = () => (
 export default function Navbar() {
     const { data: session } = useSession();
     const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
+    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [resendStatus, setResendStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
     const [isScrollingDown, setIsScrollingDown] = useState(false);
     const [lastScrollY, setLastScrollY] = useState(0);
@@ -190,6 +193,54 @@ export default function Navbar() {
                                     <PlusSignIcon size={22} strokeWidth={3} />
                                 </Link>
                             )}
+                            <div className="relative">
+                                <button 
+                                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                                    className="relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
+                                    title="Notifications"
+                                >
+                                    <Notification03Icon size={22} />
+                                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                                </button>
+
+                                {/* Notification Dropdown */}
+                                {isNotificationOpen && (
+                                    <>
+                                        <div className="fixed inset-0 z-40" onClick={() => setIsNotificationOpen(false)}></div>
+                                        <div className="absolute right-0 mt-4 w-72 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <div className="p-4 border-b border-zinc-50 bg-zinc-50/50 flex justify-between items-center">
+                                                <h3 className="font-bold text-sm text-zinc-900">Notifications</h3>
+                                                <span className="text-[10px] bg-[#008000] text-white px-1.5 py-0.5 rounded-full font-bold">2 NEW</span>
+                                            </div>
+                                            <div className="max-h-80 overflow-y-auto">
+                                                <div className="p-4 hover:bg-zinc-50 transition-colors border-b border-zinc-50 flex gap-3 items-start group">
+                                                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 shrink-0 group-hover:scale-110 transition-transform">
+                                                        <FavouriteIcon size={14} className="fill-current" />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[13px] font-bold text-zinc-950">Sarah liked your Gig</p>
+                                                        <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5 font-medium">"Premium UI Dashboard Design" was favorited.</p>
+                                                        <span className="text-[10px] text-zinc-400 mt-1 block">2 minutes ago</span>
+                                                    </div>
+                                                </div>
+                                                <div className="p-4 hover:bg-zinc-50 transition-colors border-b border-zinc-50 flex gap-3 items-start group">
+                                                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-[#008000] shrink-0 group-hover:scale-110 transition-transform">
+                                                        <CheckmarkCircle01Icon size={16} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[13px] font-bold text-zinc-950">New Purchase Inquiry</p>
+                                                        <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5 font-medium">Someone is trying to purchase "Web Deployment".</p>
+                                                        <span className="text-[10px] text-zinc-400 mt-1 block">15 minutes ago</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="p-3 text-center bg-zinc-50">
+                                                <button className="text-[12px] font-bold text-[#008000] hover:underline">View all activity</button>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
                             <button onClick={toggleOffcanvas} className="focus:outline-none group">
                                 <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-primary-600 transition-colors" />
                             </button>

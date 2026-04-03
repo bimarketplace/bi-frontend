@@ -2,13 +2,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search01Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon } from "hugeicons-react";
+import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon } from "hugeicons-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
 import { useGrid } from "@/context/GridContext";
 import { Category } from "@/lib/categories";
 import { fetchProductsPage, Product as ProductType } from "@/lib/products";
+import toast from "react-hot-toast";
 
 // Simple Alert icon component
 const AlertIcon = () => (
@@ -225,6 +226,40 @@ export default function HomePageClient({ initialProducts, categories, initialNex
     return () => observer.disconnect();
   }, [nextPageUrl, isFetchingPage, loadMore]);
 
+  // Simulation: Notification When Someone Likes or Purchases
+  useEffect(() => {
+    if (isLoggedIn) {
+      const timer = setTimeout(() => {
+        toast.success("Someone just liked your product!", {
+          icon: '❤️',
+          duration: 5000,
+          style: {
+            borderRadius: '12px',
+            background: '#333',
+            color: '#fff',
+          },
+        });
+      }, 8000);
+
+      const purchaseTimer = setTimeout(() => {
+        toast("New purchase attempt on your item!", {
+          icon: '🛍️',
+          duration: 6000,
+          style: {
+            borderRadius: '12px',
+            background: '#008000',
+            color: '#fff',
+          },
+        });
+      }, 15000);
+
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(purchaseTimer);
+      };
+    }
+  }, [isLoggedIn]);
+
 
 
   const isEmptyState = !isInitialLoading && products.length === 0;
@@ -252,19 +287,19 @@ export default function HomePageClient({ initialProducts, categories, initialNex
               </h1>
 
               {/* Search Bar Container */}
-              <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all">
+              <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[60px]">
                 <input
                   type="text"
                   placeholder="Search for any service..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="flex-1 px-4 py-2 sm:py-2.5 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent sm:text-base"
+                  className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent sm:text-base h-full"
                 />
                 <button 
-                  className="bg-[#008000] text-white p-2 sm:p-2.5 rounded-md sm:rounded-lg hover:bg-zinc-800 transition-all flex items-center justify-center aspect-square"
+                  className="bg-[#008000] text-white px-5 h-full rounded-md sm:rounded-lg hover:bg-zinc-800 transition-all flex items-center justify-center shrink-0"
                   aria-label="Search"
                 >
-                  <Search01Icon size={20} />
+                  <Search02Icon size={20} />
                 </button>
               </div>
 
@@ -294,7 +329,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
             {/* Mobile Layout Toggle */}
             <button 
               onClick={toggleColumns}
-              className="absolute bottom-4 right-4 p-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 z-20"
+              className="absolute top-4 right-4 p-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 z-20"
               title="Toggle layout"
             >
               <GridIcon size={16} />
