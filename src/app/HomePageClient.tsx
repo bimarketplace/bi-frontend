@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search01Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon } from "hugeicons-react";
+import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search01Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon } from "hugeicons-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
@@ -45,87 +45,93 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const isMini = typeof columns === 'number' && columns >= 3;
 
   return (
-<div
-  onClick={() => router.push(`/products/${product.id}`)}
-  className="group relative w-full bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col h-full cursor-pointer"
->
-  {/* Image Container */}
-  <div className="relative aspect-[16/9.5] overflow-hidden bg-gray-50">
-    <Image
-      src={product.image_url || "/assets/images/sale-fast.png"}
-      alt={product.name}
-      fill
-      className="object-cover transition-transform duration-700 group-hover:scale-110"
-      onError={(e) => {
-        const target = e.target as HTMLImageElement;
-        target.src = "/assets/images/placeholder.png";
-      }}
-    />
-
-    {/* Elegant Gradient Overlay */}
-    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/10 to-primary-950/80" />
-    
-    {/* Price Badge - Floating on Image */}
-    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-4 py-1.5 rounded-2xl font-black text-lg shadow-lg border border-black/5 text-zinc-950">
-      ₦{parseFloat(product.price || "0").toLocaleString()}
-    </div>
-  </div>
-
-  {/* Content Area */}
-  <div className="flex-1 p-6 flex flex-col">
-    {/* Product Name - Strong and Clear */}
-    <h3 className={`font-black tracking-tight text-gray-950 line-clamp-2 leading-tight mb-4
-      ${isMini ? 'text-base' : isCompact ? 'text-[17px]' : 'text-xl'}`}>
-      {product.name}
-    </h3>
-
-    {/* Seller - Smaller and Beneath */}
-    {!isMini && (
-      <div className="flex items-center gap-2.5">
-        <Avatar 
-          name={product.seller?.username || 'Unknown'} 
-          size="sm" 
-          variant="light"
-          className="ring-1 ring-gray-100"
+    <div
+      onClick={() => router.push(`/products/${product.id}`)}
+      className="group relative w-full bg-white rounded-xl overflow-hidden border border-transparent hover:border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full cursor-pointer"
+    >
+      {/* Image Container */}
+      <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+        <Image
+          src={product.image_url || "/assets/images/sale-fast.png"}
+          alt={product.name}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "/assets/images/placeholder.png";
+          }}
         />
-        <p className="text-gray-500 text-[13px] truncate font-bold">
-          {product.seller?.username || 'Unknown Seller'}
-        </p>
+
+        {/* Favourite Icon */}
+        <button 
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/30 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            // Handle favorite logic
+          }}
+        >
+          <FavouriteIcon size={18} />
+        </button>
+
+        {/* Video Icon Mockup (like Fiverr) */}
+        <div className="absolute bottom-3 left-3 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white">
+          <div className="w-0 h-0 border-t-[4px] border-t-transparent border-l-[7px] border-l-white border-b-[4px] border-b-transparent ml-0.5"></div>
+        </div>
+
+        {/* Pagination Dots Mockup */}
+        <div className="absolute bottom-3 right-0 left-0 flex justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 1 ? 'bg-white' : 'bg-white/50'}`} />
+          ))}
+        </div>
       </div>
-    )}
 
-    {/* Description */}
-    {!isMini && (
-      <p className={`mt-4 text-gray-600 leading-relaxed line-clamp-3
-        ${isCompact ? 'text-sm' : 'text-[15px]'}`}>
-        {product.description}
-      </p>
-    )}
-
-    {/* Bottom Section */}
-    <div className="mt-auto pt-6 border-t border-gray-100 flex items-center justify-between">
-      <div className="flex items-center gap-7 text-gray-500">
-        {/* Likes */}
-        <div className="flex items-center gap-2">
-          <div className="text-primary-500">
-            <ThumbsUpIcon size={isMini ? 17 : 20} />
+      {/* Content Area */}
+      <div className="flex-1 p-3 flex flex-col gap-2">
+        {/* Seller Info */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Avatar 
+                name={product.seller?.username || 'U'} 
+                size="xs"
+                variant="light"
+                className="ring-1 ring-gray-100"
+              />
+              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
+            </div>
+            <span className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
+              {product.seller?.username || 'Seller'}
+            </span>
           </div>
-          <span className="font-semibold text-sm tracking-tight">
-            {product.vote_score || 0}
+          <span className="text-[12px] font-medium text-gray-600">
+            Level 2
           </span>
         </div>
 
-        {/* Comments */}
-        <div className="flex items-center gap-2">
-          <Message01Icon size={isMini ? 17 : 20} />
-          <span className="font-semibold text-sm tracking-tight">
-            {product.comments?.length || 0}
-          </span>
+        {/* Gig Title / Name */}
+        <h3 className="text-[15px] font-normal text-gray-900 line-clamp-2 leading-snug hover:underline">
+          {product.name}
+        </h3>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1">
+          <StarIcon size={14} className="fill-gray-900 text-gray-900" />
+          <span className="text-sm font-bold text-gray-900">5.0</span>
+          <span className="text-sm text-gray-500">({product.vote_score || 0})</span>
+        </div>
+
+        {/* Price Section */}
+        <div className="mt-auto pt-2 flex flex-col">
+          <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">
+            From
+          </div>
+          <div className="text-lg font-bold text-gray-900">
+            ₦{parseFloat(product.price || "0").toLocaleString()}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
   );
 };
 
@@ -226,7 +232,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
   const isEmptyState = !isInitialLoading && products.length === 0;
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans">
+    <div className="min-h-screen bg-white font-sans">
       <main className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[125px]' : 'pt-20'} pb-16 px-4 sm:px-8`}>
         <div className="my-8 flex justify-center items-center gap-3 w-full max-w-lg mx-auto">
           <div className="relative flex-1 group">
@@ -287,21 +293,21 @@ export default function HomePageClient({ initialProducts, categories, initialNex
             {/* All Products Card */}
             <button
               onClick={() => setSelectedCategoryId(null)}
-              className={`flex-none w-[280px] p-4 rounded-[20px] border transition-all duration-300 flex items-center gap-4 text-left group
+              className={`flex-none w-[200px] p-3 rounded-xl border transition-all duration-300 flex items-center gap-3 text-left group
                 ${selectedCategoryId === null
-                  ? "bg-white border-[#008000] shadow-[0_8px_30px_rgba(0,128,0,0.08)]"
-                  : "bg-white border-gray-100 hover:border-gray-200 hover:shadow-md"
+                  ? "bg-white border-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
+                  : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
                 }`}
             >
-              <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center transition-colors
-                ${selectedCategoryId === null ? "bg-[#008000]/5 text-[#008000]" : "bg-gray-50 text-gray-400"}`}>
-                <GridIcon size={24} />
+              <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors
+                ${selectedCategoryId === null ? "bg-[#008000]/5 text-[#008000]" : "bg-gray-100 text-gray-500"}`}>
+                <GridIcon size={18} />
               </div>
-              <span className={`font-bold transition-colors ${selectedCategoryId === null ? "text-[#008000]" : "text-gray-800"}`}>
+              <span className={`text-sm font-bold transition-colors ${selectedCategoryId === null ? "text-[#008000]" : "text-gray-700"}`}>
                 All Products
               </span>
-              <div className={`ml-auto transition-all ${selectedCategoryId === null ? "text-[#008000] translate-x-1" : "text-gray-300 transform group-hover:translate-x-1 group-hover:text-gray-400"}`}>
-                <ArrowRight01Icon size={20} />
+              <div className={`ml-auto transition-all ${selectedCategoryId === null ? "text-[#008000] translate-x-1" : "text-gray-300"}`}>
+                <ArrowRight01Icon size={16} />
               </div>
             </button>
 
@@ -309,16 +315,16 @@ export default function HomePageClient({ initialProducts, categories, initialNex
               <button
                 key={category.id}
                 onClick={() => setSelectedCategoryId(category.id)}
-                className={`flex-none w-[280px] p-4 rounded-[20px] border transition-all duration-300 flex items-center gap-4 text-left group
+                className={`flex-none w-[200px] p-3 rounded-xl border transition-all duration-300 flex items-center gap-3 text-left group
                   ${selectedCategoryId === category.id
-                    ? "bg-white border-[#008000] shadow-[0_8px_30px_rgba(0,128,0,0.08)]"
-                    : "bg-white border-gray-100 hover:border-gray-200 hover:shadow-md"
+                    ? "bg-white border-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
                   }`}
               >
-                <div className={`w-12 h-12 rounded-[14px] flex items-center justify-center overflow-hidden transition-colors
-                  ${selectedCategoryId === category.id ? "bg-[#008000]/5" : "bg-gray-50"}`}>
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden transition-colors
+                  ${selectedCategoryId === category.id ? "bg-[#008000]/5" : "bg-gray-100"}`}>
                   {category.image_url ? (
-                    <div className="relative w-7 h-7">
+                    <div className="relative w-6 h-6">
                       <Image
                         src={category.image_url}
                         alt={category.name}
@@ -327,14 +333,14 @@ export default function HomePageClient({ initialProducts, categories, initialNex
                       />
                     </div>
                   ) : (
-                    <GridIcon size={24} className={selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-400"} />
+                    <GridIcon size={18} className={selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-500"} />
                   )}
                 </div>
-                <span className={`font-bold transition-colors line-clamp-1 ${selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-800"}`}>
+                <span className={`text-sm font-bold transition-colors line-clamp-1 ${selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-700"}`}>
                   {category.name}
                 </span>
-                <div className={`ml-auto transition-all ${selectedCategoryId === category.id ? "text-[#008000] translate-x-1" : "text-gray-300 transform group-hover:translate-x-1 group-hover:text-gray-400"}`}>
-                  <ArrowRight01Icon size={20} />
+                <div className={`ml-auto transition-all ${selectedCategoryId === category.id ? "text-[#008000] translate-x-1" : "text-gray-300"}`}>
+                  <ArrowRight01Icon size={16} />
                 </div>
               </button>
             ))}

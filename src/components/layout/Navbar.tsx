@@ -13,7 +13,7 @@ import {
 import { resendEmail } from "@/lib/auth";
 
 // Shared Avatar component
-export const Avatar = ({ name, size = "md", variant = "primary", className = "" }: { name: string, size?: "sm" | "md" | "lg" | "xl", variant?: "primary" | "light", className?: string }) => {
+export const Avatar = ({ name, size = "md", variant = "primary", className = "" }: { name: string, size?: "xs" | "sm" | "md" | "lg" | "xl", variant?: "primary" | "light", className?: string }) => {
     const getInitials = (name: string) => {
         if (!name) return "?";
         return name
@@ -26,6 +26,7 @@ export const Avatar = ({ name, size = "md", variant = "primary", className = "" 
     };
 
     const sizeClasses = {
+        xs: "w-6 h-6 text-[10px]",
         sm: "w-8 h-8 text-xs",
         md: "w-10 h-10 text-sm",
         lg: "w-16 h-16 text-xl",
