@@ -142,7 +142,7 @@ export default function Navbar() {
 
             {/* Fixed Header */}
             <header className={`fixed top-0 left-0 w-full py-4 px-4 sm:px-8 z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
-                <div className="w-full flex justify-between items-center mx-auto px-[20px] py-[12px]">
+                <div className="w-full flex justify-between items-center mx-auto px-[15px]">
                     <div className="flex items-center gap-8">
                         <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                             <Image 
@@ -152,6 +152,7 @@ export default function Navbar() {
                                 height={120} 
                                 className="h-8 w-auto object-contain"
                             />
+                            <span className="text-[#008102] text-sm font-medium">BIMARKETPLACE</span>
                         </Link>
 
                         {isLoggedIn && (
@@ -183,7 +184,7 @@ export default function Navbar() {
                                 <Avatar name={user?.name || (user as any)?.username || user?.email || ""} />
                             </Link>
                         )}
-                        <div className="flex items-center gap-4 border-l border-gray-100 pl-4 ml-2">
+                        <div className="flex items-center gap-4 border-gray-100 pl-4 ml-2">
                             {isLoggedIn && (
                                 <Link
                                     href="/products/new"
@@ -195,27 +196,27 @@ export default function Navbar() {
                             )}
                             <div className="relative">
                                 {/* Mobile: Link to Notifications Page */}
-                                <Link 
+                                {/* <Link 
                                     href="/notifications"
                                     className="sm:hidden relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
                                     title="Notifications"
                                 >
                                     <Notification03Icon size={22} />
                                     <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                                </Link>
+                                </Link> */}
 
                                 {/* Desktop: Toggle Dropdown */}
-                                <button 
+                                {/* <button 
                                     onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                                     className="hidden sm:block relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
                                     title="Notifications"
                                 >
                                     <Notification03Icon size={22} />
                                     <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                                </button>
+                                </button> */}
 
                                 {/* Notification Dropdown */}
-                                {isNotificationOpen && (
+                                {/* {isNotificationOpen && (
                                     <>
                                         <div className="fixed inset-0 z-40" onClick={() => setIsNotificationOpen(false)}></div>
                                         <div className="absolute right-0 mt-4 w-72 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
@@ -256,9 +257,9 @@ export default function Navbar() {
                                             </div>
                                         </div>
                                     </>
-                                )}
+                                )} */}
                             </div>
-                            <button onClick={toggleOffcanvas} className="focus:outline-none group">
+                            <button onClick={toggleOffcanvas} className="focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]">
                                 <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-primary-600 transition-colors" />
                             </button>
                         </div>
