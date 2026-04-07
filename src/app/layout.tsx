@@ -3,10 +3,11 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import Navbar from "@/components/layout/Navbar";
-import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
+// import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
+import CartFloat from "@/components/layout/CartFloat";
 import InstallPrompt from '@/components/layout/InstallPrompt';
 
-const inter = Inter({
+export const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
@@ -34,7 +35,8 @@ export default function RootLayout({
         <Providers>
           <Navbar />
           {children}
-          <WhatsAppFloat />
+          <CartFloat />
+          {/* <WhatsAppFloat /> */}
           <InstallPrompt />
         </Providers>
       </body>

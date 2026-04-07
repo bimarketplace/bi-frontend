@@ -228,16 +228,15 @@ export default function HomePageClient({ initialProducts, categories, initialNex
 
   // Welcome notification on initial login
   useEffect(() => {
-    if (isLoggedIn) {
-      toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
-        icon: '👋',
-        duration: 3000,
-        style: {
-          borderRadius: '12px',
-          background: '#008000',
-          color: '#fff',
-        },
-      });
+    if (isLoggedIn && user) {
+      const hasWelcomed = sessionStorage.getItem(`welcomed_${user.email || (user as any).username}`);
+      if (!hasWelcomed) {
+        toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
+          icon: '👋',
+          duration: 4000,
+        });
+        sessionStorage.setItem(`welcomed_${user.email || (user as any).username}`, "true");
+      }
     }
   }, [isLoggedIn, user]);
 
@@ -276,12 +275,11 @@ export default function HomePageClient({ initialProducts, categories, initialNex
                   onChange={(e) => setSearch(e.target.value)}
                   className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent sm:text-base h-full"
                 />
-                <button 
-                  className="bg-[#008000] text-white px-5 h-full rounded-md sm:rounded-lg hover:bg-zinc-800 transition-all flex items-center justify-center shrink-0"
-                  aria-label="Search"
+                <div 
+                  className="text-zinc-400 px-5 h-full flex items-center justify-center shrink-0"
                 >
                   <Search02Icon size={20} />
-                </button>
+                </div>
               </div>
                  
             </div>
