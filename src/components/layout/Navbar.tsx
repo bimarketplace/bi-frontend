@@ -169,7 +169,6 @@ export default function Navbar() {
                             </div>
                         ) : null}
                         <div className="flex items-center gap-4 border-gray-100 pl-4 ml-2">
-
                             <div className="relative">
                                 {/* Mobile: Link to Notifications Page ... */}
                                 {/* <Link 
