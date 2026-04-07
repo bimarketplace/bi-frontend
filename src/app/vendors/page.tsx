@@ -218,16 +218,15 @@ export default function Vendors({ initialProducts, categories, initialNext, init
 
   // Welcome notification on initial login
   useEffect(() => {
-    if (isLoggedIn) {
-      toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
-        icon: '👋',
-        duration: 3000,
-        style: {
-          borderRadius: '12px',
-          background: '#008000',
-          color: '#fff',
-        },
-      });
+    if (isLoggedIn && user) {
+      const hasWelcomed = sessionStorage.getItem(`welcomed_${user.email || (user as any).username}`);
+      if (!hasWelcomed) {
+        toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
+          icon: '👋',
+          duration: 4000,
+        });
+        sessionStorage.setItem(`welcomed_${user.email || (user as any).username}`, "true");
+      }
     }
   }, [isLoggedIn, user]);
 
@@ -236,7 +235,7 @@ export default function Vendors({ initialProducts, categories, initialNext, init
   const isEmptyState = !isInitialLoading && uniqueVendors.length === 0;
 
   return (
-    <div className="w-full mt-25">
+    <div className="w-full pt-25 bg-white min-h-screen">
       <div className="pb-16 px-4 sm:px-8">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-5 px-[15px]">Find the best vendors for your needs</h1>
         {/* Search Bar Container */}
