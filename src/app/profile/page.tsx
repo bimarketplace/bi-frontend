@@ -2,45 +2,51 @@
 
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { fetchProducts, deleteProduct, Product } from "@/lib/products";
+import { fetchProductsPage, deleteProduct, Product } from "@/lib/products";
 import Link from "next/link";
 import Image from "next/image";
 import {
   PlusSignIcon,
   PencilEdit01Icon,
   Delete02Icon,
-  UserIcon,
   PackageIcon,
-  Alert01Icon,
   WhatsappIcon,
   Settings01Icon,
   Cancel01Icon,
-  CheckmarkCircle01Icon
+  CheckmarkCircle01Icon,
+  Search02Icon,
+  ArrowLeft02Icon,
+  ArrowRight02Icon
 } from "hugeicons-react";
 import { toast } from "react-hot-toast";
 import { updateProfile, fetchUserProfile } from "@/lib/auth";
 import { Avatar, CloseIcon } from "@/components/layout/Navbar";
+import CreateProductModal from "@/components/CreateProductModal";
 
+// Simple Alert icon component
+const AlertIcon = () => (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+      <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
 
-
-const EmptyState = () => (
-  <div className="flex flex-col items-center justify-center py-20 bg-white rounded-[24px] border border-gray-100 shadow-sm px-6">
-    <div className="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mb-6">
-      <PackageIcon size={40} className="text-zinc-400" />
+const EmptyState = ({ onAdd }: { onAdd: () => void }) => (
+    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+      <div className="bg-gray-100 rounded-full p-6 mb-4">
+        <AlertIcon />
+      </div>
+      <h3 className="text-lg font-semibold text-gray-700 mb-2">No products yet</h3>
+      <p className="text-sm text-gray-500 mb-8">Start your marketplace journey by creating your first product.</p>
+      <button
+        onClick={onAdd}
+        className="flex items-center gap-2 bg-[#008000] text-white px-8 py-3.5 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.02]"
+      >
+        <PlusSignIcon size={20} />
+        Add First Product
+      </button>
     </div>
-    <h3 className="text-xl font-bold text-zinc-900 mb-2">No products yet</h3>
-    <p className="text-zinc-500 text-center max-w-sm mb-8">
-      You haven't listed any items for sale yet. Start your marketplace journey by creating your first product.
-    </p>
-    <Link
-      href="/products/new"
-      className="flex items-center gap-2 bg-[#008000] text-white px-8 py-3.5 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.02]"
-    >
-      <PlusSignIcon size={20} />
-      Add First Product
-    </Link>
-  </div>
-);
+  );
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -49,40 +55,53 @@ export default function ProfilePage() {
 
   // Profile settings states
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [profileData, setProfileData] = useState({
     whatsapp_number: '',
     bio: ''
   });
 
+  const [search, setSearch] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [categoriesState, setCategoriesState] = useState<any[]>([]);
+
+  const refreshData = async () => {
+    if (!session?.access_token) return;
+    setLoading(true);
+    try {
+      const username = (session.user as any).username || session.user?.name;
+      const fetchCategories = await import("@/lib/categories").then(m => m.fetchCategories);
+      
+      const [productsData, profile, categoriesData] = await Promise.all([
+        fetchProductsPage(undefined, { seller__username: username }),
+        fetchUserProfile((session as any).access_token),
+        fetchCategories()
+      ]);
+      
+      const allProducts = productsData.results;
+
+      const myProducts = allProducts.filter((p: any) =>
+        p.seller?.username === (session.user as any).username ||
+        p.seller?.username === session.user?.name
+      );
+      setProducts(myProducts);
+      setCategoriesState(categoriesData);
+      setProfileData({
+        whatsapp_number: profile.whatsapp_number || '',
+        bio: profile.bio || ''
+      });
+    } catch (error) {
+      console.error("Failed to fetch profile data:", error);
+      toast.error("Failed to load profile data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const getMyData = async () => {
-      if (!session?.access_token) return;
-      try {
-        const [allProducts, profile] = await Promise.all([
-          fetchProducts(),
-          fetchUserProfile((session as any).access_token)
-        ]);
-
-        // Filter products where seller matches logged in user
-        const myProducts = allProducts.filter((p: any) =>
-          p.seller?.username === (session.user as any).username ||
-          p.seller?.username === session.user?.name
-        );
-        setProducts(myProducts);
-        setProfileData({
-          whatsapp_number: profile.whatsapp_number || '',
-          bio: profile.bio || ''
-        });
-      } catch (error) {
-        console.error("Failed to fetch profile data:", error);
-        toast.error("Failed to load profile data");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (session) getMyData();
+    if (session) refreshData();
   }, [session]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -114,6 +133,14 @@ export default function ProfilePage() {
     }
   };
 
+  const filteredProducts = products.filter((product) => {
+    const lowerSearch = search.toLowerCase();
+    const matchesSearch = product.name?.toLowerCase().includes(lowerSearch) ||
+      product.description?.toLowerCase().includes(lowerSearch);
+    const matchesCategory = selectedCategoryId === null || product.category?.id === selectedCategoryId;
+    return matchesSearch && matchesCategory;
+  });
+
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-zinc-50 px-4">
@@ -128,95 +155,202 @@ export default function ProfilePage() {
     );
   }
 
+  const storeName = (session.user as any).username || session.user?.name || "User Profile";
+
   return (
-    <div className="min-h-screen bg-[#FAFAFA] pt-32 pb-20 px-4 sm:px-8">
+    <div className="w-full pt-25 pb-20 bg-white min-h-screen">
       <div className="max-w-6xl mx-auto">
-        {/* Profile Header */}
-        <div className="bg-white rounded-[24px] p-8 md:p-12 mb-12 border border-gray-100 shadow-sm">
-          <div className="flex flex-col md:flex-row items-center gap-8">
-            <Avatar name={session.user?.name || (session.user as any).username || session.user?.email || "U"} size="xl" />
-            <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl font-black text-zinc-900 mb-2">
-                {session.user?.name || (session.user as any).username || 'User Profile'}
-              </h1>
-              <p className="text-zinc-500 font-medium mb-4">{session.user?.email}</p>
-              <div className="flex flex-wrap justify-center md:justify-start gap-4">
-                <span className="flex items-center gap-2 bg-zinc-50 border border-zinc-100 px-4 py-2 rounded-[10px] text-zinc-600 text-sm font-semibold">
-                  <PackageIcon size={18} />
-                  {products.length} Products Listed
+        <div className="px-4 sm:px-8">
+          {/* Seller profile (Matching Vendor Page Style) */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <Avatar 
+                  name={storeName.charAt(0).toUpperCase()} 
+                  size="lg"
+                  variant="light"
+                  className="ring-1 ring-gray-100 rounded-xxl"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-lg font-bold text-gray-900 uppercase">
+                  {storeName}
                 </span>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="flex items-center gap-2 bg-white border border-zinc-200 px-4 py-2 rounded-[10px] text-zinc-600 text-sm font-semibold hover:bg-zinc-50 transition-colors"
-                >
-                  <Settings01Icon size={18} />
-                  Profile Settings
-                </button>
+                <p className="text-sm font-medium text-gray-500">
+                    {products.length} Products listed
+                </p>
               </div>
             </div>
-            <Link
-              href="/products/new"
-              className="bg-[#008000] text-white px-8 py-4 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.05] flex items-center gap-2 shadow-xl shadow-primary-900/10"
+
+            <div className="flex items-center gap-3">
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 px-5 py-2.5 rounded-xl text-gray-700 text-[14px] font-bold hover:bg-gray-50 transition-all"
+                >
+                    <Settings01Icon size={18} />
+                    Settings
+                </button>
+                <button
+                    onClick={() => setIsCreateModalOpen(true)}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#008000] text-white px-5 py-2.5 rounded-xl text-[14px] font-bold hover:bg-primary-700 transition-all shadow-sm"
+                >
+                    <PlusSignIcon size={18} />
+                    Add Product
+                </button>
+            </div>
+          </div>
+
+          <p className="text-sm font-medium text-gray-900 mb-8 max-w-3xl leading-relaxed">
+            {profileData.bio || `Welcome to ${storeName}'s store. Manage your listings and profile settings below.`}
+          </p>
+
+          {/* Search Bar Container (Matching Vendor Page Style) */}
+          <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden border border-gray-100">
+            <input
+              type="text"
+              placeholder="Search in your store..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent text-[14px] sm:text-base h-full"
+            />
+            <div className="text-black px-5 h-full flex items-center justify-center shrink-0">
+              <Search02Icon size={20} />
+            </div>
+          </div>
+        </div>
+
+        {/* Categories Bar (Matching Vendor Page Style) */}
+        <div className="max-w-6xl mx-auto mt-8 mb-5 px-4 sm:px-8">
+          <div className="flex justify-end items-end mb-6">
+            <div className="hidden sm:flex gap-2">
+              <button 
+                onClick={() => {
+                  const el = document.getElementById('categories-scroll');
+                  if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
+                }}
+                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
+              >
+                <ArrowLeft02Icon size={20} />
+              </button>
+              <button
+                onClick={() => {
+                  const el = document.getElementById('categories-scroll');
+                  if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
+                }}
+                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
+              >
+                <ArrowRight02Icon size={20} />
+              </button>
+            </div>
+          </div>
+
+          <div
+            id="categories-scroll"
+            className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth"
+          >
+            <button
+              onClick={() => setSelectedCategoryId(null)}
+              className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
+                ${selectedCategoryId === null
+                  ? "text-white bg-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
+                  : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                }`}
             >
-              <PlusSignIcon size={20} />
-              Create Product
-            </Link>
+              <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === null ? "text-white" : "text-gray-700"}`}>
+                All Products
+              </span>
+            </button>
+
+            {categoriesState.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategoryId(category.id)}
+                className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
+                  ${selectedCategoryId === category.id
+                    ? "text-white bg-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                  }`}
+              >
+                <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === category.id ? "text-white" : "text-gray-700"}`}>
+                  {category.name}
+                </span>
+              </button>
+            ))}
           </div>
         </div>
 
-        <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-black text-zinc-900 tracking-tight">Your Products</h2>
-        </div>
+        <div className="max-w-6xl mx-auto mt-5 px-4 sm:px-8">
+          {loading ? (
+            <div className={`grid gap-4 justify-items-center grid-cols-2 lg:grid-cols-4 w-full`}>
+              {Array.from({ length: 8 }).map((_, index) => (
+                <div key={index} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
+                  <div className="h-28 bg-gray-200 rounded-md mb-4" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2 mb-4" />
+                  <div className="h-8 bg-gray-200 rounded" />
+                </div>
+              ))}
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <EmptyState onAdd={() => setIsCreateModalOpen(true)} />
+          ) : (
+            <div className={`grid gap-4 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
+                {filteredProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="group relative w-full bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+                  >
+                    <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                        <Image
+                            src={product.image_url || "/assets/images/placeholder.png"}
+                            alt={product.name}
+                            fill
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            unoptimized
+                        />
+                         <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg font-bold text-[12px] shadow-sm border border-gray-100">
+                            ₦{parseFloat(product.price).toLocaleString()}
+                        </div>
+                    </div>
 
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="bg-white rounded-[24px] h-[400px] animate-pulse border border-zinc-100" />
-            ))}
-          </div>
-        ) : products.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => (
-              <div key={product.id} className="group bg-white rounded-[24px] border border-gray-100 p-5 hover:shadow-2xl hover:shadow-zinc-200/50 transition-all duration-300">
-                <div className="relative aspect-[4/3] rounded-[18px] overflow-hidden mb-5">
-                  <Image
-                    src={product.image_url || "/assets/images/placeholder.png"}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    unoptimized
-                  />
-                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-[10px] font-bold text-sm shadow-sm">
-                    ₦{parseFloat(product.price).toLocaleString()}
+                    <div className="flex-1 p-3 flex flex-col gap-2">
+                        <h3 className="text-[14px] font-medium text-gray-900 line-clamp-2 leading-snug">
+                            {product.name}
+                        </h3>
+                        
+                        <div className="mt-auto pt-2 flex flex-col gap-3">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                    <div className="relative">
+                                        <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
+                                    </div>
+                                    <span className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
+                                        {storeName}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Link
+                                    href={`/products/edit/${product.id}`}
+                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gray-50 text-gray-900 rounded-lg text-[12px] font-bold hover:bg-gray-100 transition-colors border border-gray-100"
+                                >
+                                    <PencilEdit01Icon size={14} />
+                                    Edit
+                                </Link>
+                                <button
+                                    onClick={() => handleDelete(product.id)}
+                                    className="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 rounded-lg hover:bg-red-50 hover:text-red-500 transition-all border border-gray-100"
+                                >
+                                    <Delete02Icon size={16} />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                   </div>
-                </div>
-                <div className="px-1">
-                  <h3 className="font-bold text-lg text-zinc-900 mb-2 line-clamp-1">{product.name}</h3>
-                  <p className="text-zinc-500 text-sm line-clamp-2 mb-6 h-10">
-                    {product.description}
-                  </p>
-                  <div className="flex items-center gap-3 pt-4 border-t border-zinc-50">
-                    <Link
-                      href={`/products/edit/${product.id}`}
-                      className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-zinc-50 text-zinc-900 rounded-[12px] text-sm font-bold hover:bg-zinc-100 transition-colors"
-                    >
-                      <PencilEdit01Icon size={18} />
-                      Edit
-                    </Link>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="w-12 h-12 flex items-center justify-center bg-zinc-50 text-zinc-400 rounded-[12px] hover:bg-red-50 hover:text-red-500 transition-all"
-                    >
-                      <Delete02Icon size={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Profile Settings Modal */}
@@ -290,6 +424,13 @@ export default function ProfilePage() {
             </form>
           </div>
         </div>
+      )}
+      {/* Create Product Modal */}
+      {isCreateModalOpen && (
+        <CreateProductModal 
+            onClose={() => setIsCreateModalOpen(false)} 
+            onSuccess={refreshData}
+        />
       )}
     </div>
   );

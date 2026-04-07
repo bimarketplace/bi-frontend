@@ -142,31 +142,20 @@ export default function Navbar() {
 
             {/* Fixed Header */}
             <header className={`fixed top-0 left-0 w-full py-4 px-4 sm:px-8 z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
-                <div className="w-full flex justify-between items-center mx-auto px-[20px] py-[12px]">
-                    <div className="flex items-center gap-8">
-                        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                            <Image 
-                                src="/assets/images/bi.png" 
-                                alt="BIMARKETPLACE" 
-                                width={200} 
-                                height={120} 
-                                className="h-8 w-auto object-contain"
-                            />
-                        </Link>
+                <div className="w-full flex justify-between items-center mx-auto px-[15px]">
+                        <div className="flex items-center gap-8">
+                            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                                <Image 
+                                    src="/assets/images/bi.png" 
+                                    alt="BIMARKETPLACE" 
+                                    width={200} 
+                                    height={120} 
+                                    className="h-8 w-auto object-contain"
+                                />
+                                <span className="text-[#008102] text-sm font-medium">BIMARKETPLACE</span>
+                            </Link>
 
-                        {isLoggedIn && (
-                            <div className="hidden md:flex items-center gap-4 pl-8 border-l border-gray-200">
-                                <div className="flex flex-col">
-                                    <span className="text-[14px] font-bold text-gray-900 leading-tight">
-                                        {user?.name || (user as any)?.username || 'User'}
-                                    </span>
-                                    <span className="text-[12px] text-gray-500 font-medium leading-tight">
-                                        {user?.email}
-                                    </span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                        </div>
 
                     <div className="flex items-center gap-6">
                         {!isLoggedIn ? (
@@ -178,44 +167,32 @@ export default function Navbar() {
                                     Register
                                 </Link>
                             </div>
-                        ) : (
-                            <Link href="/profile" className="hidden sm:flex items-center gap-4 hover:opacity-80 transition-opacity">
-                                <Avatar name={user?.name || (user as any)?.username || user?.email || ""} />
-                            </Link>
-                        )}
-                        <div className="flex items-center gap-4 border-l border-gray-100 pl-4 ml-2">
-                            {isLoggedIn && (
-                                <Link
-                                    href="/products/new"
-                                    className="hidden sm:flex w-10 h-10 bg-[#008000] text-white rounded-full items-center justify-center hover:bg-primary-700 transition-all hover:scale-110 shadow-[0_4px_14px_0_rgba(0,128,0,0.2)] mr-2"
-                                    title="Add Product"
-                                >
-                                    <PlusSignIcon size={22} strokeWidth={3} />
-                                </Link>
-                            )}
+                        ) : null}
+                        <div className="flex items-center gap-4 border-gray-100 pl-4 ml-2">
+
                             <div className="relative">
                                 {/* Mobile: Link to Notifications Page */}
-                                <Link 
+                                {/* <Link 
                                     href="/notifications"
                                     className="sm:hidden relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
                                     title="Notifications"
                                 >
                                     <Notification03Icon size={22} />
                                     <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                                </Link>
+                                </Link> */}
 
                                 {/* Desktop: Toggle Dropdown */}
-                                <button 
+                                {/* <button 
                                     onClick={() => setIsNotificationOpen(!isNotificationOpen)}
                                     className="hidden sm:block relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
                                     title="Notifications"
                                 >
                                     <Notification03Icon size={22} />
                                     <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                                </button>
+                                </button> */}
 
                                 {/* Notification Dropdown */}
-                                {isNotificationOpen && (
+                                {/* {isNotificationOpen && (
                                     <>
                                         <div className="fixed inset-0 z-40" onClick={() => setIsNotificationOpen(false)}></div>
                                         <div className="absolute right-0 mt-4 w-72 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
@@ -256,9 +233,9 @@ export default function Navbar() {
                                             </div>
                                         </div>
                                     </>
-                                )}
+                                )} */}
                             </div>
-                            <button onClick={toggleOffcanvas} className="focus:outline-none group">
+                            <button onClick={toggleOffcanvas} className="focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]">
                                 <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-primary-600 transition-colors" />
                             </button>
                         </div>
@@ -285,6 +262,9 @@ export default function Navbar() {
                     </div>
 
                     <nav className="space-y-4 flex-1">
+                        <Link href="/vendors" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            Vendors
+                        </Link>
                         <Link href={whatsappUrl} onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
                             Contact Support
                         </Link>
@@ -340,23 +320,7 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* Mobile Floating Action Button (FAB) */}
-            {isLoggedIn && (
-                <div
-                    className={`fixed bottom-[24px] left-1/2 -translate-x-1/2 z-[60] sm:hidden transition-all duration-300 ease-in-out ${isScrollingDown
-                        ? 'opacity-0 translate-y-10 pointer-events-none'
-                        : 'opacity-100 translate-y-0'
-                        }`}
-                >
-                    <Link
-                        href="/products/new"
-                        className="w-14 h-14 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full flex items-center justify-center shadow-[0_8px_30px_rgba(16,185,129,0.4)] hover:scale-110 active:scale-95 transition-transform"
-                        title="Add Product"
-                    >
-                        <PlusSignIcon size={28} strokeWidth={3} />
-                    </Link>
-                </div>
-            )}
+
         </>
     );
 }

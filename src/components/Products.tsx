@@ -10,6 +10,8 @@ import { useGrid } from "@/context/GridContext";
 import { Category } from "@/lib/categories";
 import { fetchProductsPage, Product as ProductType } from "@/lib/products";
 import toast from "react-hot-toast";
+import Tabs from '@/components/Tabs';
+import ProductModal from "@/components/ProductModal";
 
 // Simple Alert icon component
 const AlertIcon = () => (
@@ -35,19 +37,15 @@ const EmptyState = ({ message = "No products available" }: { message?: string })
 // Product card component with proper typing
 interface ProductCardProps {
   product: ProductType;
+  onSelect: (product: ProductType) => void;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
-  const router = useRouter();
+const ProductCard = ({ product, onSelect }: ProductCardProps) => {
   const { columns } = useGrid();
-
-  // Define responsive styles based on grid columns
-  const isCompact = typeof columns === 'number' && columns >= 2;
-  const isMini = typeof columns === 'number' && columns >= 3;
 
   return (
     <div
-      onClick={() => router.push(`/products/${product.id}`)}
+      onClick={() => onSelect(product)}
       className="group relative w-full bg-white rounded-xl overflow-hidden border border-transparent hover:border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full cursor-pointer"
     >
       {/* Image Container */}
@@ -64,7 +62,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         />
 
         {/* Favourite Icon */}
-        <button 
+        {/* <button 
           className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/30 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
@@ -72,19 +70,19 @@ const ProductCard = ({ product }: ProductCardProps) => {
           }}
         >
           <FavouriteIcon size={18} />
-        </button>
+        </button> */}
 
         {/* Video Icon Mockup (like Fiverr) */}
-        <div className="absolute bottom-3 left-3 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white">
+        {/* <div className="absolute bottom-3 left-3 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white">
           <div className="w-0 h-0 border-t-[4px] border-t-transparent border-l-[7px] border-l-white border-b-[4px] border-b-transparent ml-0.5"></div>
-        </div>
+        </div> */}
 
         {/* Pagination Dots Mockup */}
-        <div className="absolute bottom-3 right-0 left-0 flex justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+        {/* <div className="absolute bottom-3 right-0 left-0 flex justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className={`w-1.5 h-1.5 rounded-full ${i === 1 ? 'bg-white' : 'bg-white/50'}`} />
           ))}
-        </div>
+        </div> */}
       </div>
 
       {/* Content Area */}
@@ -95,16 +93,33 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {product.name}
         </h3>
 
+
+        {/* Rating */}
+        {/* <div className="flex items-center gap-1">
+          <StarIcon size={14} className="fill-gray-900 text-gray-900" />
+          <span className="text-sm font-bold text-gray-900">5.0</span>
+          <span className="text-sm text-gray-500">({product.vote_score || 0})</span>
+        </div> */}
+
+        {/* Price Section */}
+        <div className="mt-auto pt-2 flex flex-col">
+          {/* <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">
+            From
+          </div> */}
+          <div className="text-lg font-bold text-gray-900">
+            ₦{parseFloat(product.price || "0").toLocaleString()}
+          </div>
+        </div>
         {/* Seller Info */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Avatar 
+              {/* <Avatar 
                 name={product.seller?.username || 'U'} 
                 size="xs"
                 variant="light"
                 className="ring-1 ring-gray-100"
-              />
+              /> */}
               <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
             <span className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
@@ -112,29 +127,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
             </span>
           </div>
         </div>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1">
-          <StarIcon size={14} className="fill-gray-900 text-gray-900" />
-          <span className="text-sm font-bold text-gray-900">5.0</span>
-          <span className="text-sm text-gray-500">({product.vote_score || 0})</span>
-        </div>
-
-        {/* Price Section */}
-        <div className="mt-auto pt-2 flex flex-col">
-          <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wide">
-            From
-          </div>
-          <div className="text-lg font-bold text-gray-900">
-            ₦{parseFloat(product.price || "0").toLocaleString()}
-          </div>
-        </div>
       </div>
     </div>
   );
 };
 
-export default function HomePageClient({ initialProducts, categories, initialNext, initialPrev, initialCount }: { initialProducts: ProductType[] | null | undefined; categories: Category[] | null | undefined; initialNext?: string | null; initialPrev?: string | null; initialCount?: number; }) {
+export default function Products({ initialProducts, categories, initialNext, initialPrev, initialCount }: { initialProducts: ProductType[] | null | undefined; categories: Category[] | null | undefined; initialNext?: string | null; initialPrev?: string | null; initialCount?: number; }) {
   const { data: session } = useSession();
   const { columns, toggleColumns } = useGrid();
   const [search, setSearch] = useState("");
@@ -144,12 +142,44 @@ export default function HomePageClient({ initialProducts, categories, initialNex
   const normalizedInitialProducts = Array.isArray(initialProducts) ? initialProducts : [];
 
   const [products, setProducts] = useState<ProductType[]>(normalizedInitialProducts);
+  const [categoriesState, setCategoriesState] = useState<Category[]>(normalizedCategories);
   const [nextPageUrl, setNextPageUrl] = useState<string | null>(initialNext ?? null);
   const [totalCount, setTotalCount] = useState<number>(initialCount ?? 0);
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
 
-  const [isInitialLoading, setIsInitialLoading] = useState(normalizedInitialProducts.length === 0);
+  const [isInitialLoading, setIsInitialLoading] = useState(normalizedInitialProducts.length === 0 && (!categories || categories.length === 0));
   const [isFetchingPage, setIsFetchingPage] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
+
+  // Initial fetch if props are missing
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      if (normalizedInitialProducts.length > 0 || (categories && categories.length > 0)) {
+        setIsInitialLoading(false);
+        return;
+      }
+
+      setIsInitialLoading(true);
+      try {
+        const [productsData, categoriesData] = await Promise.all([
+          fetchProductsPage(),
+          import("@/lib/categories").then(m => m.fetchCategories())
+        ]);
+
+        setProducts(productsData.results);
+        setCategoriesState(categoriesData);
+        setNextPageUrl(productsData.next);
+        setTotalCount(productsData.count);
+      } catch (error) {
+        console.error("Failed to fetch initial products:", error);
+        setPageError("Failed to load products. Please refresh.");
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, [normalizedInitialProducts.length, categories]);
 
   const user = session?.user;
   const isLoggedIn = !!session;
@@ -228,15 +258,16 @@ export default function HomePageClient({ initialProducts, categories, initialNex
 
   // Welcome notification on initial login
   useEffect(() => {
-    if (isLoggedIn && user) {
-      const hasWelcomed = sessionStorage.getItem(`welcomed_${user.email || (user as any).username}`);
-      if (!hasWelcomed) {
-        toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
-          icon: '👋',
-          duration: 4000,
-        });
-        sessionStorage.setItem(`welcomed_${user.email || (user as any).username}`, "true");
-      }
+    if (isLoggedIn) {
+      toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
+        icon: '👋',
+        duration: 3000,
+        style: {
+          borderRadius: '12px',
+          background: '#008000',
+          color: '#fff',
+        },
+      });
     }
   }, [isLoggedIn, user]);
 
@@ -245,63 +276,29 @@ export default function HomePageClient({ initialProducts, categories, initialNex
   const isEmptyState = !isInitialLoading && products.length === 0;
 
   return (
-    <div className="min-h-screen bg-white font-sans">
-      <main className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[125px]' : 'pt-20'} pb-16 px-4 sm:px-8`}>
-        {/* Hero Section */}
-        <section className="max-w-6xl mx-auto mt-8 mb-8 px-0 shadow-sm relative overflow-hidden rounded-[20px]">
-          <div className="relative aspect-[16/11] sm:aspect-[24/5] w-full bg-zinc-900 flex items-center p-6 sm:p-12 overflow-hidden transition-all duration-500 group">
-            {/* Background Image */}
-            <Image 
-              src="/assets/images/search_banner.jpg"
-              alt="Search Banner"
-              fill
-              className="object-cover opacity-80"
-              priority
-            />
-            <div className="absolute inset-0 bg-black/40" />
-
-            {/* Content Container */}
-            <div className="relative z-10 w-full max-w-3xl">
-              <h1 className="text-xl sm:text-3xl font-extrabold text-white mb-5 tracking-tight max-w-2xl leading-tight">
-                Find your favourite vendors <br /> Hire professionals
-              </h1>
-
-              {/* Search Bar Container */}
-              <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
-                <input
-                  type="text"
-                  placeholder="Search for any service..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent sm:text-base h-full"
-                />
-                <div 
-                  className="text-zinc-400 px-5 h-full flex items-center justify-center shrink-0"
-                >
-                  <Search02Icon size={20} />
-                </div>
-              </div>
-                 
-            </div>
-
-            {/* Mobile Layout Toggle */}
-            <button 
-              onClick={toggleColumns}
-              className="absolute top-4 right-4 p-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 z-20"
-              title="Toggle layout"
-            >
-              <GridIcon size={16} />
-              <span className="text-[10px] font-bold">{columns}</span>
-            </button>
-          </div>
-        </section>
-
+    <div className="w-full">
+                      <div className="pb-16 px-4 sm:px-8">
+                      {/* Search Bar Container */}
+                      <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
+                        <input
+                          type="text"
+                          placeholder="Search for any service..."
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                          className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent text-[14px] sm:text-base h-full"
+                        />
+                        <div 
+                          className="text-black px-5 h-full flex items-center justify-center shrink-0"
+                        >
+                          <Search02Icon size={20} />
+                        </div>
+                      </div>
         {/* Categories Bar */}
-        <div className="max-w-6xl mx-auto mb-12">
-          <div className="flex justify-between items-end mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
+        <div className="max-w-6xl mx-auto mb-5">
+          <div className="flex justify-end items-end mb-6">
+            {/* <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
               Most popular categories
-            </h2>
+            </h2> */}
             <div className="hidden sm:flex gap-2">
               <button 
                 onClick={() => {
@@ -331,60 +328,42 @@ export default function HomePageClient({ initialProducts, categories, initialNex
             {/* All Products Card */}
             <button
               onClick={() => setSelectedCategoryId(null)}
-              className={`flex-none w-[200px] p-3 rounded-xl border transition-all duration-300 flex items-center gap-3 text-left group
+              className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
                 ${selectedCategoryId === null
-                  ? "bg-white border-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
+                  ? "text-white bg-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
                   : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
                 }`}
             >
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors
+              {/* <div className={`w-6 h-6 rounded-lg flex items-center justify-center transition-colors
                 ${selectedCategoryId === null ? "bg-[#008000]/5 text-[#008000]" : "bg-gray-100 text-gray-500"}`}>
-                <GridIcon size={18} />
-              </div>
-              <span className={`text-sm font-bold transition-colors ${selectedCategoryId === null ? "text-[#008000]" : "text-gray-700"}`}>
+                <GridIcon size={14} />
+              </div> */}
+              <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === null ? "text-white" : "text-gray-700"}`}>
                 All Products
               </span>
-              <div className={`ml-auto transition-all ${selectedCategoryId === null ? "text-[#008000] translate-x-1" : "text-gray-300"}`}>
+              {/* <div className={`ml-auto transition-all ${selectedCategoryId === null ? "text-[#008000] translate-x-1" : "text-gray-300"}`}>
                 <ArrowRight01Icon size={16} />
-              </div>
+              </div> */}
             </button>
 
-            {normalizedCategories.map((category) => (
+            {categoriesState.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategoryId(category.id)}
-                className={`flex-none w-[200px] p-3 rounded-xl border transition-all duration-300 flex items-center gap-3 text-left group
+                className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
                   ${selectedCategoryId === category.id
-                    ? "bg-white border-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
+                    ? "text-white bg-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
                     : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
                   }`}
               >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden transition-colors
-                  ${selectedCategoryId === category.id ? "bg-[#008000]/5" : "bg-gray-100"}`}>
-                  {category.image_url ? (
-                    <div className="relative w-6 h-6">
-                      <Image
-                        src={category.image_url}
-                        alt={category.name}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <GridIcon size={18} className={selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-500"} />
-                  )}
-                </div>
-                <span className={`text-sm font-bold transition-colors line-clamp-1 ${selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-700"}`}>
+                <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === category.id ? "text-white" : "text-gray-700"}`}>
                   {category.name}
                 </span>
-                <div className={`ml-auto transition-all ${selectedCategoryId === category.id ? "text-[#008000] translate-x-1" : "text-gray-300"}`}>
-                  <ArrowRight01Icon size={16} />
-                </div>
               </button>
             ))}
           </div>
         </div>
-        <div className="max-w-6xl mx-auto mt-10">
+        <div className="max-w-6xl mx-auto mt-5">
           {pageError && (
             <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
               {pageError}
@@ -408,7 +387,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
             <>
               <div className={`grid gap-4 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
                 {filteredProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                  <ProductCard key={product.id} product={product} onSelect={setSelectedProduct} />
                 ))}
               </div>
 
@@ -429,7 +408,14 @@ export default function HomePageClient({ initialProducts, categories, initialNex
             </>
           )}
         </div>
-      </main>
+      </div>
+      {selectedProduct && (
+        <ProductModal 
+          product={selectedProduct} 
+          onClose={() => setSelectedProduct(null)} 
+          showAddToCart={false}
+        />
+      )}
     </div>
   );
 }

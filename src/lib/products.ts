@@ -44,10 +44,24 @@ export interface ProductCreateData {
     category?: string | number | null;
 }
 
-export const fetchProductsPage = async (url?: string): Promise<PaginatedProductsResponse> => {
-    const endpoint = url || `${API_URL}/api/products/`;
+export const fetchProductsPage = async (url?: string, params?: Record<string, string | number>): Promise<PaginatedProductsResponse> => {
+    let endpoint = url;
+    
+    if (!endpoint) {
+        const searchParams = new URLSearchParams();
+        if (params) {
+            Object.entries(params).forEach(([key, value]) => {
+                if (value !== undefined && value !== null) {
+                    searchParams.append(key, value.toString());
+                }
+            });
+        }
+        const queryString = searchParams.toString();
+        endpoint = `${API_URL}/api/products/${queryString ? `?${queryString}` : ''}`;
+    }
+
     const response = await fetch(endpoint, {
-        next: { revalidate: 60 } // Cache for 60 seconds
+        next: { revalidate: 0 } // Disable cache to see results immediately during dev
     });
     if (!response.ok) {
         throw new Error('Failed to fetch products');
