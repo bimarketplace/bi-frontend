@@ -81,22 +81,23 @@ const ProductCard = ({ product, onSelect }: { product: ProductType, onSelect: (p
 
 interface VendorPageProps {
   params: Promise<{ id: string }>;
-  initialProducts?: ProductType[];
-  categories?: Category[];
-  initialNext?: string | null;
-  initialPrev?: string | null;
-  initialCount?: number;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export default function Products({ 
   params, 
-  initialProducts, 
-  categories, 
-  initialNext, 
-  initialPrev, 
-  initialCount 
+  searchParams 
 }: VendorPageProps) {
+  // These initial values are not passed to Next.js pages but 
+  // were present in the interface. We initialize them as constants.
+  const initialProducts: ProductType[] = [];
+  const categories: Category[] = [];
+  const initialNext: string | null = null;
+  const initialPrev: string | null = null;
+  const initialCount: number = 0;
+
   const { id } = React.use(params);
+  const searchParamsValue = React.use(searchParams); // Use if needed
   const { data: session } = useSession();
   const { columns, toggleColumns } = useGrid();
   const [search, setSearch] = useState("");

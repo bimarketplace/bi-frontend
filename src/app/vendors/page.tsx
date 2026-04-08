@@ -92,7 +92,23 @@ const VendorCard = ({ vendor }: VendorCardProps) => {
   );
 };
 
-export default function Vendors({ initialProducts, categories, initialNext, initialPrev, initialCount }: { initialProducts: ProductType[] | null | undefined; categories: Category[] | null | undefined; initialNext?: string | null; initialPrev?: string | null; initialCount?: number; }) {
+interface VendorsPageProps {
+  params: Promise<any>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}
+
+export default function Vendors({ 
+  params, 
+  searchParams 
+}: VendorsPageProps) {
+  // These initial values are not passed to Next.js pages but 
+  // were present in the previous interface. We initialize them as constants.
+  const initialProducts: ProductType[] | null | undefined = undefined;
+  const categories: Category[] | null | undefined = undefined;
+  const initialNext: string | null = null;
+  const initialPrev: string | null = null;
+  const initialCount: number = 0;
+
   const { data: session } = useSession();
   const user = session?.user;
   const isLoggedIn = !!session;
@@ -114,7 +130,7 @@ export default function Vendors({ initialProducts, categories, initialNext, init
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      if (normalizedInitialProducts.length > 0 || (categories && categories.length > 0)) {
+      if (normalizedInitialProducts.length > 0 || normalizedCategories.length > 0) {
         setIsInitialLoading(false);
         return;
       }

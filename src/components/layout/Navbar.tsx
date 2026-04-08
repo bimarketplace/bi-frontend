@@ -169,9 +169,8 @@ export default function Navbar() {
                             </div>
                         ) : null}
                         <div className="flex items-center gap-4 border-gray-100 pl-4 ml-2">
-
                             <div className="relative">
-                                {/* Mobile: Link to Notifications Page */}
+                                {/* Mobile: Link to Notifications Page ... */}
                                 {/* <Link 
                                     href="/notifications"
                                     className="sm:hidden relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
