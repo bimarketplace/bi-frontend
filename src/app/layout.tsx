@@ -7,7 +7,7 @@ import Navbar from "@/components/layout/Navbar";
 import CartFloat from "@/components/layout/CartFloat";
 import InstallPrompt from '@/components/layout/InstallPrompt';
 
-export const inter = Inter({
+const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
