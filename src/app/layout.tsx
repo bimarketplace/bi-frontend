@@ -39,7 +39,7 @@ export default function RootLayout({
           <CartFloat />
           {/* <WhatsAppFloat /> */}
           <InstallPrompt />
-          <OfflineFallback />
+          {/* <OfflineFallback /> */}
         </Providers>
       </body>
     </html>
