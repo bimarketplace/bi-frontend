@@ -6,6 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 // import WhatsAppFloat from "@/components/layout/WhatsAppFloat";
 import CartFloat from "@/components/layout/CartFloat";
 import InstallPrompt from '@/components/layout/InstallPrompt';
+import OfflineFallback from '@/components/layout/OfflineFallback';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -38,6 +39,7 @@ export default function RootLayout({
           <CartFloat />
           {/* <WhatsAppFloat /> */}
           <InstallPrompt />
+          <OfflineFallback />
         </Providers>
       </body>
     </html>

@@ -138,7 +138,7 @@ export default function Vendors({
       setIsInitialLoading(true);
       try {
         const [productsData, categoriesData] = await Promise.all([
-          fetchProductsPage(),
+          fetchProductsPage(undefined, { page_size: 100 }),
           import("@/lib/categories").then(m => m.fetchCategories())
         ]);
 
@@ -213,7 +213,6 @@ export default function Vendors({
     }
   }, [nextPageUrl, isFetchingPage]);
 
-  /*
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -230,7 +229,6 @@ export default function Vendors({
 
     return () => observer.disconnect();
   }, [nextPageUrl, isFetchingPage, loadMore]);
-  */
 
   // Welcome notification on initial login
   useEffect(() => {
@@ -245,8 +243,6 @@ export default function Vendors({
       }
     }
   }, [isLoggedIn, user]);
-
-
 
   const isEmptyState = !isInitialLoading && uniqueVendors.length === 0;
 
