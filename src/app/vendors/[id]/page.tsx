@@ -302,7 +302,7 @@ export default function Products({
           )}
 
           {isInitialLoading ? (
-            <div className={`grid gap-6 justify-items-center grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full`}>
+            <div className={`grid gap-6 justify-items-center grid-cols-2 lg:grid-cols-4 w-full`}>
               {Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                   <div className="h-28 bg-gray-200 rounded-md mb-4" />
@@ -316,7 +316,7 @@ export default function Products({
             <EmptyState message="No matching products found" />
           ) : (
             <>
-              <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full`}>
+              <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} onSelect={setSelectedProduct} />
                 ))}
@@ -324,7 +324,7 @@ export default function Products({
 
               <div ref={observerTarget} className="mt-8 w-full flex justify-center pb-8">
                 {isFetchingPage && (
-                  <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full`}>
+                  <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
                     {Array.from({ length: 4 }).map((_, index) => (
                       <div key={`skeleton-${index}`} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                         <div className="h-28 bg-gray-200 rounded-md mb-4" />
