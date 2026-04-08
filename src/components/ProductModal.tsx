@@ -43,7 +43,7 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
   };
 
   const handleWhatsAppCheckout = () => {
-    const phoneNumber = "2349124848282"; // Default support number or vendor number if available
+    const phoneNumber = product.seller.whatsapp_number || "2348123456789"; // Use seller's number or a default fallback
     const message = `Hello, I'm interested in purchasing: ${product.name}\nPrice: ₦${parseFloat(product.price || "0").toLocaleString()}`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
