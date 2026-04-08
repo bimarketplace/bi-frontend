@@ -281,7 +281,7 @@ export default function ProfilePage() {
 
         <div className="max-w-6xl mx-auto mt-5 px-4 sm:px-8">
           {loading ? (
-            <div className={`grid gap-4 justify-items-center grid-cols-2 lg:grid-cols-4 w-full`}>
+            <div className={`grid gap-6 justify-items-center grid-cols-2 lg:grid-cols-4 w-full`}>
               {Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                   <div className="h-28 bg-gray-200 rounded-md mb-4" />
@@ -294,7 +294,7 @@ export default function ProfilePage() {
           ) : filteredProducts.length === 0 ? (
             <EmptyState onAdd={() => setIsCreateModalOpen(true)} />
           ) : (
-            <div className={`grid gap-4 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
+            <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
                 {filteredProducts.map((product) => (
                   <div
                     key={product.id}
