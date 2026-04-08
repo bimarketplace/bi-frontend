@@ -253,9 +253,9 @@ export default function Vendors({
   return (
     <div className="w-full pt-25 bg-white min-h-screen">
       <div className="pb-16 px-4 sm:px-8">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-5 px-[15px]">Find the best vendors for your needs</h1>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-5 px-4 sm:px-8">Find the best vendors for your needs</h1>
         {/* Search Bar Container */}
-        <div className="mx-auto px-[15px]">
+        <div className="mx-auto px-4 sm:px-8">
           <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
             <input
               type="text"
@@ -272,7 +272,7 @@ export default function Vendors({
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto mt-12 px-[15px]">
+        <div className="max-w-6xl mx-auto mt-12 px-4 sm:px-8">
           {pageError && (
             <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
               {pageError}
@@ -280,7 +280,7 @@ export default function Vendors({
           )}
 
           {isInitialLoading ? (
-            <div className={`grid gap-4 justify-items-center grid-cols-2 lg:grid-cols-4 w-full`}>
+            <div className={`grid gap-6 justify-items-center grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full`}>
               {Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                   <div className="h-28 bg-gray-200 rounded-md mb-4" />
@@ -294,7 +294,7 @@ export default function Vendors({
             <EmptyState message="No matching vendors found" />
           ) : (
             <>
-              <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
+              <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full`}>
                 {filteredVendors.map((vendor) => (
                   <VendorCard key={vendor.id} vendor={vendor} />
                 ))}
@@ -302,7 +302,7 @@ export default function Vendors({
 
               <div ref={observerTarget} className="mt-8 w-full flex justify-center pb-8">
                 {isFetchingPage && (
-                  <div className={`grid gap-4 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
+                  <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 w-full`}>
                     {Array.from({ length: 4 }).map((_, index) => (
                       <div key={`skeleton-${index}`} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                         <div className="h-28 bg-gray-200 rounded-md mb-4" />
