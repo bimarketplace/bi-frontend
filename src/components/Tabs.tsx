@@ -44,7 +44,7 @@ export default function Tabs({ productsProps }: TabsProps) {
   return (
     <div className="">
       {/* Tab Buttons */}
-      <div className="flex border-b border-gray-300">
+      <div className="flex border-b border-gray-300 lg:mx-15">
         {tabs.map((tab) => (
           <button
             key={tab.id}

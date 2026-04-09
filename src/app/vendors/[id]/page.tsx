@@ -202,7 +202,7 @@ export default function Products({
       <div className="max-w-6xl mx-auto">
         <div className="px-4 sm:px-8">
           {/* Seller profile */}
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center gap-4 mb-">
             <div className="relative">
               <Avatar 
                 name={storeName.charAt(0).toUpperCase()} 
@@ -215,6 +215,32 @@ export default function Products({
               {storeName}
             </span>
           </div>
+              <button
+                onClick={() => {
+                  const url = `${window.location.origin}/store/${id}`;
+
+                  const message = `🛍️ I'm now officially listed on BI Marketplace!
+
+                You can now shop with me easily — no stress, no hassle, just smooth and secure shopping 🛒✨
+
+                Browse my store here:
+                ${url}`;
+
+                  navigator.clipboard.writeText(message);
+
+                  toast.success("Store link copied!", {
+                    style: {
+                      borderRadius: "12px",
+                      background: "#ffffff",
+                      color: "#000000",
+                      border: "1px solid #f5f5f5",
+                    },
+                  });
+                }}
+                className="px-5 py-2.5 cursor-pointer my-4 bg-[#f5f5f5] text-gray-900 text-[14px] font-bold rounded-[10px] hover:bg-[#fcfcfc] transition-all hover:scale-[1.02]"
+              >
+                Copy Profile Link
+              </button>
           <p className="text-sm font-medium text-gray-900 mb-4">
             Welcome to {storeName}&apos;s store. We provide the best products at competitive prices.
           </p>

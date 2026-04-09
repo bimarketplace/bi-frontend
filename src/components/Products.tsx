@@ -278,8 +278,9 @@ export default function Products({ initialProducts, categories, initialNext, ini
   return (
     <div className="w-full">
                       <div className="pb-16 px-4 sm:px-8">
+                        <div className="max-w-6xl">
                       {/* Search Bar Container */}
-                      <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
+                      <div className="flex items-center w-full max-w-2xl lg:mx-5 bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
                         <input
                           type="text"
                           placeholder="Search for any service..."
@@ -293,6 +294,7 @@ export default function Products({ initialProducts, categories, initialNext, ini
                           <Search02Icon size={20} />
                         </div>
                       </div>
+                        </div>
         {/* Categories Bar */}
         <div className="max-w-6xl mx-auto mb-5">
           <div className="flex justify-end items-end mb-6">
