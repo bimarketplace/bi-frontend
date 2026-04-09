@@ -47,43 +47,47 @@ const VendorCard = ({ vendor }: VendorCardProps) => {
       className="group relative w-full bg-white rounded-xl overflow-hidden border border-transparent hover:border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full cursor-pointer"
     >
       {/* Image Container */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-gray-100 p-8 flex items-center justify-center">
-        <Image
-          src={vendor.avatar_url || "/assets/images/bi.png"}
-          alt={vendor.username}
-          fill
-          className="object-contain p-4 transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = "/assets/images/bi.png";
-          }}
-        />
-      </div>
+      <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+      <Image
+        src={vendor.banner_url || vendor.avatar_url || "/assets/images/bi.png"}
+        alt={vendor.username}
+        fill
+        className={`transition-transform duration-500 group-hover:scale-105 ${
+          vendor.banner_url
+            ? "object-cover" // FULL banner
+            : "object-contain p-6" // logo fallback
+        }`}
+        onError={(e) => {
+          const target = e.target as HTMLImageElement;
+          target.src = "/assets/images/bi.png";
+        }}
+      />
+    </div>
 
       {/* Content Area */}
       <div className="flex-1 p-3 flex flex-col gap-2">
         {/* Vendor Title / Name */}
-        <h3 className="text-[17px] font-bold text-gray-900 line-clamp-2 leading-snug hover:underline uppercase">
+        <h3 className="text-[17px] truncate font-bold text-gray-900 line-clamp-2 leading-snug hover:underline uppercase">
           {vendor.username}
         </h3>
 
         {/* Location */}
         <div className="flex items-center gap-1">
-          <span className="text-sm text-gray-500 font-medium">Verified Vendor</span>
+          <span className="text-sm text-gray-500 font-medium line-clamp-2">{vendor.bio}</span>
         </div>
 
         {/* Rating */}
-        <div className="flex items-center gap-1">
+        {/* <div className="flex items-center gap-1">
           <StarIcon size={14} className="fill-gray-900 text-gray-900" />
           <StarIcon size={14} className="fill-gray-900 text-gray-900" />
           <StarIcon size={14} className="fill-gray-900 text-gray-900" />
           <StarIcon size={14} className="fill-gray-900 text-gray-900" />
           <StarIcon size={14} className="fill-gray-900 text-gray-900" />
           <span className="text-sm text-gray-500 ml-1">(5.0)</span>
-        </div>
+        </div> */}
 
         <div className="mt-auto pt-4">
-          <div className="w-full text-center text-sm bg-[#008000] text-white py-2.5 rounded-xl group-hover:bg-[#006000] transition-colors font-bold shadow-sm">
+          <div className="w-full text-center text-sm bg-[#f5f5f5] text-gray-900 py-2.5 rounded-xl group-hover:bg-[#006000] hover:text-white transition-colors font-bold hover:shadow-sm">
             Visit Store
           </div>
         </div>
@@ -248,10 +252,11 @@ export default function Vendors({
 
   return (
     <div className="w-full pt-25 bg-white min-h-screen">
+      <div className="max-w-6xl mx-auto mt-2">
       <div className="pb-16 px-4 sm:px-8">
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-5 px-4 sm:px-8">Find the best vendors for your needs</h1>
+        <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-5 ">Find the best vendors for your needs</h1>
         {/* Search Bar Container */}
-        <div className="mx-auto px-4 sm:px-8">
+        <div className="mx-auto ">
           <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
             <input
               type="text"
@@ -267,8 +272,9 @@ export default function Vendors({
             </div>
           </div>
         </div>
+        </div>
 
-        <div className="max-w-6xl mx-auto mt-12 px-4 sm:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8">
           {pageError && (
             <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
               {pageError}

@@ -44,7 +44,7 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
 
   const handleWhatsAppCheckout = () => {
     const phoneNumber = product.seller.whatsapp_number; // Use seller's number or a default fallback
-    const message = `Hello, I'm interested in purchasing: ${product.name}\nPrice: ₦${parseFloat(product.price || "0").toLocaleString()}`;
+    const message = `Hello, I'm interested in purchasing listed on BI Marketplace: ${product.name}\nPrice: ₦${parseFloat(product.price || "0").toLocaleString()}`;
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
   };

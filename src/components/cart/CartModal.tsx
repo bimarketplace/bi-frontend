@@ -5,6 +5,14 @@ import Image from "next/image";
 import { Cancel01Icon, ShoppingBasket01Icon, Delete01Icon } from "hugeicons-react";
 import { useCart } from "@/context/CartContext";
 import toast from "react-hot-toast";
+import { Product as ProductType } from "@/lib/products";
+
+
+interface ProductModalProps {
+  product: ProductType;
+  onClose: () => void;
+  showAddToCart?: boolean;
+}
 
 const CartModal = ({ onClose }: { onClose: () => void }) => {
   const { items, removeFromCart, clearCart, itemCount } = useCart();
@@ -27,24 +35,30 @@ const CartModal = ({ onClose }: { onClose: () => void }) => {
     0
   );
 
-  const handleCheckout = () => {
-    const phoneNumber = "2349124848282";
-    const itemList = items.map(item => `- ${item.product.name} (Qty: ${item.quantity})`).join('\n');
-    const message = `Hello, I'm interested in purchasing the following items:\n\n${itemList}\n\nTotal: ₦${totalPrice.toLocaleString()}`;
-    const encodedMessage = encodeURIComponent(message);
-    
-    toast.success("Proceeding to checkout...", {
-       style: {
-        borderRadius: "12px",
-        background: "#ffffff",
-        color: "#000000",
-        border: "1px solid #f5f5f5",
-      },
-    });
+const handleCheckout = () => {
+  if (items.length === 0) return;
 
-    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
-    handleClose();
-  };
+  const phoneNumber = items[0].product.seller.whatsapp_number;
+
+  const itemList = items
+    .map(item => `- ${item.product.name} (Qty: ${item.quantity})`)
+    .join('\n');
+
+  const message = `Hello, I'm interested in purchasing the following items listed on BI Marketplace:\n\n${itemList}\n\nTotal: ₦${totalPrice.toLocaleString()}`;
+  const encodedMessage = encodeURIComponent(message);
+
+  toast.success("Proceeding to checkout...", {
+    style: {
+      borderRadius: "12px",
+      background: "#ffffff",
+      color: "#000000",
+      border: "1px solid #f5f5f5",
+    },
+  });
+
+  window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, "_blank");
+  handleClose();
+};
 
   return (
     <div className="fixed inset-0 z-[110] flex items-end sm:items-stretch sm:justify-end overflow-hidden">
@@ -125,7 +139,7 @@ const CartModal = ({ onClose }: { onClose: () => void }) => {
               onClick={handleCheckout}
               className="w-full bg-[#008000] text-white py-3.5 rounded-xl font-bold hover:bg-[#006000] transition-colors flex items-center justify-center gap-3 shadow-[0_4px_14px_rgba(0,128,0,0.2)]"
             >
-              Proceed
+              Checkout via WhatsApp
             </button>
           </div>
         )}
