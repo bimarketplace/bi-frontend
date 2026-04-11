@@ -12,6 +12,8 @@ export interface Product {
         bio?: string;
         avatar?: string | null;
         avatar_url?: string | null;
+        first_name?: string;
+        last_name?: string;
     };
     name: string;
     price: string;

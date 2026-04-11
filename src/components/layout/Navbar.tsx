@@ -11,7 +11,12 @@ import {
     CheckmarkCircle01Icon,
     PlusSignIcon,
     Notification03Icon,
-    FavouriteIcon
+    FavouriteIcon,
+    ShoppingBag01Icon,
+    Store01Icon,
+    WhatsappIcon,
+    UserCircleIcon,
+    Login01Icon
 } from "hugeicons-react";
 import { resendEmail } from "@/lib/auth";
 
@@ -261,17 +266,24 @@ export default function Navbar() {
                     </div>
 
                     <nav className="space-y-4 flex-1">
-                        <Link href="/vendors" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                        <Link href="/" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            <ShoppingBag01Icon size={20} />
+                            Marketplace
+                        </Link>
+                        <Link href="/vendors" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            <Store01Icon size={20} />
                             Vendors
                         </Link>
-                        <Link href={whatsappUrl} onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
-                            Contact Support
-                        </Link>
                         {isLoggedIn && (
-                            <Link href="/profile" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
-                                My Profile & Listings
+                            <Link href="/profile" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                                <Store01Icon size={20} />
+                                My Store
                             </Link>
                         )}
+                        <Link href={whatsappUrl} onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            <WhatsappIcon size={20} />
+                            Contact Support
+                        </Link>
                         {/* <Link href="/products" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 rounded-xl transition-all font-bold">
                             All Products
                         </Link> */}
@@ -280,10 +292,12 @@ export default function Navbar() {
 
                         {!isLoggedIn ? (
                             <>
-                                <Link href="/auth/login" onClick={closeOffcanvas} className="block py-3 px-4 text-primary-950 font-bold hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all">
+                                <Link href="/auth/login" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-primary-950 font-bold hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all">
+                                    <Login01Icon size={20} />
                                     Sign In
                                 </Link>
-                                <Link href="/auth/signup" onClick={closeOffcanvas} className="block py-3 px-4 bg-[#008000] text-white rounded-xl transition-all text-center font-bold mt-4 shadow-[0_4px_14px_0_rgba(0,128,0,0.2)] hover:bg-primary-700">
+                                <Link href="/auth/signup" onClick={closeOffcanvas} className="flex items-center justify-center gap-2 py-3 px-4 bg-[#008000] text-white rounded-xl transition-all font-bold mt-4 shadow-[0_4px_14px_0_rgba(0,128,0,0.2)] hover:bg-primary-700">
+                                    <PlusSignIcon size={20} />
                                     Get Started
                                 </Link>
                             </>

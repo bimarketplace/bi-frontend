@@ -226,19 +226,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
     return () => observer.disconnect();
   }, [nextPageUrl, isFetchingPage, loadMore]);
 
-  // Welcome notification on initial login
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      const hasWelcomed = sessionStorage.getItem(`welcomed_${user.email || (user as any).username}`);
-      if (!hasWelcomed) {
-        toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
-          icon: '👋',
-          duration: 4000,
-        });
-        sessionStorage.setItem(`welcomed_${user.email || (user as any).username}`, "true");
-      }
-    }
-  }, [isLoggedIn, user]);
+
 
 
 

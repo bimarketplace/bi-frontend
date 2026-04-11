@@ -114,12 +114,21 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
               Add to Cart
             </button>
           ) : (
+            <div>
             <button 
               onClick={handleWhatsAppCheckout}
               className="w-full bg-[#008000] text-white py-3 rounded-xl font-bold hover:bg-[#006000] transition-colors flex items-center justify-center gap-3"
             >
               Checkout via WhatsApp
             </button>
+            <a href={`/vendors/${product.seller?.username}`}>
+            <button 
+              className="w-full bg-[#f5f5f5] mt-3 text-gray-900 py-3 rounded-xl font-bold hover:bg-[#e5e5e5] transition-colors flex items-center justify-center gap-3"
+            >
+              Open Store
+            </button>
+            </a>
+            </div>
           )}
         </div>
       </div>

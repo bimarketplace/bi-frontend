@@ -19,9 +19,10 @@ import {
   ArrowRight02Icon
 } from "hugeicons-react";
 import { toast } from "react-hot-toast";
-import { updateProfile, fetchUserProfile } from "@/lib/auth";
-import { Avatar, CloseIcon } from "@/components/layout/Navbar";
+import { fetchUserProfile } from "@/lib/auth";
+import { Avatar } from "@/components/layout/Navbar";
 import CreateProductModal from "@/components/CreateProductModal";
+import ProfileSettingsModal from "@/components/ProfileSettingsModal";
 
 // Simple Alert icon component
 const AlertIcon = () => (
@@ -55,12 +56,12 @@ export default function ProfilePage() {
 
   // Profile settings states
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [profileData, setProfileData] = useState({
     whatsapp_number: '',
-    bio: ''
+    bio: '',
+    first_name: '',
+    last_name: ''
   });
 
   const [search, setSearch] = useState("");
@@ -90,7 +91,9 @@ export default function ProfilePage() {
       setCategoriesState(categoriesData);
       setProfileData({
         whatsapp_number: profile.whatsapp_number || '',
-        bio: profile.bio || ''
+        bio: profile.bio || '',
+        first_name: profile.first_name || '',
+        last_name: profile.last_name || ''
       });
     } catch (error) {
       console.error("Failed to fetch profile data:", error);
@@ -103,22 +106,6 @@ export default function ProfilePage() {
   useEffect(() => {
     if (session) refreshData();
   }, [session]);
-
-  const handleUpdateProfile = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!session?.access_token) return;
-
-    setIsUpdating(true);
-    try {
-      await updateProfile(profileData, (session as any).access_token);
-      toast.success("Profile updated successfully");
-      setIsModalOpen(false);
-    } catch (error) {
-      toast.error("Failed to update profile");
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
@@ -176,6 +163,11 @@ export default function ProfilePage() {
                 <span className="text-lg font-bold text-gray-900 uppercase">
                   {storeName}
                 </span>
+                {(profileData.first_name || profileData.last_name) && (
+                  <span className="text-sm font-medium text-gray-500 mb-1">
+                    {`${profileData.first_name} ${profileData.last_name}`.trim()}
+                  </span>
+                )}
                 <p className="text-sm font-medium text-gray-500">
                     {products.length} Products listed
                 </p>
@@ -355,75 +347,11 @@ export default function ProfilePage() {
 
       {/* Profile Settings Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-[#008000]/40 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
-          <div className="relative bg-white w-full max-w-xl rounded-[32px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="p-8 border-b border-zinc-50 flex justify-between items-center bg-zinc-50/50">
-              <h2 className="text-2xl font-black text-zinc-900 flex items-center gap-3">
-                <Settings01Icon size={28} />
-                Profile Settings
-              </h2>
-              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-white rounded-full transition-colors border border-transparent hover:border-zinc-100">
-                <CloseIcon />
-              </button>
-            </div>
-
-            <form onSubmit={handleUpdateProfile} className="p-8 space-y-8">
-              <div>
-                <label className="block text-sm font-bold text-zinc-900 mb-3 uppercase tracking-wider">WhatsApp Number</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400">
-                    <WhatsappIcon size={20} />
-                  </div>
-                  <input
-                    type="text"
-                    placeholder="+234..."
-                    value={profileData.whatsapp_number}
-                    onChange={(e) => setProfileData({ ...profileData, whatsapp_number: e.target.value })}
-                    className="w-full pl-12 pr-4 py-4 bg-zinc-50 border border-zinc-100 rounded-[18px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-medium"
-                  />
-                </div>
-                <p className="mt-2 text-xs text-zinc-400 font-medium">Include country code for the direct WhatsApp link to work.</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-zinc-900 mb-3 uppercase tracking-wider">Public Bio</label>
-                <textarea
-                  rows={4}
-                  placeholder="Tell the community about yourself..."
-                  value={profileData.bio}
-                  onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-                  className="w-full px-5 py-4 bg-zinc-50 border border-zinc-100 rounded-[18px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-medium resize-none"
-                />
-              </div>
-
-              <div className="flex gap-4 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="flex-1 py-4 bg-zinc-50 text-zinc-600 rounded-[18px] font-bold hover:bg-zinc-100 transition-all flex items-center justify-center gap-2"
-                >
-                  <Cancel01Icon size={20} />
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isUpdating}
-                  className="flex-[2] py-4 bg-[#008000] text-white rounded-[18px] font-black text-lg hover:bg-zinc-800 transition-all shadow-xl shadow-primary-900/10 disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {isUpdating ? (
-                    <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                  ) : (
-                    <>
-                      <CheckmarkCircle01Icon size={22} />
-                      Save Changes
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ProfileSettingsModal 
+            initialData={profileData} 
+            onClose={() => setIsModalOpen(false)} 
+            onSuccess={refreshData}
+        />
       )}
       {/* Create Product Modal */}
       {isCreateModalOpen && (
