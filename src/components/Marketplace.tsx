@@ -18,20 +18,7 @@ export default function Marketplace({ initialProducts, categories, initialNext, 
   const isLoggedIn = !!session;
   const isVerified = (user as any)?.is_verified ?? (user as any)?.email_verified ?? true;
 
-  // Welcome notification on initial login
-  useEffect(() => {
-    if (isLoggedIn && isMounted) {
-      toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
-        icon: '👋',
-        duration: 3000,
-        style: {
-          borderRadius: '12px',
-          background: '#008000',
-          color: '#fff',
-        },
-      });
-    }
-  }, [isLoggedIn, user, isMounted]);
+
 
   // Use server-side default padding first to avoid hydration mismatch
   const paddingTopClass = (isMounted && isLoggedIn && !isVerified) ? 'pt-[125px]' : 'pt-20';

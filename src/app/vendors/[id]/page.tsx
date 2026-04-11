@@ -194,6 +194,9 @@ export default function Products({
 
   // Dynamic store name
   const storeName = products.length > 0 ? products[0].seller.username : "BI STORE";
+  const firstName = products.length > 0 ? products[0].seller.first_name : "";
+  const lastName = products.length > 0 ? products[0].seller.last_name : "";
+  const fullName = firstName || lastName ? `${firstName || ""} ${lastName || ""}`.trim() : "";
 
   const isEmptyState = !isInitialLoading && filteredProducts.length === 0;
 
@@ -211,13 +214,20 @@ export default function Products({
                 className="ring-1 ring-gray-100 rounded-xxl"
               />
             </div>
-            <span className="text-lg font-bold text-gray-900 uppercase">
-              {storeName}
-            </span>
+            <div className="flex flex-col">
+              <span className="text-lg font-bold text-gray-900 uppercase">
+                {storeName}
+              </span>
+              {fullName && (
+                <span className="text-sm font-medium text-gray-500">
+                  {fullName}
+                </span>
+              )}
+            </div>
           </div>
               <button
                 onClick={() => {
-                  const url = `${window.location.origin}/store/${id}`;
+                  const url = `${window.location.origin}/vendors/${id}`;
 
                   const message = `🛍️ I'm now officially listed on BI Marketplace!
 

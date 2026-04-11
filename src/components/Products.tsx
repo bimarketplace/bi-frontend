@@ -256,20 +256,7 @@ export default function Products({ initialProducts, categories, initialNext, ini
     return () => observer.disconnect();
   }, [nextPageUrl, isFetchingPage, loadMore]);
 
-  // Welcome notification on initial login
-  useEffect(() => {
-    if (isLoggedIn) {
-      toast.success(`Welcome back, ${user?.name || (user as any)?.username || 'User'}!`, {
-        icon: '👋',
-        duration: 3000,
-        style: {
-          borderRadius: '12px',
-          background: '#008000',
-          color: '#fff',
-        },
-      });
-    }
-  }, [isLoggedIn, user]);
+
 
 
 
