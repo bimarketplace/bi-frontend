@@ -14,9 +14,33 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BI",
-  description: "Marketplace for your products",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
+  title: "BI - The Ultimate Marketplace",
+  description: "Discover BI, the ultimate marketplace for all your products. Shop from a wide range of verified sellers, enjoy secure payments, fast delivery, and top-notch customer support.",
+  keywords: ["marketplace", "ecommerce", "shopping", "buy online", "sell online", "BI marketplace", "products"],
   manifest: "/manifest.json",
+  openGraph: {
+    title: "BI - The Ultimate Marketplace",
+    description: "Discover BI, the ultimate marketplace for all your products. Shop from a wide range of verified sellers, enjoy secure payments, fast delivery, and top-notch customer support.",
+    url: "/",
+    siteName: "BI Marketplace",
+    images: [
+      {
+        url: "/icon512_rounded.png", // Assuming this acts as our logo, adjust if there's a specific logo URL
+        width: 512,
+        height: 512,
+        alt: "BI Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BI - The Ultimate Marketplace",
+    description: "Discover BI, the ultimate marketplace for all your products. Shop from a wide range of verified sellers, enjoy secure payments, fast delivery, and top-notch customer support.",
+    images: ["/icon512_rounded.png"],
+  },
 };
 
 export const viewport: Viewport = {
