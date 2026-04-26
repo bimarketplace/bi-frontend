@@ -49,3 +49,8 @@ next-env.d.ts
 **/public/worker-*.js.map
 **/public/fallback-*.js
 **/public/swe-worker-*.js
+
+# Sitemap
+public/robots.txt
+public/sitemap-0.xml
+public/sitemap.xml
