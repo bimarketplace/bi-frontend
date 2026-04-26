@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Cancel01Icon } from "hugeicons-react";
+import { Cancel01Icon, Location01Icon } from "hugeicons-react";
 import { Product as ProductType } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import toast from "react-hot-toast";
@@ -94,6 +94,16 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
              <div className="text-2xl font-bold text-[#008000]">
                ₦{parseFloat(product.price || "0").toLocaleString()}
              </div>
+
+             {product.seller.state_details && (
+               <div className="flex items-center gap-1.5 text-zinc-500 mt-1">
+                 <Location01Icon size={16} />
+                 <span className="text-sm font-medium">
+                   {product.seller.lga_details?.name ? `${product.seller.lga_details.name}, ` : ''}
+                   {product.seller.state_details.name}
+                 </span>
+               </div>
+             )}
 
              <div className="mt-4 flex flex-col gap-2">
                <h3 className="font-bold text-gray-900">Description</h3>

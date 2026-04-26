@@ -5,6 +5,7 @@ import { Cancel01Icon, Settings01Icon, WhatsappIcon, CheckmarkCircle01Icon } fro
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import { updateProfile } from "@/lib/auth";
+import { fetchStates, fetchLGAs, State, LGA } from "@/lib/locations";
 
 interface ProfileSettingsModalProps {
   initialData: { whatsapp_number: string; bio: string; first_name?: string; last_name?: string };
@@ -22,8 +23,35 @@ const ProfileSettingsModal = ({ initialData, onClose, onSuccess }: ProfileSettin
     first_name: initialData.first_name || '',
     last_name: initialData.last_name || '',
     whatsapp_number: initialData.whatsapp_number || '',
-    bio: initialData.bio || ''
+    bio: initialData.bio || '',
+    state: (initialData as any).state || '',
+    lga: (initialData as any).lga || ''
   });
+
+  const [states, setStates] = useState<State[]>([]);
+  const [lgas, setLgas] = useState<LGA[]>([]);
+
+  useEffect(() => {
+    const loadLocations = async () => {
+      const statesData = await fetchStates();
+      setStates(statesData);
+      if (formData.state) {
+        const lgasData = await fetchLGAs(Number(formData.state));
+        setLgas(lgasData);
+      }
+    };
+    loadLocations();
+  }, []);
+
+  const handleStateChange = async (stateId: string) => {
+    setFormData({ ...formData, state: stateId, lga: '' });
+    if (stateId) {
+      const lgasData = await fetchLGAs(Number(stateId));
+      setLgas(lgasData);
+    } else {
+      setLgas([]);
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => setIsOpening(true), 10);
@@ -126,6 +154,36 @@ const ProfileSettingsModal = ({ initialData, onClose, onSuccess }: ProfileSettin
                   />
                 </div>
                 <p className="mt-2 text-xs text-zinc-400 font-medium">Include country code for the direct WhatsApp link to work.</p>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="flex-1">
+                  <label className="block text-sm font-bold text-zinc-900 mb-2 uppercase tracking-wider">State</label>
+                  <select
+                    value={formData.state}
+                    onChange={(e) => handleStateChange(e.target.value)}
+                    className="w-full px-4 py-3 sm:py-4 bg-zinc-50 border border-zinc-100 rounded-[18px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-medium text-sm sm:text-base appearance-none"
+                  >
+                    <option value="">Select State</option>
+                    {Array.isArray(states) && states.map(state => (
+                      <option key={state.id} value={state.id}>{state.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex-1">
+                  <label className="block text-sm font-bold text-zinc-900 mb-2 uppercase tracking-wider">LGA</label>
+                  <select
+                    value={formData.lga}
+                    onChange={(e) => setFormData({ ...formData, lga: e.target.value })}
+                    disabled={!formData.state}
+                    className="w-full px-4 py-3 sm:py-4 bg-zinc-50 border border-zinc-100 rounded-[18px] focus:outline-none focus:ring-4 focus:ring-primary-600/5 focus:bg-white focus:border-primary-600 transition-all font-medium text-sm sm:text-base appearance-none disabled:opacity-50"
+                  >
+                    <option value="">Select LGA</option>
+                    {Array.isArray(lgas) && lgas.map(lga => (
+                      <option key={lga.id} value={lga.id}>{lga.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div>

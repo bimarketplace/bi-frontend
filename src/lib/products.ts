@@ -14,6 +14,8 @@ export interface Product {
         avatar_url?: string | null;
         first_name?: string;
         last_name?: string;
+        state_details?: { id: number; name: string };
+        lga_details?: { id: number; name: string };
     };
     name: string;
     price: string;

@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
     ImageAdd01Icon,
     PackageIcon,
-    Dollar01Icon,
+    Money01Icon,
     File01Icon
 } from "hugeicons-react";
 import { Category, fetchCategories } from "@/lib/categories";
@@ -150,7 +150,7 @@ export default function ProductForm({ initialData, onSubmit, isLoading, submitTe
                     <label className="block text-xs font-bold text-zinc-900 mb-2 uppercase tracking-wider">Price (NGN)</label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-zinc-400">
-                            <Dollar01Icon size={18} />
+                            <Money01Icon size={18} />
                         </div>
                         <input
                             type="number"

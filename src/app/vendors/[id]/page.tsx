@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon, Cancel01Icon } from "hugeicons-react";
+import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon, Cancel01Icon, Location01Icon } from "hugeicons-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
@@ -222,6 +222,15 @@ export default function Products({
                 <span className="text-sm font-medium text-gray-500">
                   {fullName}
                 </span>
+              )}
+              {products.length > 0 && products[0].seller.state_details && (
+                <div className="flex items-center gap-1 text-zinc-500 mt-0.5">
+                  <Location01Icon size={14} />
+                  <span className="text-xs font-medium">
+                    {products[0].seller.lga_details?.name ? `${products[0].seller.lga_details.name}, ` : ''}
+                    {products[0].seller.state_details.name}
+                  </span>
+                </div>
               )}
             </div>
           </div>
