@@ -210,7 +210,12 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
                                         <Avatar name={product.seller.username} size="md" />
                                         <div>
                                             <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter">Seller</p>
-                                            <p className="font-bold text-zinc-900 leading-none">{product.seller.username}</p>
+                                            <Link 
+                                                href={`/vendors/${product.seller.username}`}
+                                                className="font-bold text-zinc-900 leading-none hover:underline hover:text-brand-green transition-colors"
+                                            >
+                                                {product.seller.username}
+                                            </Link>
                                         </div>
                                     </div>
 

@@ -75,9 +75,13 @@ const ProductCard = ({ product, onSelect }: ProductCardProps) => {
             <div className="relative">
               <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
-            <span className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
+            <Link 
+              href={`/vendors/${product.seller?.username}`}
+              onClick={(e) => e.stopPropagation()}
+              className="text-sm font-bold text-gray-900 truncate max-w-[120px] hover:underline hover:text-brand-green transition-colors"
+            >
               {product.seller?.username || 'Seller'}
-            </span>
+            </Link>
           </div>
         </div>
       </div>
