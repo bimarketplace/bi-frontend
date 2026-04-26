@@ -59,11 +59,30 @@ export default function RootLayout({
       >
         <Providers>
           <Navbar />
-          {children}
+          <main id="main-content">
+            {children}
+          </main>
           <CartFloat />
           {/* <WhatsAppFloat /> */}
           <InstallPrompt />
           {/* <OfflineFallback /> */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                "name": "BI Marketplace",
+                "url": "https://www.bimarketplace.org",
+                "logo": "https://www.bimarketplace.org/icon512_rounded.png",
+                "description": "The ultimate marketplace for all your products. Shop from verified sellers.",
+                "sameAs": [
+                  "https://twitter.com/bimarketplace",
+                  "https://instagram.com/bimarketplace"
+                ]
+              }),
+            }}
+          />
         </Providers>
       </body>
     </html>

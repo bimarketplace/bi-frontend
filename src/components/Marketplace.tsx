@@ -26,6 +26,7 @@ export default function Marketplace({ initialProducts, categories, initialNext, 
   return (
     <div className="min-h-screen bg-white font-sans">
       <main className={`transition-all duration-300 ${paddingTopClass} pb-16 px-4 sm:px-8`}>
+        <h1 className="sr-only">BI Marketplace - Buy and Sell Products Effectively</h1>
         <Tabs productsProps={{ initialProducts, categories, initialNext, initialPrev, initialCount }} />     
       </main>
     </div>
