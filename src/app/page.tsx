@@ -1,3 +1,4 @@
+import React, { Suspense } from "react";
 import HomePageClient from "./HomePageClient";
 import { fetchProductsPage, Product } from "@/lib/products";
 import { fetchCategories, Category } from "@/lib/categories";
@@ -27,5 +28,9 @@ export default async function Home() {
     // Try fallback...
   }
 
-  return <Marketplace initialProducts={products} initialPrev={prevPage} initialNext={nextPage} initialCount={totalCount} categories={categories} />;
+  return (
+    <Suspense fallback={<div>Loading marketplace...</div>}>
+      <Marketplace initialProducts={products} initialPrev={prevPage} initialNext={nextPage} initialCount={totalCount} categories={categories} />
+    </Suspense>
+  );
 }
