@@ -10,7 +10,8 @@ import {
     ThumbsUpIcon
 } from "hugeicons-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
+import { Container } from '@/components/layout/Container';
 import { useSession } from "next-auth/react";
 
 export default function NotificationsPage() {
@@ -81,8 +82,8 @@ export default function NotificationsPage() {
     return (
         <div className="min-h-screen bg-white">
             {/* Header */}
-            <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-zinc-100 px-4 sm:px-8 py-4 mt-20">
-                <div className="max-w-2xl mx-auto flex items-center gap-4">
+            <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md border-b border-zinc-100 py-4 mt-20">
+                <Container className="flex items-center gap-4">
                     <button 
                         onClick={() => router.back()}
                         className="p-2 hover:bg-zinc-50 rounded-full transition-colors text-zinc-600"
@@ -90,14 +91,14 @@ export default function NotificationsPage() {
                         <ArrowLeft02Icon size={24} />
                     </button>
                     <div>
-                        <h1 className="text-xl font-black text-zinc-900 leading-none">Notifications</h1>
+                        <h1 className="text-xl font-bold text-zinc-900 tracking-tight">Notifications</h1>
                         <p className="text-xs text-zinc-500 font-bold mt-1 uppercase tracking-wider">Stay updated with your shop</p>
                     </div>
-                </div>
+                </Container>
             </div>
 
             {/* Content */}
-            <main className="max-w-2xl mx-auto py-6">
+            <Container as="main" className="py-6">
                 <div className="px-4 mb-4 flex justify-between items-center px-6">
                     <span className="text-[13px] font-extrabold text-zinc-950">Recent Activity</span>
                     <button className="text-[12px] font-bold text-[#008000] hover:underline">Mark all as read</button>
@@ -139,7 +140,7 @@ export default function NotificationsPage() {
                         <div className="h-[1px] w-8 bg-zinc-200"></div>
                     </div>
                 </div>
-            </main>
+            </Container>
         </div>
     );
 }

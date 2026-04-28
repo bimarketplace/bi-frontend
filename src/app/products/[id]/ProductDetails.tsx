@@ -19,6 +19,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { Avatar } from "@/components/layout/Navbar";
+import { Container } from "@/components/layout/Container";
 
 interface Comment {
     id: number;
@@ -162,8 +163,8 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
     };
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] pt-32 pb-20 px-4 sm:px-8">
-            <div className="max-w-7xl mx-auto">
+        <div className="min-h-screen bg-[#FAFAFA] pt-32 pb-20">
+            <Container>
                 <Link
                     href="/"
                     className="flex items-center gap-2 text-zinc-500 hover:text-primary-950 mb-8 font-semibold transition-colors w-fit"
@@ -315,7 +316,7 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
                         </div>
                     </div>
                 </div>
-            </div>
+            </Container>
         </div>
     );
 }

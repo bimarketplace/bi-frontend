@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
     Menu01Icon,
     Alert01Icon,
@@ -16,9 +17,11 @@ import {
     Store01Icon,
     WhatsappIcon,
     UserCircleIcon,
-    Login01Icon
+    Login01Icon,
+    Search02Icon
 } from "hugeicons-react";
 import { resendEmail } from "@/lib/auth";
+import { Container } from './Container';
 
 // Shared Avatar component
 export const Avatar = ({ name, size = "md", variant = "primary", className = "" }: { name: string, size?: "xs" | "sm" | "md" | "lg" | "xl", variant?: "primary" | "light", className?: string }) => {
@@ -117,6 +120,41 @@ export default function Navbar() {
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+
+    const handleSearch = (value: string) => {
+        setSearchQuery(value);
+        const params = new URLSearchParams(searchParams.toString());
+        if (value) {
+            params.set('search', value);
+        } else {
+            params.delete('search');
+        }
+        // Always redirect to home page for search results
+        router.push(`/?${params.toString()}`);
+    };
+
+    const [showSearch, setShowSearch] = useState(true);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.scrollY > 10) {
+                setShowSearch(false);
+            } else {
+                setShowSearch(true);
+            }
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
+        setSearchQuery(searchParams.get('search') || '');
+    }, [searchParams]);
+
     return (
         <>
             {/* Email Verification Banner */}
@@ -146,8 +184,9 @@ export default function Navbar() {
             )}
 
             {/* Fixed Header */}
-            <header className={`fixed top-0 left-0 w-full py-4 px-4 sm:px-8 z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
-                <div className="w-full flex justify-between items-center mx-auto px-[15px]">
+            <header className={`fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 shadow-sm ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
+                <Container className="flex flex-col py-3 md:py-4">
+                    <div className="flex items-center justify-between w-full gap-4">
                         <div className="flex items-center gap-8">
                             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                                 <Image 
@@ -159,92 +198,156 @@ export default function Navbar() {
                                 />
                                 <span className="text-[#008102] text-sm font-medium">BIMARKETPLACE</span>
                             </Link>
-
                         </div>
 
-                    <div className="flex items-center gap-6">
-                        {!isLoggedIn ? (
-                            <div className="hidden sm:flex items-center gap-6">
-                                <Link href="/auth/login" className="text-[14px] font-semibold text-gray-600 hover:text-primary-600 transition-colors">
-                                    Sign In
-                                </Link>
-                                <Link href="/auth/signup" className="px-5 py-2.5 bg-[#008000] text-white text-[14px] font-bold rounded-[10px] hover:bg-primary-700 transition-all hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(0,128,0,0.2)]">
-                                    Register
-                                </Link>
+                        {/* Central Search Bar (Desktop) */}
+                        <form 
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSearch(searchQuery);
+                            }}
+                            className={`hidden md:flex flex-1 max-w-2xl mx-12 transition-all duration-300 ${showSearch ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+                        >
+                            <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
+                                <input
+                                    type="text"
+                                    placeholder="Search BI Marketplace"
+                                    className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                />
+                                <button 
+                                    type="submit"
+                                    className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-gray-50 shrink-0"
+                                >
+                                    <Search02Icon size={18} />
+                                </button>
                             </div>
-                        ) : null}
-                        <div className="flex items-center gap-4 border-gray-100 pl-4 ml-2">
-                            <div className="relative">
-                                {/* Mobile: Link to Notifications Page ... */}
-                                {/* <Link 
-                                    href="/notifications"
-                                    className="sm:hidden relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
-                                    title="Notifications"
-                                >
-                                    <Notification03Icon size={22} />
-                                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                                </Link> */}
+                        </form>
 
-                                {/* Desktop: Toggle Dropdown */}
-                                {/* <button 
-                                    onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                                    className="hidden sm:block relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
-                                    title="Notifications"
-                                >
-                                    <Notification03Icon size={22} />
-                                    <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                                </button> */}
+                        {/* Right side actions & Menu Toggle */}
+                        <div className="flex items-center gap-2 sm:gap-4">
+                            {isLoggedIn ? (
+                                <div className="hidden md:flex items-center gap-1 sm:gap-3">
+                                    <Link href="/cart" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Shopping Bag">
+                                        <ShoppingBag01Icon size={24} />
+                                    </Link>
+                                    <Link href="/vendors" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Vendors">
+                                        <Store01Icon size={24} />
+                                    </Link>
+                                    <Link href="/profile" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Profile">
+                                        <UserCircleIcon size={24} />
+                                    </Link>
+                                </div>
+                            ) : (
+                                <div className="flex items-center gap-3">
+                                    <Link href="/auth/login" className="hidden md:block text-[14px] font-semibold text-gray-600 hover:text-primary-600 transition-colors">
+                                        Sign In
+                                    </Link>
+                                    <Link href="/auth/signup" className="hidden md:block px-4 sm:px-6 py-2 sm:py-3 bg-[#008000] text-white text-[13px] sm:text-[14px] font-bold rounded-[10px] hover:bg-primary-700 transition-all hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(0,128,0,0.25)]">
+                                        Register
+                                    </Link>
+                                </div>
+                            )}
 
-                                {/* Notification Dropdown */}
-                                {/* {isNotificationOpen && (
-                                    <>
-                                        <div className="fixed inset-0 z-40" onClick={() => setIsNotificationOpen(false)}></div>
-                                        <div className="absolute right-0 mt-4 w-72 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
-                                            <div className="p-4 border-b border-zinc-50 bg-zinc-50/50 flex justify-between items-center">
-                                                <h3 className="font-bold text-sm text-zinc-900">Notifications</h3>
-                                                <span className="text-[10px] bg-[#008000] text-white px-1.5 py-0.5 rounded-full font-bold">2 NEW</span>
-                                            </div>
-                                            <div className="max-h-80 overflow-y-auto">
-                                                <div className="p-4 hover:bg-zinc-50 transition-colors border-b border-zinc-50 flex gap-3 items-start group">
-                                                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 shrink-0 group-hover:scale-110 transition-transform">
-                                                        <FavouriteIcon size={14} className="fill-current" />
+                            <div className="flex items-center gap-4 border-gray-100 pl-4 ml-2">
+                                <div className="relative">
+                                    {/* Mobile: Link to Notifications Page ... */}
+                                    {/* <Link 
+                                        href="/notifications"
+                                        className="sm:hidden relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
+                                        title="Notifications"
+                                    >
+                                        <Notification03Icon size={22} />
+                                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                                    </Link> */}
+
+                                    {/* Desktop: Toggle Dropdown */}
+                                    {/* <button 
+                                        onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+                                        className="hidden sm:block relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
+                                        title="Notifications"
+                                    >
+                                        <Notification03Icon size={22} />
+                                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
+                                    </button> */}
+
+                                    {/* Notification Dropdown */}
+                                    {/* {isNotificationOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-40" onClick={() => setIsNotificationOpen(false)}></div>
+                                            <div className="absolute right-0 mt-4 w-72 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
+                                                <div className="p-4 border-b border-zinc-50 bg-zinc-50/50 flex justify-between items-center">
+                                                    <h3 className="font-bold text-sm text-zinc-900">Notifications</h3>
+                                                    <span className="text-[10px] bg-[#008000] text-white px-1.5 py-0.5 rounded-full font-bold">2 NEW</span>
+                                                </div>
+                                                <div className="max-h-80 overflow-y-auto">
+                                                    <div className="p-4 hover:bg-zinc-50 transition-colors border-b border-zinc-50 flex gap-3 items-start group">
+                                                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 shrink-0 group-hover:scale-110 transition-transform">
+                                                            <FavouriteIcon size={14} className="fill-current" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[13px] font-bold text-zinc-950">Sarah liked your Gig</p>
+                                                            <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5 font-medium">"Premium UI Dashboard Design" was favorited.</p>
+                                                            <span className="text-[10px] text-zinc-400 mt-1 block">2 minutes ago</span>
+                                                        </div>
                                                     </div>
-                                                    <div>
-                                                        <p className="text-[13px] font-bold text-zinc-950">Sarah liked your Gig</p>
-                                                        <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5 font-medium">"Premium UI Dashboard Design" was favorited.</p>
-                                                        <span className="text-[10px] text-zinc-400 mt-1 block">2 minutes ago</span>
+                                                    <div className="p-4 hover:bg-zinc-50 transition-colors border-b border-zinc-50 flex gap-3 items-start group">
+                                                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-[#008000] shrink-0 group-hover:scale-110 transition-transform">
+                                                            <CheckmarkCircle01Icon size={16} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[13px] font-bold text-zinc-950">New Purchase Inquiry</p>
+                                                            <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5 font-medium">Someone is trying to purchase "Web Deployment".</p>
+                                                            <span className="text-[10px] text-zinc-400 mt-1 block">15 minutes ago</span>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="p-4 hover:bg-zinc-50 transition-colors border-b border-zinc-50 flex gap-3 items-start group">
-                                                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-[#008000] shrink-0 group-hover:scale-110 transition-transform">
-                                                        <CheckmarkCircle01Icon size={16} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-[13px] font-bold text-zinc-950">New Purchase Inquiry</p>
-                                                        <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5 font-medium">Someone is trying to purchase "Web Deployment".</p>
-                                                        <span className="text-[10px] text-zinc-400 mt-1 block">15 minutes ago</span>
-                                                    </div>
+                                                <div className="p-3 text-center bg-zinc-50 border-t border-zinc-100">
+                                                    <Link 
+                                                        href="/notifications"
+                                                        onClick={() => setIsNotificationOpen(false)}
+                                                        className="text-[12px] font-bold text-[#008000] hover:underline"
+                                                    >
+                                                        View all activity
+                                                    </Link>
                                                 </div>
                                             </div>
-                                            <div className="p-3 text-center bg-zinc-50 border-t border-zinc-100">
-                                                <Link 
-                                                    href="/notifications"
-                                                    onClick={() => setIsNotificationOpen(false)}
-                                                    className="text-[12px] font-bold text-[#008000] hover:underline"
-                                                >
-                                                    View all activity
-                                                </Link>
-                                            </div>
-                                        </div>
-                                    </>
-                                )} */}
+                                        </>
+                                    )} */}
+                                </div>
+                                <button onClick={toggleOffcanvas} className="focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]">
+                                    <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-primary-600 transition-colors" />
+                                </button>
                             </div>
-                            <button onClick={toggleOffcanvas} className="focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]">
-                                <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-primary-600 transition-colors" />
-                            </button>
                         </div>
                     </div>
-                </div>
+
+                    {/* Mobile Search Bar (Beneath Logo/Menu) */}
+                    <form 
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSearch(searchQuery);
+                        }}
+                        className={`md:hidden w-full transition-all duration-300 overflow-hidden ${showSearch ? 'mt-3 h-auto opacity-100' : 'mt-0 h-0 opacity-0 pointer-events-none'}`}
+                    >
+                        <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
+                            <input
+                                type="text"
+                                placeholder="Search BI Marketplace"
+                                className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
+                                value={searchQuery}
+                                onChange={(e) => handleSearch(e.target.value)}
+                            />
+                            <button 
+                                type="submit"
+                                className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all flex items-center justify-center shrink-0"
+                            >
+                                <Search02Icon size={18} />
+                            </button>
+                        </div>
+                    </form>
+                </Container>
             </header>
 
             {/* Offcanvas Overlay */}

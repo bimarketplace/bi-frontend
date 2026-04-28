@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const getApiUrl = () => 'https://bi-backend-1tf6.onrender.com';
 
 export interface Product {
     id: number;
@@ -61,17 +61,29 @@ export const fetchProductsPage = async (url?: string, params?: Record<string, st
             });
         }
         const queryString = searchParams.toString();
-        endpoint = `${API_URL}/api/products/${queryString ? `?${queryString}` : ''}`;
+        endpoint = `${getApiUrl()}/api/products/${queryString ? `?${queryString}` : ''}`;
     }
 
-    const response = await fetch(endpoint, {
-        next: { revalidate: 0 } // Disable cache to see results immediately during dev
-    });
-    if (!response.ok) {
-        throw new Error('Failed to fetch products');
-    }
+    console.log(`[Fetch] Fetching from: ${endpoint}`);
 
-    const payload = await response.json();
+    try {
+        const response = await fetch(endpoint, {
+            next: { revalidate: 0 }
+        });
+        if (!response.ok) {
+            console.error(`[Fetch Error] Status: ${response.status} for ${endpoint}`);
+            throw new Error('Failed to fetch products');
+        }
+        const payload = await response.json();
+        return processPayload(payload);
+    } catch (err) {
+        console.error(`[Fetch Exception] ${err} for ${endpoint}`);
+        throw err;
+    }
+};
+
+// Extracted payload processing to keep fetchProductsPage clean
+const processPayload = (payload: any): PaginatedProductsResponse => {
 
     if (Array.isArray(payload)) {
         return {
@@ -132,7 +144,7 @@ export const createProduct = async (data: ProductCreateData, token: string) => {
     if (data.image) formData.append('image', data.image);
     if (data.category) formData.append('category', data.category.toString());
 
-    const response = await axios.post(`${API_URL}/api/products/`, formData, {
+    const response = await axios.post(`${getApiUrl()}/api/products/`, formData, {
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
@@ -142,7 +154,7 @@ export const createProduct = async (data: ProductCreateData, token: string) => {
 };
 
 export const deleteProduct = async (id: number, token: string) => {
-    const response = await axios.delete(`${API_URL}/api/products/${id}/`, {
+    const response = await axios.delete(`${getApiUrl()}/api/products/${id}/`, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -159,7 +171,7 @@ export const updateProduct = async (id: number, data: Partial<ProductCreateData>
     if (data.image) formData.append('image', data.image);
     if (data.category) formData.append('category', data.category.toString());
 
-    const response = await axios.patch(`${API_URL}/api/products/${id}/`, formData, {
+    const response = await axios.patch(`${getApiUrl()}/api/products/${id}/`, formData, {
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data',
@@ -170,12 +182,12 @@ export const updateProduct = async (id: number, data: Partial<ProductCreateData>
 
 export const fetchProductById = async (id: number, token?: string) => {
     const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-    const response = await axios.get(`${API_URL}/api/products/${id}/`, { headers });
+    const response = await axios.get(`${getApiUrl()}/api/products/${id}/`, { headers });
     return response.data;
 };
 
 export const addComment = async (productId: number, text: string, token: string) => {
-    const response = await axios.post(`${API_URL}/api/products/${productId}/comment/`, { text }, {
+    const response = await axios.post(`${getApiUrl()}/api/products/${productId}/comment/`, { text }, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -184,7 +196,7 @@ export const addComment = async (productId: number, text: string, token: string)
 };
 
 export const castVote = async (productId: number, value: number, token: string) => {
-    const response = await axios.post(`${API_URL}/api/products/${productId}/vote/`, { value }, {
+    const response = await axios.post(`${getApiUrl()}/api/products/${productId}/vote/`, { value }, {
         headers: {
             'Authorization': `Bearer ${token}`,
         },
@@ -193,6 +205,6 @@ export const castVote = async (productId: number, value: number, token: string) 
 };
 
 export const shareProduct = async (productId: number) => {
-    const response = await axios.post(`${API_URL}/api/products/${productId}/share/`, {});
+    const response = await axios.post(`${getApiUrl()}/api/products/${productId}/share/`, {});
     return response.data;
 };

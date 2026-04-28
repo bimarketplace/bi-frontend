@@ -20,6 +20,7 @@ import {
 } from "hugeicons-react";
 import { toast } from "react-hot-toast";
 import { fetchUserProfile } from "@/lib/auth";
+import { Container } from "@/components/layout/Container";
 import { Avatar } from "@/components/layout/Navbar";
 import CreateProductModal from "@/components/CreateProductModal";
 import ProfileSettingsModal from "@/components/ProfileSettingsModal";
@@ -146,8 +147,8 @@ export default function ProfilePage() {
 
   return (
     <div className="w-full pt-25 pb-20 bg-white min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <div className="px-4 sm:px-8">
+      <Container>
+        <div className="w-full">
           {/* Seller profile (Matching Vendor Page Style) */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-4">
@@ -212,7 +213,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Categories Bar (Matching Vendor Page Style) */}
-        <div className="max-w-6xl mx-auto mt-8 mb-5 px-4 sm:px-8">
+        <div className="w-full mt-8 mb-5">
           <div className="flex justify-end items-end mb-6">
             <div className="hidden sm:flex gap-2">
               <button 
@@ -271,7 +272,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto mt-5 px-4 sm:px-8">
+        <div className="w-full mt-5">
           {loading ? (
             <div className={`grid gap-6 justify-items-center grid-cols-2 lg:grid-cols-4 w-full`}>
               {Array.from({ length: 8 }).map((_, index) => (
@@ -343,7 +344,7 @@ export default function ProfilePage() {
             </div>
           )}
         </div>
-      </div>
+      </Container>
 
       {/* Profile Settings Modal */}
       {isModalOpen && (

@@ -1,6 +1,5 @@
-import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const getApiUrl = () => '';
 
 export interface State {
     id: number;
@@ -15,8 +14,12 @@ export interface LGA {
 
 export const fetchStates = async (): Promise<State[]> => {
     try {
-        const response = await axios.get(`${API_URL}/api/states/`);
-        const payload = response.data;
+        const response = await fetch(`${getApiUrl()}/api/states/`, {
+            next: { revalidate: 60 * 60 } // Cache for 1 hour
+        });
+        if (!response.ok) throw new Error('Failed to fetch states');
+        const payload = await response.json();
+        console.log('[API] States payload received:', Array.isArray(payload) ? payload.length : 'not an array');
         
         // Handle both bare arrays and paginated responses
         if (Array.isArray(payload)) return payload;
@@ -33,10 +36,13 @@ export const fetchStates = async (): Promise<State[]> => {
 export const fetchLGAs = async (stateId?: number): Promise<LGA[]> => {
     try {
         const url = stateId 
-            ? `${API_URL}/api/lgas/?state=${stateId}` 
-            : `${API_URL}/api/lgas/`;
-        const response = await axios.get(url);
-        const payload = response.data;
+            ? `${getApiUrl()}/api/lgas/?state=${stateId}` 
+            : `${getApiUrl()}/api/lgas/`;
+        const response = await fetch(url, {
+            next: { revalidate: 60 * 60 } // Cache for 1 hour
+        });
+        if (!response.ok) throw new Error('Failed to fetch LGAs');
+        const payload = await response.json();
 
         if (Array.isArray(payload)) return payload;
         if (payload && Array.isArray((payload as any).results)) return (payload as any).results;

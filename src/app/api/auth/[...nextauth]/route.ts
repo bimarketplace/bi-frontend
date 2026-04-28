@@ -20,7 +20,7 @@ const getCurrentEpochTime = () => {
 
 const SIGN_IN_HANDLERS: Record<string, (user: any, account: any) => Promise<boolean>> = {
   credentials: async () => true,
-  google: async (user, account) => {
+      google: async (user, account) => {
     try {
       // Prefer access_token over id_token for allauth compatibility
       const token = (account && (account.access_token || account.id_token)) as string | undefined;
@@ -29,7 +29,7 @@ const SIGN_IN_HANDLERS: Record<string, (user: any, account: any) => Promise<bool
         return false;
       }
       const tokenType = account?.access_token ? 'access_token' : 'id_token';
-      const baseUrl = (process.env.DJANGO_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+      const baseUrl = 'https://bi-backend-1tf6.onrender.com';
       const googleUrl = `${baseUrl}/google/`;
 
       console.log('Google sign-in: sending token to backend', {
@@ -82,7 +82,7 @@ const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         try {
-          const baseUrl = (process.env.DJANGO_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+          const baseUrl = 'https://bi-backend-1tf6.onrender.com';
           const loginUrl = `${baseUrl}/auth/login/`;
 
           console.log('Credentials login: sending to', { url: loginUrl });
@@ -167,7 +167,7 @@ const authOptions: NextAuthOptions = {
       // Refresh token if expired
       if (getCurrentEpochTime() > (token.ref as number)) {
         try {
-          const baseUrl = (process.env.DJANGO_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL)?.replace(/\/api\/?$/, '') || 'http://localhost:8000';
+          const baseUrl = 'https://bi-backend-1tf6.onrender.com';
           const refreshUrl = `${baseUrl}/auth/token/refresh/`;
 
           console.log('Token refresh: sending to', { url: refreshUrl });

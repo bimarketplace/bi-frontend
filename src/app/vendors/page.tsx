@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
 import { useGrid } from "@/context/GridContext";
 import { Category } from "@/lib/categories";
+import { Container } from "@/components/layout/Container";
 import { fetchProductsPage, Product as ProductType } from "@/lib/products";
 import toast from "react-hot-toast";
 import Tabs from '@/components/Tabs';
@@ -48,21 +49,20 @@ const VendorCard = ({ vendor }: VendorCardProps) => {
     >
       {/* Image Container */}
       <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-      <Image
-        src={vendor.banner_url || vendor.avatar_url || "/assets/images/bi.png"}
-        alt={vendor.username}
-        fill
-        className={`transition-transform duration-500 group-hover:scale-105 ${
-          vendor.banner_url
-            ? "object-cover" // FULL banner
-            : "object-contain p-6" // logo fallback
-        }`}
-        onError={(e) => {
-          const target = e.target as HTMLImageElement;
-          target.src = "/assets/images/bi.png";
-        }}
-      />
-    </div>
+        <Image
+          src={vendor.banner_url || vendor.avatar_url || "/assets/images/bi.png"}
+          alt={vendor.username}
+          fill
+          className={`transition-transform duration-500 group-hover:scale-105 ${vendor.banner_url
+              ? "object-cover" // FULL banner
+              : "object-contain p-6" // logo fallback
+            }`}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "/assets/images/bi.png";
+          }}
+        />
+      </div>
 
       {/* Content Area */}
       <div className="flex-1 p-3 flex flex-col gap-2">
@@ -101,9 +101,9 @@ interface VendorsPageProps {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default function Vendors({ 
-  params, 
-  searchParams 
+export default function Vendors({
+  params,
+  searchParams
 }: VendorsPageProps) {
   // These initial values are not passed to Next.js pages but 
   // were present in the previous interface. We initialize them as constants.
@@ -240,8 +240,7 @@ export default function Vendors({
 
   return (
     <div className="w-full pt-25 bg-white min-h-screen">
-      <div className="max-w-6xl mx-auto mt-2">
-      <div className="pb-16 px-4 sm:px-8">
+      <Container className="mt-2 pb-16">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-5 ">Find the best vendors for your needs</h1>
         {/* Search Bar Container */}
         <div className="mx-auto ">
@@ -253,16 +252,15 @@ export default function Vendors({
               onChange={(e) => setSearch(e.target.value)}
               className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent text-[14px] sm:text-base h-full"
             />
-            <div 
+            <div
               className="text-black px-5 h-full flex items-center justify-center shrink-0"
             >
               <Search02Icon size={20} />
             </div>
           </div>
         </div>
-        </div>
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-8">
+        <div className="w-full">
           {pageError && (
             <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
               {pageError}
@@ -307,7 +305,7 @@ export default function Vendors({
             </>
           )}
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

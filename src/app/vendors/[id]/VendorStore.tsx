@@ -20,6 +20,7 @@ import {
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
+import { Container } from "@/components/layout/Container";
 import { useGrid } from "@/context/GridContext";
 import { Category } from "@/lib/categories";
 import { fetchProductsPage, Product as ProductType } from "@/lib/products";
@@ -112,8 +113,8 @@ export default function VendorStore({ id, initialProducts, categoriesData }: { i
 
   return (
     <div className="w-full pt-25 bg-white min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        <div className="px-4 sm:px-8">
+      <Container>
+        <div className="w-full">
           <div className="flex items-center gap-4 mb-4">
             <Avatar 
                 name={storeName.charAt(0).toUpperCase()} 
@@ -172,7 +173,7 @@ export default function VendorStore({ id, initialProducts, categoriesData }: { i
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto mt-8 mb-5 px-4 sm:px-8">
+        <div className="w-full mt-8 mb-5">
           <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
             <button
               onClick={() => setSelectedCategoryId(null)}
@@ -192,7 +193,7 @@ export default function VendorStore({ id, initialProducts, categoriesData }: { i
           </div>
         </div>
 
-        <div className="max-w-6xl mx-auto mt-5 px-4 sm:px-8">
+        <div className="w-full mt-5">
           {isEmptyState ? (
             <EmptyState message="No matching products found" />
           ) : (
@@ -203,7 +204,7 @@ export default function VendorStore({ id, initialProducts, categoriesData }: { i
             </div>
           )}
         </div>
-      </div>
+      </Container>
       {selectedProduct && <ProductModal product={selectedProduct} onClose={() => setSelectedProduct(null)} />}
     </div>
   );

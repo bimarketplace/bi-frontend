@@ -7,6 +7,14 @@ const withPWA = withPWAInit({
 });
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: '/api/backend/:path*',
+        destination: 'https://bi-backend-1tf6.onrender.com/:path*',
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

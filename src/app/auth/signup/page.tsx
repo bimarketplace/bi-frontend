@@ -5,7 +5,7 @@ import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import Link from 'next/link';
 import { register } from '@/lib/auth';
 import { useRouter } from 'next/navigation';
-import { Mail01Icon, LockPasswordIcon, UserIcon, CheckmarkCircle01Icon, AlertCircleIcon } from 'hugeicons-react';
+import { Mail01Icon, LockPasswordIcon, UserIcon, CheckmarkCircle01Icon, AlertCircleIcon, ViewIcon, ViewOffIcon } from 'hugeicons-react';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
@@ -17,6 +17,7 @@ export default function SignupPage() {
         password1: '',
         password2: ''
     });
+    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
@@ -25,6 +26,7 @@ export default function SignupPage() {
         e.preventDefault();
         setIsLoading(true);
         setStatus('idle');
+        console.log('[SIGNUP] Form submitted, calling register...');
 
         try {
             await register({
@@ -42,7 +44,23 @@ export default function SignupPage() {
             }, 3000);
         } catch (error: any) {
             setStatus('error');
-            const msg = error.response?.data?.detail || 'Registration failed. Please try again.';
+            // Handle Django/allauth style error responses (nested field errors)
+            const errorData = error.response?.data;
+            let msg = 'Registration failed. Please try again.';
+            
+            if (errorData) {
+                if (typeof errorData === 'string') {
+                    msg = errorData;
+                } else if (errorData.detail) {
+                    msg = errorData.detail;
+                } else {
+                    // Extract errors from specific fields like { "email": ["error"], "username": ["error"] }
+                    msg = Object.entries(errorData)
+                        .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(' ') : errors}`)
+                        .join(' | ');
+                }
+            }
+            
             setErrorMessage(msg);
             toast.error(msg);
         } finally {
@@ -135,13 +153,20 @@ export default function SignupPage() {
                                 <LockPasswordIcon size={18} />
                             </div>
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 required
                                 value={formData.password1}
                                 onChange={(e) => setFormData({ ...formData, password1: e.target.value, password2: e.target.value })}
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
+                                className="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
                                 placeholder="••••••••"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                {showPassword ? <ViewOffIcon size={18} /> : <ViewIcon size={18} />}
+                            </button>
                         </div>
                     </div>
 

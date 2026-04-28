@@ -3,9 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon } from "hugeicons-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
+import { Container } from "@/components/layout/Container";
 import { useGrid } from "@/context/GridContext";
 import { Category } from "@/lib/categories";
 import { fetchProductsPage, Product as ProductType } from "@/lib/products";
@@ -64,7 +65,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         />
 
         {/* Favourite Icon */}
-        <button 
+        <button
           className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/30 transition-colors"
           onClick={(e) => {
             e.stopPropagation();
@@ -99,8 +100,8 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="relative">
-              <Avatar 
-                name={product.seller?.username || 'U'} 
+              <Avatar
+                name={product.seller?.username || 'U'}
                 size="xs"
                 variant="light"
                 className="ring-1 ring-gray-100"
@@ -137,8 +138,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
 export default function HomePageClient({ initialProducts, categories, initialNext, initialPrev, initialCount }: { initialProducts: ProductType[] | null | undefined; categories: Category[] | null | undefined; initialNext?: string | null; initialPrev?: string | null; initialCount?: number; }) {
   const { data: session } = useSession();
   const { columns, toggleColumns } = useGrid();
-  const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('search') || "");
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setSearch(searchParams.get('search') || "");
+  }, [searchParams]);
 
   const normalizedCategories = Array.isArray(categories) ? categories : [];
   const normalizedInitialProducts = Array.isArray(initialProducts) ? initialProducts : [];
@@ -155,16 +161,8 @@ export default function HomePageClient({ initialProducts, categories, initialNex
   const isLoggedIn = !!session;
   const isVerified = (user as any)?.is_verified ?? (user as any)?.email_verified ?? true;
 
-  const filteredProducts = products.filter((product) => {
-    const lowerSearch = search.toLowerCase();
-    const matchesSearch = product.name?.toLowerCase().includes(lowerSearch) ||
-      product.description?.toLowerCase().includes(lowerSearch) ||
-      product.seller?.username?.toLowerCase().includes(lowerSearch);
-
-    const matchesCategory = selectedCategoryId === null || product.category?.id === selectedCategoryId;
-
-    return matchesSearch && matchesCategory;
-  });
+  // Use products directly since backend handles filtering now
+  const filteredProducts = products;
 
   const getPageNumberFromUrl = (url: string | null): number => {
     if (!url) return 1;
@@ -209,6 +207,35 @@ export default function HomePageClient({ initialProducts, categories, initialNex
     }
   }, [nextPageUrl, isFetchingPage]);
 
+  // Handle search and category changes from URL
+  useEffect(() => {
+    const querySearch = searchParams.get('search') || "";
+    const queryCategory = searchParams.get('category');
+    
+    const fetchFiltered = async () => {
+      setIsInitialLoading(true);
+      setPageError(null);
+      try {
+        const params: Record<string, string | number> = {};
+        if (querySearch) params.search = querySearch;
+        if (queryCategory) params.category = queryCategory;
+        
+        const response = await fetchProductsPage(undefined, params);
+        setProducts(response.results);
+        setNextPageUrl(response.next);
+        setTotalCount(response.count);
+        setCurrentPage(1);
+      } catch (error) {
+        console.error("Failed to fetch filtered products:", error);
+        setPageError("Failed to load search results.");
+      } finally {
+        setIsInitialLoading(false);
+      }
+    };
+
+    fetchFiltered();
+  }, [searchParams]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -234,145 +261,8 @@ export default function HomePageClient({ initialProducts, categories, initialNex
 
   return (
     <div className="min-h-screen bg-white font-sans">
-      <main className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[125px]' : 'pt-20'} pb-16 px-4 sm:px-8`}>
-        {/* Hero Section */}
-        <section className="max-w-6xl mx-auto mt-8 mb-8 px-0 shadow-sm relative overflow-hidden rounded-[20px]">
-          <div className="relative aspect-[16/11] sm:aspect-[24/5] w-full bg-zinc-900 flex items-center p-6 sm:p-12 overflow-hidden transition-all duration-500 group">
-            {/* Background Image */}
-            <Image 
-              src="/assets/images/search_banner.jpg"
-              alt="Search Banner"
-              fill
-              className="object-cover opacity-80"
-              priority
-            />
-            <div className="absolute inset-0 bg-black/40" />
-
-            {/* Content Container */}
-            <div className="relative z-10 w-full max-w-3xl">
-              <h1 className="text-xl sm:text-3xl font-extrabold text-white mb-5 tracking-tight max-w-2xl leading-tight">
-                Find your favourite vendors <br /> Hire professionals
-              </h1>
-
-              {/* Search Bar Container */}
-              <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
-                <input
-                  type="text"
-                  placeholder="Search for any service..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent sm:text-base h-full"
-                />
-                <div 
-                  className="text-zinc-400 px-5 h-full flex items-center justify-center shrink-0"
-                >
-                  <Search02Icon size={20} />
-                </div>
-              </div>
-                 
-            </div>
-
-            {/* Mobile Layout Toggle */}
-            <button 
-              onClick={toggleColumns}
-              className="absolute top-4 right-4 p-2.5 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 text-white hover:bg-white/20 transition-all flex items-center justify-center gap-1.5 z-20"
-              title="Toggle layout"
-            >
-              <GridIcon size={16} />
-              <span className="text-[10px] font-bold">{columns}</span>
-            </button>
-          </div>
-        </section>
-
-        {/* Categories Bar */}
-        <div className="max-w-6xl mx-auto mb-12">
-          <div className="flex justify-between items-end mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-              Most popular categories
-            </h2>
-            <div className="hidden sm:flex gap-2">
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('categories-scroll');
-                  if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
-                }}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
-              >
-                <ArrowLeft02Icon size={20} />
-              </button>
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('categories-scroll');
-                  if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
-                }}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
-              >
-                <ArrowRight02Icon size={20} />
-              </button>
-            </div>
-          </div>
-
-          <div 
-            id="categories-scroll"
-            className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth"
-          >
-            {/* All Products Card */}
-            <button
-              onClick={() => setSelectedCategoryId(null)}
-              className={`flex-none w-[200px] p-3 rounded-xl border transition-all duration-300 flex items-center gap-3 text-left group
-                ${selectedCategoryId === null
-                  ? "bg-white border-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
-                  : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
-                }`}
-            >
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center transition-colors
-                ${selectedCategoryId === null ? "bg-[#008000]/5 text-[#008000]" : "bg-gray-100 text-gray-500"}`}>
-                <GridIcon size={18} />
-              </div>
-              <span className={`text-sm font-bold transition-colors ${selectedCategoryId === null ? "text-[#008000]" : "text-gray-700"}`}>
-                All Products
-              </span>
-              <div className={`ml-auto transition-all ${selectedCategoryId === null ? "text-[#008000] translate-x-1" : "text-gray-300"}`}>
-                <ArrowRight01Icon size={16} />
-              </div>
-            </button>
-
-            {normalizedCategories.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategoryId(category.id)}
-                className={`flex-none w-[200px] p-3 rounded-xl border transition-all duration-300 flex items-center gap-3 text-left group
-                  ${selectedCategoryId === category.id
-                    ? "bg-white border-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
-                    : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
-                  }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center overflow-hidden transition-colors
-                  ${selectedCategoryId === category.id ? "bg-[#008000]/5" : "bg-gray-100"}`}>
-                  {category.image_url ? (
-                    <div className="relative w-6 h-6">
-                      <Image
-                        src={category.image_url}
-                        alt={category.name}
-                        fill
-                        className="object-contain"
-                      />
-                    </div>
-                  ) : (
-                    <GridIcon size={18} className={selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-500"} />
-                  )}
-                </div>
-                <span className={`text-sm font-bold transition-colors line-clamp-1 ${selectedCategoryId === category.id ? "text-[#008000]" : "text-gray-700"}`}>
-                  {category.name}
-                </span>
-                <div className={`ml-auto transition-all ${selectedCategoryId === category.id ? "text-[#008000] translate-x-1" : "text-gray-300"}`}>
-                  <ArrowRight01Icon size={16} />
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="max-w-6xl mx-auto mt-10">
+      <Container as="main" className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[170px] md:pt-[125px]' : 'pt-[130px] md:pt-20'} pb-16`}>
+        <div className="w-full mt-10">
           {pageError && (
             <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
               {pageError}
@@ -417,7 +307,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
             </>
           )}
         </div>
-      </main>
+      </Container>
     </div>
   );
 }

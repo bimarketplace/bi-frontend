@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const BACKEND_URL = 'https://bi-backend-1tf6.onrender.com';
 
 export const googleAuth = async (accessToken: string, code?: string) => {
     try {
-        const response = await axios.post(`${API_URL}/google/`, {
+        const response = await axios.post(`${BACKEND_URL}/google/`, {
             access_token: accessToken,
             code: code
         });
@@ -16,7 +16,9 @@ export const googleAuth = async (accessToken: string, code?: string) => {
 };
 export const register = async (userData: any) => {
     try {
-        const response = await axios.post(`${API_URL}/auth/registration/`, userData);
+        console.log('[DEBUG] Registering via local proxy...');
+        // We use the local Next.js API route to bypass CORS issues securely.
+        const response = await axios.post('/api/register', userData);
         return response.data;
     } catch (error) {
         console.error('Registration Error:', error);
@@ -26,7 +28,7 @@ export const register = async (userData: any) => {
 
 export const resendEmail = async (email: string) => {
     try {
-        const response = await axios.post(`${API_URL}/auth/registration/resend-email/`, { email });
+        const response = await axios.post(`${BACKEND_URL}/auth/registration/resend-email/`, { email });
         return response.data;
     } catch (error) {
         console.error('Resend Email Error:', error);
@@ -36,7 +38,7 @@ export const resendEmail = async (email: string) => {
 
 export const verifyEmail = async (key: string) => {
     try {
-        const response = await axios.post(`${API_URL}/auth/registration/verify-email/`, { key });
+        const response = await axios.post(`${BACKEND_URL}/auth/registration/verify-email/`, { key });
         return response.data;
     } catch (error) {
         console.error('Verify Email Error:', error);
@@ -46,7 +48,7 @@ export const verifyEmail = async (key: string) => {
 
 export const fetchUserProfile = async (token: string) => {
     try {
-        const response = await axios.get(`${API_URL}/auth/user/`, {
+        const response = await axios.get(`${BACKEND_URL}/auth/user/`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -60,7 +62,7 @@ export const fetchUserProfile = async (token: string) => {
 
 export const updateProfile = async (userData: any, token: string) => {
     try {
-        const response = await axios.patch(`${API_URL}/auth/user/`, userData, {
+        const response = await axios.patch(`${BACKEND_URL}/auth/user/`, userData, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }

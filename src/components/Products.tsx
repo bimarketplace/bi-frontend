@@ -2,8 +2,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, ArrowLeft02Icon, ArrowRight02Icon } from "hugeicons-react";
-import { useRouter } from "next/navigation";
+import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, Location01Icon, ArrowDown01Icon } from "hugeicons-react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
 import { useGrid } from "@/context/GridContext";
@@ -12,8 +12,8 @@ import { fetchProductsPage, Product as ProductType } from "@/lib/products";
 import { fetchStates, fetchLGAs, State, LGA } from "@/lib/locations";
 import { fetchUserProfile } from "@/lib/auth";
 import toast from "react-hot-toast";
-import Tabs from '@/components/Tabs';
-import ProductModal from "@/components/ProductModal";
+import ProductModal from "./ProductModal";
+import { Container } from './layout/Container';
 
 // Simple Alert icon component
 const AlertIcon = () => (
@@ -75,7 +75,7 @@ const ProductCard = ({ product, onSelect }: ProductCardProps) => {
             <div className="relative">
               <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
             </div>
-            <Link 
+            <Link
               href={`/vendors/${product.seller?.username}`}
               onClick={(e) => e.stopPropagation()}
               className="text-sm font-bold text-gray-900 truncate max-w-[120px] hover:underline hover:text-brand-green transition-colors"
@@ -89,30 +89,117 @@ const ProductCard = ({ product, onSelect }: ProductCardProps) => {
   );
 };
 
-export default function Products({ 
-  initialProducts, 
-  categories, 
-  initialNext, 
-  initialPrev, 
-  initialCount 
+// Custom Dropdown Component
+const CustomDropdown = ({ 
+  value, 
+  options, 
+  onSelect, 
+  isOpen, 
+  setIsOpen, 
+  placeholder = "Select option",
+  disabled = false 
 }: { 
-  initialProducts: ProductType[] | null | undefined; 
-  categories: Category[] | null | undefined; 
-  initialNext?: string | null; 
-  initialPrev?: string | null; 
-  initialCount?: number; 
+  value: string; 
+  options: { id: string | number; name: string }[]; 
+  onSelect: (val: string) => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [setIsOpen]);
+
+  const selectedOption = options.find(opt => opt.id.toString() === value);
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center justify-between w-full sm:w-[180px] px-4 py-2.5 bg-white border rounded-full transition-all duration-200 text-left
+          ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:border-[#008000] hover:shadow-sm cursor-pointer'}
+          ${isOpen ? 'border-[#008000] ring-4 ring-[#008000]/5' : 'border-gray-200'}
+        `}
+      >
+        <div className="flex items-center gap-2 overflow-hidden">
+          <Location01Icon size={16} className={value ? "text-[#008000]" : "text-gray-400"} />
+          <span className={`text-[13px] font-semibold truncate ${value ? "text-gray-900" : "text-gray-500"}`}>
+            {selectedOption ? selectedOption.name : placeholder}
+          </span>
+        </div>
+        <ArrowDown01Icon size={16} className={`transition-transform duration-200 shrink-0 ${isOpen ? "rotate-180 text-[#008000]" : "text-gray-400"}`} />
+      </button>
+
+      {isOpen && !disabled && (
+        <div className="absolute top-full left-0 mt-2 w-full sm:w-[240px] bg-white border border-gray-100 rounded-2xl shadow-2xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="max-h-[280px] overflow-y-auto no-scrollbar">
+            <button
+              onClick={() => { onSelect(""); setIsOpen(false); }}
+              className="w-full text-left px-4 py-2.5 text-[13px] font-medium text-gray-500 hover:bg-gray-50 hover:text-[#008000] transition-colors"
+            >
+              {placeholder}
+            </button>
+            {options.map((opt) => (
+              <button
+                key={opt.id}
+                onClick={() => { onSelect(opt.id.toString()); setIsOpen(false); }}
+                className={`w-full text-left px-4 py-2.5 text-[13px] font-semibold transition-colors
+                  ${value === opt.id.toString() 
+                    ? "bg-[#008000]/5 text-[#008000]" 
+                    : "text-gray-700 hover:bg-gray-50 hover:text-[#008000]"}
+                `}
+              >
+                {opt.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default function Products({
+  initialProducts,
+  categories,
+  initialNext,
+  initialPrev,
+  initialCount
+}: {
+  initialProducts: ProductType[] | null | undefined;
+  categories: Category[] | null | undefined;
+  initialNext?: string | null;
+  initialPrev?: string | null;
+  initialCount?: number;
 }) {
   const { data: session } = useSession();
   const { columns, toggleColumns } = useGrid();
-  const [search, setSearch] = useState("");
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [selectedStateId, setSelectedStateId] = useState<string>("");
-  const [selectedLgaId, setSelectedLgaId] = useState<string>("");
-  
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('search') || "");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    searchParams.get('category') ? Number(searchParams.get('category')) : null
+  );
+  const [selectedStateId, setSelectedStateId] = useState<string>(searchParams.get('state') || "");
+  const [selectedLgaId, setSelectedLgaId] = useState<string>(searchParams.get('lga') || "");
+
+  const [isStateOpen, setIsStateOpen] = useState(false);
+  const [isLgaOpen, setIsLgaOpen] = useState(false);
+
   // Use unique names to avoid any potential shadowing issues
   const [locationStates, setLocationStates] = useState<State[]>([]);
   const [locationLgas, setLocationLgas] = useState<LGA[]>([]);
-  
+
   const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const normalizedCategories = Array.isArray(categories) ? categories : [];
@@ -128,38 +215,29 @@ export default function Products({
   const [isFetchingPage, setIsFetchingPage] = useState(false);
   const [pageError, setPageError] = useState<string | null>(null);
 
-  // Pre-generate options for maximum stability
-  const stateOptions = useMemo(() => {
-    if (!Array.isArray(locationStates)) return [];
-    return locationStates.map(s => (
-      <option key={s.id} value={s.id}>{s.name}</option>
-    ));
-  }, [locationStates]);
-
-  const lgaOptions = useMemo(() => {
-    if (!Array.isArray(locationLgas)) return [];
-    return locationLgas.map(l => (
-      <option key={l.id} value={l.id}>{l.name}</option>
-    ));
-  }, [locationLgas]);
-
   // Load locations and user default location
   useEffect(() => {
+    console.log("[Filters] Initializing filters. Session status:", !!session);
     const initFilters = async () => {
       try {
         const statesData = await fetchStates();
+        console.log("[Filters] States loaded:", statesData?.length);
         setLocationStates(Array.isArray(statesData) ? statesData : []);
 
-        if (session?.access_token) {
-          const profile = await fetchUserProfile((session as any).access_token);
-          if (profile.state) {
-            setSelectedStateId(profile.state.toString());
-            const lgasData = await fetchLGAs(profile.state);
-            setLocationLgas(Array.isArray(lgasData) ? lgasData : []);
-            if (profile.lga) {
-              setSelectedLgaId(profile.lga.toString());
+        try {
+          if (session?.access_token) {
+            const profile = await fetchUserProfile((session as any).access_token);
+            if (profile.state) {
+              setSelectedStateId(profile.state.toString());
+              const lgasData = await fetchLGAs(profile.state);
+              setLocationLgas(Array.isArray(lgasData) ? lgasData : []);
+              if (profile.lga) {
+                setSelectedLgaId(profile.lga.toString());
+              }
             }
           }
+        } catch (profileError) {
+          console.error("Failed to load user profile for filters:", profileError);
         }
       } catch (error) {
         console.error("Init filters error:", error);
@@ -186,16 +264,30 @@ export default function Products({
     }
   };
 
+  // Handle URL changes
+  useEffect(() => {
+    const querySearch = searchParams.get('search') || "";
+    const queryCategory = searchParams.get('category');
+    const queryState = searchParams.get('state');
+    const queryLga = searchParams.get('lga');
+
+    setSearch(querySearch);
+    if (queryCategory) setSelectedCategoryId(Number(queryCategory));
+    if (queryState) setSelectedStateId(queryState);
+    if (queryLga) setSelectedLgaId(queryLga);
+  }, [searchParams]);
+
   const refreshProducts = useCallback(async () => {
     if (isFirstLoad) return;
-    
+
     setIsFetchingPage(true);
     try {
       const params: any = {};
+      if (search) params.search = search;
       if (selectedCategoryId) params.category = selectedCategoryId;
       if (selectedStateId) params.seller__state = selectedStateId;
       if (selectedLgaId) params.seller__lga = selectedLgaId;
-      
+
       const data = await fetchProductsPage(undefined, params);
       setProducts(data.results || []);
       setNextPageUrl(data.next);
@@ -205,7 +297,7 @@ export default function Products({
     } finally {
       setIsFetchingPage(false);
     }
-  }, [selectedCategoryId, selectedStateId, selectedLgaId, isFirstLoad]);
+  }, [search, selectedCategoryId, selectedStateId, selectedLgaId, isFirstLoad]);
 
   useEffect(() => {
     refreshProducts();
@@ -241,16 +333,8 @@ export default function Products({
     fetchInitialData();
   }, [normalizedInitialProducts.length, categories]);
 
-  const filteredProducts = products.filter((product) => {
-    const lowerSearch = search.toLowerCase();
-    const matchesSearch = product.name?.toLowerCase().includes(lowerSearch) ||
-      product.description?.toLowerCase().includes(lowerSearch) ||
-      product.seller?.username?.toLowerCase().includes(lowerSearch);
-
-    const matchesCategory = selectedCategoryId === null || product.category?.id === selectedCategoryId;
-
-    return matchesSearch && matchesCategory;
-  });
+  // Products are filtered on the backend
+  const filteredProducts = products;
 
   const observerTarget = useRef<HTMLDivElement>(null);
 
@@ -293,133 +377,57 @@ export default function Products({
 
   return (
     <div className="w-full">
-      <div className="pb-16 px-4 sm:px-8">
-        <div className="max-w-6xl">
-          {/* Search Bar Container */}
-          <div className="flex items-center w-full max-w-2xl lg:mx-5 bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
-            <input
-              type="text"
-              placeholder="Search for any service..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent text-[14px] sm:text-base h-full"
-            />
-            <div className="text-black px-5 h-full flex items-center justify-center shrink-0">
-              <Search02Icon size={20} />
-            </div>
+      <Container className="pb-16">
+        {/* Search Bar Container */}
+        {/* <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
+          <input
+            type="text"
+            placeholder="Search for any service..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent text-[14px] sm:text-base h-full"
+          />
+          <div className="text-black px-5 h-full flex items-center justify-center shrink-0">
+            <Search02Icon size={20} />
           </div>
+        </div> */}
 
-          {/* Location Filters */}
-          <div className="flex flex-wrap items-center gap-3 mt-4 lg:mx-5">
-            <div className="relative">
-              <select
-                value={selectedStateId}
-                onChange={(e) => handleStateChange(e.target.value)}
-                className="appearance-none bg-zinc-50 border border-zinc-100 px-4 py-2 pr-10 rounded-full text-[13px] font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#008000]/20 transition-all cursor-pointer hover:bg-zinc-100 shadow-sm"
-              >
-                <option value="">All States</option>
-                {stateOptions}
-              </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </div>
+        {/* Location Filters */}
+        <div className="flex flex-wrap items-center gap-3 mt-4">
+          <CustomDropdown 
+            placeholder="All States"
+            value={selectedStateId}
+            options={locationStates}
+            onSelect={handleStateChange}
+            isOpen={isStateOpen}
+            setIsOpen={setIsStateOpen}
+          />
 
-            <div className="relative">
-              <select
-                value={selectedLgaId}
-                onChange={(e) => setSelectedLgaId(e.target.value)}
-                disabled={!selectedStateId}
-                className="appearance-none bg-zinc-50 border border-zinc-100 px-4 py-2 pr-10 rounded-full text-[13px] font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#008000]/20 transition-all cursor-pointer hover:bg-zinc-100 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <option value="">All LGAs</option>
-                {lgaOptions}
-              </select>
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 9L12 15L18 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-            </div>
+          <CustomDropdown 
+            placeholder="All LGAs"
+            value={selectedLgaId}
+            options={locationLgas}
+            onSelect={setSelectedLgaId}
+            isOpen={isLgaOpen}
+            setIsOpen={setIsLgaOpen}
+            disabled={!selectedStateId}
+          />
 
-            {(selectedStateId || selectedLgaId) && (
-              <button 
-                onClick={() => {
-                  setSelectedStateId("");
-                  setSelectedLgaId("");
-                  setLocationLgas([]);
-                }}
-                className="text-[12px] font-bold text-red-500 hover:text-red-600 transition-colors"
-              >
-                Clear Filters
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Categories Bar */}
-        <div className="max-w-6xl mx-auto mb-5">
-          <div className="flex justify-end items-end mb-6">
-            <div className="hidden sm:flex gap-2">
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('categories-scroll');
-                  if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
-                }}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
-              >
-                <ArrowLeft02Icon size={20} />
-              </button>
-              <button 
-                onClick={() => {
-                  const el = document.getElementById('categories-scroll');
-                  if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
-                }}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
-              >
-                <ArrowRight02Icon size={20} />
-              </button>
-            </div>
-          </div>
-
-          <div 
-            id="categories-scroll"
-            className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth"
-          >
+          {(selectedStateId || selectedLgaId) && (
             <button
-              onClick={() => setSelectedCategoryId(null)}
-              className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
-                ${selectedCategoryId === null
-                  ? "text-white bg-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
-                  : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
-                }`}
+              onClick={() => {
+                setSelectedStateId("");
+                setSelectedLgaId("");
+                setLocationLgas([]);
+              }}
+              className="px-4 py-2 text-[12px] font-bold text-red-500 hover:bg-red-50 rounded-full transition-colors flex items-center gap-1"
             >
-              <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === null ? "text-white" : "text-gray-700"}`}>
-                All Products
-              </span>
+              <span>✕</span> Clear Filters
             </button>
-
-            {categoriesState.map((category) => (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategoryId(category.id)}
-                className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
-                  ${selectedCategoryId === category.id
-                    ? "text-white bg-[#008000] shadow-[0_4px_15_rgba(0,128,0,0.1)]"
-                    : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
-                  }`}
-              >
-                <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === category.id ? "text-white" : "text-gray-700"}`}>
-                  {category.name}
-                </span>
-              </button>
-            ))}
-          </div>
+          )}
         </div>
 
-        <div className="max-w-6xl mx-auto mt-5">
+        <div className="w-full mt-5">
           {pageError && (
             <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
               {pageError}
@@ -464,11 +472,11 @@ export default function Products({
             </>
           )}
         </div>
-      </div>
+      </Container>
       {selectedProduct && (
-        <ProductModal 
-          product={selectedProduct} 
-          onClose={() => setSelectedProduct(null)} 
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setSelectedProduct(null)}
           showAddToCart={false}
         />
       )}

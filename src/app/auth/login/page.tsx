@@ -38,21 +38,18 @@ function LoginContent() {
 
         try {
             const result = await signIn('credentials', {
-                redirect: false,
+                redirect: true,
+                callbackUrl: '/',
                 username: formData.email,
                 password: formData.password
             });
 
             if (result?.error) {
                 toast.error('Invalid email or password. Please try again.');
-            } else {
-                toast.success('Logged in successfully!');
-                router.push('/');
-                router.refresh();
+                setIsLoading(false);
             }
         } catch (err) {
             toast.error('An unexpected error occurred. Please try again later.');
-        } finally {
             setIsLoading(false);
         }
     };

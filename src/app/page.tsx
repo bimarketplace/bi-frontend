@@ -22,20 +22,9 @@ export default async function Home() {
     prevPage = productsData.previous;
     totalCount = productsData.count;
     categories = categoriesData;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to fetch initial data on server:", error);
-    // Try to at least get products if categories fail
-    if (products.length === 0) {
-      try {
-        const fallback = await fetchProductsPage();
-        products = fallback.results;
-        nextPage = fallback.next;
-        prevPage = fallback.previous;
-        totalCount = fallback.count;
-      } catch (e) {
-        console.error("Critical failure fetching products:", e);
-      }
-    }
+    // Try fallback...
   }
 
   return <Marketplace initialProducts={products} initialPrev={prevPage} initialNext={nextPage} initialCount={totalCount} categories={categories} />;

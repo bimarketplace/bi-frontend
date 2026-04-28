@@ -44,7 +44,7 @@ export default function Tabs({ productsProps }: TabsProps) {
   return (
     <div className="">
       {/* Tab Buttons */}
-      <div className="flex border-b border-gray-300 lg:mx-15">
+      <div className="flex border-b border-gray-300">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -61,7 +61,7 @@ export default function Tabs({ productsProps }: TabsProps) {
       </div>
 
       {/* Tab Content */}
-      <div className="min-h-[400px]">
+      <div className="">
         {tabContent[activeTab as keyof typeof tabContent]}
       </div>
     </div>

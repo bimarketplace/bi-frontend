@@ -1,4 +1,4 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_URL = 'https://bi-backend-1tf6.onrender.com';
 
 export interface Category {
     id: number;
