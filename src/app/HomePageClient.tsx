@@ -331,7 +331,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
           <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 mb-20 mt-4 lg:mt-10">
             {/* Left: Text */}
             <div className="flex-1 space-y-6 text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
-              <h1 className="text-4xl sm:text-5xl lg:text-[45px] font-bold text-gray-900 leading-[1.1] tracking-tight">
+              <h1 className="text-2xl sm:text-4xl lg:text-[px] font-semibold text-gray-900 leading-[1.1] tracking-tight">
                 Discover the world's top <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#008000] to-green-400">products</span> & services.
               </h1>
               <p className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
