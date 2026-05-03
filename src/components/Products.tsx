@@ -15,6 +15,69 @@ import toast from "react-hot-toast";
 import ProductModal from "./ProductModal";
 import { Container } from './layout/Container';
 
+const HeroCarousel = ({ products }: { products: ProductType[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (products.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % products.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [products.length]);
+
+  if (!products || products.length === 0) {
+    return (
+      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-gray-300 border-t-[#008000] rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full overflow-hidden">
+      {products.map((product, index) => (
+        <div
+          key={product.id || index}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+          }`}
+        >
+          <Image
+            src={product.image_url || "/assets/images/sale-fast.png"}
+            alt={product.name || "Product"}
+            fill
+            className="object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/assets/images/placeholder.png";
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <h3 className="text-white font-bold text-lg line-clamp-1">{product.name}</h3>
+            <div className="flex items-center gap-2 mt-1">
+                <Avatar name={product.seller?.username || 'U'} size="xs" variant="light" className="ring-1 ring-white/20" />
+                <span className="text-white/90 font-medium text-sm">
+                    {product.seller?.username || 'Seller'} • ₦{parseFloat(product.price || "0").toLocaleString()}
+                </span>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        {products.map((_, idx) => (
+          <div
+            key={idx}
+            className={`w-2 h-2 rounded-full transition-all shadow-sm ${
+              idx === currentIndex ? "bg-white scale-125" : "bg-white/40"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Simple Alert icon component
 const AlertIcon = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -378,19 +441,51 @@ export default function Products({
   return (
     <div className="w-full">
       <Container className="pb-16">
-        {/* Search Bar Container */}
-        {/* <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
-          <input
-            type="text"
-            placeholder="Search for any service..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-4 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent text-[14px] sm:text-base h-full"
-          />
-          <div className="text-black px-5 h-full flex items-center justify-center shrink-0">
-            <Search02Icon size={20} />
+        {/* Hero Section */}
+        {(!search && !selectedCategoryId && !selectedStateId && products.length > 0) && (
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 mb-20 mt-4 lg:mt-10">
+            {/* Left: Text */}
+            <div className="flex-1 space-y-6 text-center lg:text-left max-w-2xl mx-auto lg:mx-0 w-full">
+              <h1 className="text-4xl sm:text-5xl lg:text-[64px] font-black text-gray-900 leading-[1.1] tracking-tight">
+                Discover the world's top <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#008000] to-green-400">products</span> & services.
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
+                Explore a marketplace of thousands of highly-rated vendors, premium digital services, and exclusive products.
+              </p>
+              
+              <div className="pt-2 w-full max-w-md mx-auto lg:mx-0">
+                <div className="flex items-center w-full bg-white rounded-full p-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] group-within:ring-4 group-within:ring-[#008000]/10 transition-all h-[60px] border border-gray-100 relative z-10">
+                  <input
+                    type="text"
+                    placeholder="Search for any product or service..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="flex-1 px-5 text-zinc-800 placeholder:text-zinc-400 focus:outline-none font-medium bg-transparent text-[15px] h-full"
+                  />
+                  <button 
+                    onClick={() => refreshProducts()}
+                    className="h-[48px] w-[48px] bg-[#008000] text-white rounded-full hover:bg-green-700 transition-colors flex items-center justify-center shrink-0 shadow-md"
+                  >
+                    <Search02Icon size={22} />
+                  </button>
+                </div>
+              </div>
+
+              {!session && (
+                <div className="pt-4">
+                  <Link href="/auth/signup" className="inline-block px-8 py-4 bg-gray-900 text-white font-bold rounded-full hover:bg-gray-800 transition-all hover:scale-105 shadow-xl hover:shadow-gray-900/20 text-lg">
+                    Get started
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Carousel */}
+            <div className="w-full sm:w-[450px] lg:w-[480px] shrink-0 aspect-square relative rounded-[32px] overflow-hidden shadow-2xl bg-gray-100 group">
+              <HeroCarousel products={products.slice(0, 5)} />
+            </div>
           </div>
-        </div> */}
+        )}
 
         {/* Categories Horizontal Scroll */}
         <div className="flex gap-2 overflow-x-auto pb-4 pt-1 px-1 mt-4 no-scrollbar scroll-smooth snap-x">

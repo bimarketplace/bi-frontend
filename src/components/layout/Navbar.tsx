@@ -140,21 +140,31 @@ export default function Navbar() {
         router.push(`/?${params.toString()}`);
     };
 
-    const [showSearch, setShowSearch] = useState(true);
+    const isHomePage = pathname === '/';
+    const [showSearch, setShowSearch] = useState(!isHomePage);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
     const isSearchablePage = pathname === '/' || pathname === '/vendors' || pathname.startsWith('/vendors/') || pathname.startsWith('/products');
 
     useEffect(() => {
         const handleScroll = () => {
-            if (window.scrollY > 10) {
-                setShowSearch(false);
+            if (isHomePage) {
+                if (window.scrollY > 350) {
+                    setShowSearch(true);
+                } else {
+                    setShowSearch(false);
+                    setIsMobileSearchOpen(false); // Close mobile search if scrolled back up
+                }
             } else {
                 setShowSearch(true);
             }
         };
+        
+        // Initial check
+        handleScroll();
+        
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [isHomePage]);
 
     useEffect(() => {
         setSearchQuery(searchParams.get('search') || '');
@@ -192,8 +202,8 @@ export default function Navbar() {
             <header className={`fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
                 <Container className="flex flex-col py-3 md:py-4">
                     <div className="flex items-center justify-between w-full gap-4">
-                        <div className="flex items-center gap-8 lg:gap-12">
-                            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                        <div className="flex items-center gap-4 lg:gap-8 flex-1">
+                            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
                                 <Image 
                                     src="/assets/images/bi.png" 
                                     alt="BIMARKETPLACE" 
@@ -204,10 +214,37 @@ export default function Navbar() {
                                 <span className="text-[#008102] text-sm font-medium">BIMARKETPLACE</span>
                             </Link>
 
-                            <div className="hidden lg:flex items-center gap-6">
+                            {/* Header Search Bar (Desktop) - After Logo */}
+                            {isSearchablePage && (
+                                <form 
+                                    onSubmit={(e) => {
+                                        e.preventDefault();
+                                        handleSearch(searchQuery);
+                                    }}
+                                    className={`hidden md:flex flex-1 max-w-[280px] lg:max-w-md xl:max-w-[500px] transition-all duration-500 overflow-hidden ${showSearch ? 'opacity-100 translate-x-0 w-full ml-4' : 'opacity-0 -translate-x-4 w-0 ml-0 pointer-events-none'}`}
+                                >
+                                    <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-full p-[6px] transition-all hover:bg-gray-200/80">
+                                        <input
+                                            type="text"
+                                            placeholder="Search BI Marketplace"
+                                            className="flex-1 bg-transparent px-4 py-1 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium min-w-[120px]"
+                                            value={searchQuery}
+                                            onChange={(e) => handleSearch(e.target.value)}
+                                        />
+                                        <button 
+                                            type="submit"
+                                            className="h-[36px] w-[36px] bg-[#008000] text-white rounded-full hover:bg-green-700 transition-all hover:scale-105 active:scale-95 flex items-center justify-center shrink-0 shadow-sm"
+                                        >
+                                            <Search02Icon size={18} />
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+
+                            <div className={`hidden lg:flex items-center gap-6 shrink-0 transition-all duration-500 ${!showSearch ? 'ml-4 lg:ml-8' : 'ml-0'}`}>
                             {/* Marketplace Mega Menu */}
                             <div className="relative group">
-                                <button className="flex items-center gap-1 text-[13px] font-normal text-gray-800 hover:text-[#008000] py-2 transition-colors">
+                                <button className="flex items-center gap-1 text-[15px] font-semibold text-gray-800 hover:text-[#008000] py-2 transition-colors">
                                     Marketplace
                                     <ArrowDown01Icon size={14} className="group-hover:rotate-180 transition-transform duration-200" />
                                 </button>
@@ -296,7 +333,7 @@ export default function Navbar() {
 
                             {/* Contact Dropdown */}
                             <div className="relative group">
-                                <button className="flex items-center gap-1 text-[13px] font-normal text-black hover:text-[#008000] py-2 transition-colors">
+                                <button className="flex items-center gap-1 text-[15px] font-semibold text-black hover:text-[#008000] py-2 transition-colors">
                                     Contact
                                     <ArrowDown01Icon size={14} className="group-hover:rotate-180 transition-transform duration-200" />
                                 </button>
@@ -310,7 +347,7 @@ export default function Navbar() {
 
                             {/* Help Dropdown */}
                             <div className="relative group">
-                                <button className="flex items-center gap-1 text-[13px] font-normal text-black hover:text-[#008000] py-2 transition-colors">
+                                <button className="flex items-center gap-1 text-[15px] font-semibold text-black hover:text-[#008000] py-2 transition-colors">
                                     Help
                                     <ArrowDown01Icon size={14} className="group-hover:rotate-180 transition-transform duration-200" />
                                 </button>
@@ -325,40 +362,13 @@ export default function Navbar() {
                             </div>
                         </div>
 
-                        {/* Central Search Bar (Desktop) */}
-                        {/* {isSearchablePage && (
-                            <form 
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleSearch(searchQuery);
-                                }}
-                                className={`hidden md:flex flex-1 max-w-2xl mx-12 transition-all duration-300 ${showSearch ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
-                            >
-                                <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
-                                    <input
-                                        type="text"
-                                        placeholder="Search BI Marketplace"
-                                        className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
-                                        value={searchQuery}
-                                        onChange={(e) => handleSearch(e.target.value)}
-                                    />
-                                    <button 
-                                        type="submit"
-                                        className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-gray-50 shrink-0"
-                                    >
-                                        <Search02Icon size={18} />
-                                    </button>
-                                </div>
-                            </form>
-                        )} */}
-
                         {/* Right side actions & Menu Toggle */}
                         <div className="flex items-center gap-4 sm:gap-5">
                             {/* 1. Mobile Search Icon */}
                             {isSearchablePage && (
                                 <button 
                                     onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} 
-                                    className="md:hidden focus:outline-none group p-1"
+                                    className={`md:hidden focus:outline-none group p-1 transition-all duration-300 ${showSearch ? 'opacity-100 w-auto translate-y-0 scale-100' : 'opacity-0 w-0 -translate-y-2 scale-90 pointer-events-none'}`}
                                 >
                                     <Search02Icon size={24} className="text-zinc-800 cursor-pointer group-hover:text-[#008000] transition-colors" />
                                 </button>

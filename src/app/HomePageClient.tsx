@@ -33,6 +33,69 @@ const EmptyState = ({ message = "No products available" }: { message?: string })
 
 // Product type is imported from '@/lib/products' as ProductType
 
+const HeroCarousel = ({ products }: { products: ProductType[] }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (products.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % products.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [products.length]);
+
+  if (!products || products.length === 0) {
+    return (
+      <div className="w-full h-full bg-gray-100 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-gray-300 border-t-[#008000] rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-full overflow-hidden">
+      {products.map((product, index) => (
+        <div
+          key={product.id || index}
+          className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+            index === currentIndex ? "opacity-100 z-10" : "opacity-0 z-0"
+          }`}
+        >
+          <Image
+            src={product.image_url || "/assets/images/sale-fast.png"}
+            alt={product.name || "Product"}
+            fill
+            className="object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/assets/images/placeholder.png";
+            }}
+          />
+          <div className="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <h3 className="text-white font-bold text-lg line-clamp-1">{product.name}</h3>
+            <div className="flex items-center gap-2 mt-1">
+                <Avatar name={product.seller?.username || 'U'} size="xs" variant="light" className="ring-1 ring-white/20" />
+                <span className="text-white/90 font-medium text-sm">
+                    {product.seller?.username || 'Seller'} • ₦{parseFloat(product.price || "0").toLocaleString()}
+                </span>
+            </div>
+          </div>
+        </div>
+      ))}
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        {products.map((_, idx) => (
+          <div
+            key={idx}
+            className={`w-2 h-2 rounded-full transition-all shadow-sm ${
+              idx === currentIndex ? "bg-white scale-125" : "bg-white/40"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
 // Product card component with proper typing
 interface ProductCardProps {
   product: ProductType;
@@ -262,7 +325,36 @@ export default function HomePageClient({ initialProducts, categories, initialNex
   return (
     <div className="min-h-screen bg-white font-sans">
       <Container as="main" className={`transition-all duration-300 ${isLoggedIn && !isVerified ? 'pt-[170px] md:pt-[125px]' : 'pt-[130px] md:pt-20'} pb-16`}>
-        <div className="w-full mt-10">
+        
+        {/* Hero Section */}
+        {(!searchParams.get('search') && !searchParams.get('category')) && (
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-8 mb-20 mt-4 lg:mt-10">
+            {/* Left: Text */}
+            <div className="flex-1 space-y-6 text-center lg:text-left max-w-2xl mx-auto lg:mx-0">
+              <h1 className="text-4xl sm:text-5xl lg:text-[45px] font-bold text-gray-900 leading-[1.1] tracking-tight">
+                Discover the world's top <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#008000] to-green-400">products</span> & services.
+              </h1>
+              <p className="text-lg sm:text-xl text-gray-600 max-w-xl mx-auto lg:mx-0 font-medium leading-relaxed">
+                Explore a marketplace of thousands of highly-rated vendors, premium digital services, and exclusive products.
+              </p>
+              {!isLoggedIn && (
+                <div className="pt-4">
+                  <Link href="/auth/signup" className="inline-block px-8 py-4 bg-gray-900 text-white font-bold rounded-full hover:bg-gray-800 transition-all hover:scale-105 shadow-xl hover:shadow-gray-900/20 text-lg">
+                    Get started
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Right: Carousel */}
+            <div className="w-full sm:w-[450px] lg:w-[480px] shrink-0 aspect-square relative rounded-[32px] overflow-hidden shadow-2xl bg-gray-100 group">
+              <HeroCarousel products={products.slice(0, 5)} />
+            </div>
+          </div>
+        )}
+
+        {/* Product Grid */}
+        <div className="w-full mt-4 lg:mt-10">
           {pageError && (
             <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
               {pageError}
