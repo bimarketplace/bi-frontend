@@ -18,7 +18,10 @@ import {
     WhatsappIcon,
     UserCircleIcon,
     Login01Icon,
-    Search02Icon
+    Search02Icon,
+    ArrowDown01Icon,
+    ArrowRight01Icon,
+    Briefcase02Icon,
 } from "hugeicons-react";
 import { resendEmail } from "@/lib/auth";
 import { Container } from './Container';
@@ -45,7 +48,7 @@ export const Avatar = ({ name, size = "md", variant = "primary", className = "" 
     };
 
     const variantClasses = {
-        primary: "bg-gradient-to-br from-primary-500 to-primary-700 text-white border-primary-400 font-black shadow-inner",
+        primary: "bg-[#F5F5F5] text-zinc-800 font-bold",
         light: "bg-[#f5f5f5] text-zinc-900 border-zinc-100 font-extrabold shadow-sm"
     };
 
@@ -186,10 +189,10 @@ export default function Navbar() {
             )}
 
             {/* Fixed Header */}
-            <header className={`fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 shadow-sm ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
+            <header className={`fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
                 <Container className="flex flex-col py-3 md:py-4">
                     <div className="flex items-center justify-between w-full gap-4">
-                        <div className="flex items-center gap-8">
+                        <div className="flex items-center gap-8 lg:gap-12">
                             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                                 <Image 
                                     src="/assets/images/bi.png" 
@@ -200,10 +203,130 @@ export default function Navbar() {
                                 />
                                 <span className="text-[#008102] text-sm font-medium">BIMARKETPLACE</span>
                             </Link>
+
+                            <div className="hidden lg:flex items-center gap-6">
+                            {/* Marketplace Mega Menu */}
+                            <div className="relative group">
+                                <button className="flex items-center gap-1 text-[13px] font-normal text-gray-800 hover:text-[#008000] py-2 transition-colors">
+                                    Marketplace
+                                    <ArrowDown01Icon size={14} className="group-hover:rotate-180 transition-transform duration-200" />
+                                </button>
+                                {/* Mega Menu Panel */}
+                                <div className="absolute top-[100%] left-0 pt-4 w-[750px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
+                                    <div className="bg-white border border-gray-100 rounded-2xl shadow-2xl p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 flex gap-8">
+                                        
+                                        {/* Products Column */}
+                                        <div className="flex-1">
+                                            <h3 className="text-xs font-semibold text-black uppercase tracking-wider mb-5 flex items-center gap-2">
+                                                <ShoppingBag01Icon size={16} /> Products
+                                            </h3>
+                                            <div className="space-y-4">
+                                                <Link href="/products?category=electronics" className="group/link flex flex-col">
+                                                    <span className="text-[14px] font-bold text-gray-900 group-hover/link:text-[#008000] transition-colors">Electronics & Gadgets</span>
+                                                    <span className="text-[12px] text-gray-500 font-medium mt-0.5">Phones, Laptops, Accessories</span>
+                                                </Link>
+                                                <Link href="/products?category=fashion" className="group/link flex flex-col">
+                                                    <span className="text-[14px] font-bold text-gray-900 group-hover/link:text-[#008000] transition-colors">Fashion & Apparel</span>
+                                                    <span className="text-[12px] text-gray-500 font-medium mt-0.5">Clothing, Shoes, Jewelry</span>
+                                                </Link>
+                                                <Link href="/products?category=home" className="group/link flex flex-col">
+                                                    <span className="text-[14px] font-bold text-gray-900 group-hover/link:text-[#008000] transition-colors">Home & Kitchen</span>
+                                                    <span className="text-[12px] text-gray-500 font-medium mt-0.5">Furniture, Decor, Appliances</span>
+                                                </Link>
+                                                <Link href="/products" className="inline-flex items-center gap-1 text-[13px] font-bold text-[#008000] hover:underline mt-2">
+                                                    View All Categories <ArrowRight01Icon size={14} />
+                                                </Link>
+                                            </div>
+                                        </div>
+
+                                        <div className="w-px bg-gray-100"></div>
+
+                                        {/* Services Column */}
+                                        <div className="flex-1">
+                                            <h3 className="text-xs font-semibold text-black uppercase tracking-wider mb-5 flex items-center gap-2">
+                                                <Briefcase02Icon size={16} /> Services
+                                            </h3>
+                                            <div className="space-y-4">
+                                                <Link href="/services?category=tech" className="group/link flex flex-col">
+                                                    <span className="text-[14px] font-bold text-gray-900 group-hover/link:text-[#008000] transition-colors">Tech & Programming</span>
+                                                    <span className="text-[12px] text-gray-500 font-medium mt-0.5">Web Dev, Mobile Apps</span>
+                                                </Link>
+                                                <Link href="/services?category=design" className="group/link flex flex-col">
+                                                    <span className="text-[14px] font-bold text-gray-900 group-hover/link:text-[#008000] transition-colors">Design & Creative</span>
+                                                    <span className="text-[12px] text-gray-500 font-medium mt-0.5">Logos, UI/UX, Graphics</span>
+                                                </Link>
+                                                <Link href="/services?category=marketing" className="group/link flex flex-col">
+                                                    <span className="text-[14px] font-bold text-gray-900 group-hover/link:text-[#008000] transition-colors">Digital Marketing</span>
+                                                    <span className="text-[12px] text-gray-500 font-medium mt-0.5">SEO, Social Media</span>
+                                                </Link>
+                                                <Link href="/services" className="inline-flex items-center gap-1 text-[13px] font-bold text-[#008000] hover:underline mt-2">
+                                                    Explore Services <ArrowRight01Icon size={14} />
+                                                </Link>
+                                            </div>
+                                        </div>
+
+                                        <div className="w-px bg-gray-100"></div>
+
+                                        {/* Vendors Column */}
+                                        <div className="flex-1">
+                                            <h3 className="text-xs font-semibold text-black uppercase tracking-wider mb-5 flex items-center gap-2">
+                                                <Store01Icon size={16} /> Vendors
+                                            </h3>
+                                            <div className="space-y-4">
+                                                <Link href="/vendors?type=verified" className="group/link flex flex-col">
+                                                    <span className="text-[14px] font-bold text-gray-900 group-hover/link:text-[#008000] transition-colors">Verified Stores</span>
+                                                    <span className="text-[12px] text-gray-500 font-medium mt-0.5">Top rated sellers</span>
+                                                </Link>
+                                                <Link href="/vendors?type=local" className="group/link flex flex-col">
+                                                    <span className="text-[14px] font-bold text-gray-900 group-hover/link:text-[#008000] transition-colors">Local Businesses</span>
+                                                    <span className="text-[12px] text-gray-500 font-medium mt-0.5">Find shops near you</span>
+                                                </Link>
+                                                <div className="mt-6 p-4 bg-[#008000]/5 rounded-xl border border-[#008000]/10 hover:border-[#008000]/30 transition-colors">
+                                                    <p className="text-[13px] font-bold text-[#006000] mb-2">Want to sell on BI?</p>
+                                                    <Link href="/auth/signup" className="text-[13px] font-black text-white bg-[#008000] py-2 px-3 rounded-lg block text-center hover:bg-[#006000] transition-all hover:scale-[1.02]">
+                                                        Become a Vendor
+                                                    </Link>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Contact Dropdown */}
+                            <div className="relative group">
+                                <button className="flex items-center gap-1 text-[13px] font-normal text-black hover:text-[#008000] py-2 transition-colors">
+                                    Contact
+                                    <ArrowDown01Icon size={14} className="group-hover:rotate-180 transition-transform duration-200" />
+                                </button>
+                                <div className="absolute top-[100%] left-0 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    <div className="bg-white border border-gray-100 rounded-xl shadow-xl py-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-200">
+                                        <Link href="/contact" className="block px-4 py-2 text-[13px] font-medium text-black hover:bg-gray-50 hover:text-[#008000]">Get in Touch</Link>
+                                        <Link href="/support" className="block px-4 py-2 text-[13px] font-medium text-black hover:bg-gray-50 hover:text-[#008000]">Support Center</Link>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Help Dropdown */}
+                            <div className="relative group">
+                                <button className="flex items-center gap-1 text-[13px] font-normal text-black hover:text-[#008000] py-2 transition-colors">
+                                    Help
+                                    <ArrowDown01Icon size={14} className="group-hover:rotate-180 transition-transform duration-200" />
+                                </button>
+                                <div className="absolute top-[100%] left-0 pt-2 w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                    <div className="bg-white border border-gray-100 rounded-xl shadow-xl py-2 translate-y-2 group-hover:translate-y-0 transition-transform duration-200">
+                                        <Link href="/faq" className="block px-4 py-2 text-[13px] font-medium text-black hover:bg-gray-50 hover:text-[#008000]">FAQ</Link>
+                                        <Link href="/terms" className="block px-4 py-2 text-[13px] font-medium text-black hover:bg-gray-50 hover:text-[#008000]">Terms of Service</Link>
+                                        <Link href="/privacy" className="block px-4 py-2 text-[13px] font-medium text-black hover:bg-gray-50 hover:text-[#008000]">Privacy Policy</Link>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
                         </div>
 
                         {/* Central Search Bar (Desktop) */}
-                        {isSearchablePage && (
+                        {/* {isSearchablePage && (
                             <form 
                                 onSubmit={(e) => {
                                     e.preventDefault();
@@ -227,111 +350,40 @@ export default function Navbar() {
                                     </button>
                                 </div>
                             </form>
-                        )}
+                        )} */}
 
                         {/* Right side actions & Menu Toggle */}
-                        <div className="flex items-center gap-2 sm:gap-4">
+                        <div className="flex items-center gap-4 sm:gap-5">
+                            {/* 1. Mobile Search Icon */}
+                            {isSearchablePage && (
+                                <button 
+                                    onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} 
+                                    className="md:hidden focus:outline-none group p-1"
+                                >
+                                    <Search02Icon size={24} className="text-zinc-800 cursor-pointer group-hover:text-[#008000] transition-colors" />
+                                </button>
+                            )}
+
+                            {/* 2. Avatar / Auth Buttons */}
                             {isLoggedIn ? (
-                                <div className="hidden md:flex items-center gap-1 sm:gap-3">
-                                    <Link href="/cart" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Shopping Bag">
-                                        <ShoppingBag01Icon size={24} />
-                                    </Link>
-                                    <Link href="/vendors" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Vendors">
-                                        <Store01Icon size={24} />
-                                    </Link>
-                                    <Link href="/profile" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Profile">
-                                        <UserCircleIcon size={24} />
-                                    </Link>
-                                </div>
+                                <Link href="/profile" className="flex items-center text-zinc-800 hover:text-[#008000] transition-colors rounded-full overflow-hidden" title="Profile">
+                                    <Avatar name={user?.name || (user as any)?.username || user?.email || "U"} size="md" className="ring-3 ring-transparent hover:ring-[#008000]/30 transition-all" />
+                                </Link>
                             ) : (
-                                <div className="flex items-center gap-3">
-                                    <Link href="/auth/login" className="hidden md:block text-[14px] font-semibold text-gray-600 hover:text-primary-600 transition-colors">
-                                        Sign In
+                                <div className="flex items-center gap-2 sm:gap-3">
+                                    <Link href="/auth/signup" className="hidden md:block text-[13px] font-semibold text-gray-600 hover:text-black transition-colors">
+                                        Sign Up
                                     </Link>
-                                    <Link href="/auth/signup" className="hidden md:block px-4 sm:px-6 py-2 sm:py-3 bg-[#008000] text-white text-[13px] sm:text-[14px] font-bold rounded-[10px] hover:bg-primary-700 transition-all hover:scale-[1.02] shadow-[0_4px_14px_0_rgba(0,128,0,0.25)]">
-                                        Register
+                                    <Link href="/auth/login" className="px-4 py-2 sm:px-6 sm:py-3 bg-[#008000] text-white text-[13px] sm:text-[14px] font-medium rounded-full hover:bg-primary-700 transition-all hover:scale-[1.02]">
+                                        Log in
                                     </Link>
                                 </div>
                             )}
-
-                            <div className="flex items-center gap-2 sm:gap-4 border-gray-100 pl-2 sm:pl-4 ml-1 sm:ml-2">
-                                {isSearchablePage && (
-                                    <button 
-                                        onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} 
-                                        className="md:hidden focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]"
-                                    >
-                                        <Search02Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-[#008000] transition-colors" />
-                                    </button>
-                                )}
-                                <div className="relative">
-                                    {/* Mobile: Link to Notifications Page ... */}
-                                    {/* <Link 
-                                        href="/notifications"
-                                        className="sm:hidden relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
-                                        title="Notifications"
-                                    >
-                                        <Notification03Icon size={22} />
-                                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                                    </Link> */}
-
-                                    {/* Desktop: Toggle Dropdown */}
-                                    {/* <button 
-                                        onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-                                        className="hidden sm:block relative p-2 text-gray-500 hover:text-[#008000] transition-colors" 
-                                        title="Notifications"
-                                    >
-                                        <Notification03Icon size={22} />
-                                        <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-                                    </button> */}
-
-                                    {/* Notification Dropdown */}
-                                    {/* {isNotificationOpen && (
-                                        <>
-                                            <div className="fixed inset-0 z-40" onClick={() => setIsNotificationOpen(false)}></div>
-                                            <div className="absolute right-0 mt-4 w-72 bg-white rounded-2xl shadow-2xl border border-zinc-100 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-300">
-                                                <div className="p-4 border-b border-zinc-50 bg-zinc-50/50 flex justify-between items-center">
-                                                    <h3 className="font-bold text-sm text-zinc-900">Notifications</h3>
-                                                    <span className="text-[10px] bg-[#008000] text-white px-1.5 py-0.5 rounded-full font-bold">2 NEW</span>
-                                                </div>
-                                                <div className="max-h-80 overflow-y-auto">
-                                                    <div className="p-4 hover:bg-zinc-50 transition-colors border-b border-zinc-50 flex gap-3 items-start group">
-                                                        <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-500 shrink-0 group-hover:scale-110 transition-transform">
-                                                            <FavouriteIcon size={14} className="fill-current" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[13px] font-bold text-zinc-950">Sarah liked your Gig</p>
-                                                            <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5 font-medium">"Premium UI Dashboard Design" was favorited.</p>
-                                                            <span className="text-[10px] text-zinc-400 mt-1 block">2 minutes ago</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="p-4 hover:bg-zinc-50 transition-colors border-b border-zinc-50 flex gap-3 items-start group">
-                                                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-[#008000] shrink-0 group-hover:scale-110 transition-transform">
-                                                            <CheckmarkCircle01Icon size={16} />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[13px] font-bold text-zinc-950">New Purchase Inquiry</p>
-                                                            <p className="text-[11px] text-zinc-500 line-clamp-1 mt-0.5 font-medium">Someone is trying to purchase "Web Deployment".</p>
-                                                            <span className="text-[10px] text-zinc-400 mt-1 block">15 minutes ago</span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div className="p-3 text-center bg-zinc-50 border-t border-zinc-100">
-                                                    <Link 
-                                                        href="/notifications"
-                                                        onClick={() => setIsNotificationOpen(false)}
-                                                        className="text-[12px] font-bold text-[#008000] hover:underline"
-                                                    >
-                                                        View all activity
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        </>
-                                    )} */}
-                                </div>
-                                <button onClick={toggleOffcanvas} className="focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]">
-                                    <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-primary-600 transition-colors" />
-                                </button>
-                            </div>
+                            
+                            {/* 3. Mobile Menu Toggle */}
+                            <button onClick={toggleOffcanvas} className="lg:hidden focus:outline-none group p-1">
+                                <Menu01Icon size={24} className="text-zinc-800 cursor-pointer group-hover:text-[#008000] transition-colors" />
+                            </button>
                         </div>
                     </div>
 
@@ -383,28 +435,41 @@ export default function Navbar() {
                         </button>
                     </div>
 
-                    <nav className="space-y-4 flex-1">
-                        <Link href="/" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                    <nav className="space-y-1 flex-1 overflow-y-auto">
+                        <Link href="/products" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
                             <ShoppingBag01Icon size={20} />
-                            Marketplace
+                            Products
+                        </Link>
+                        <Link href="/services" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            <Briefcase02Icon size={20} />
+                            Services
                         </Link>
                         <Link href="/vendors" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
                             <Store01Icon size={20} />
                             Vendors
                         </Link>
-                        {isLoggedIn && (
-                            <Link href="/profile" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
-                                <Store01Icon size={20} />
-                                My Store
-                            </Link>
-                        )}
-                        <Link href={whatsappUrl} onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
-                            <WhatsappIcon size={20} />
-                            Contact Support
+                        
+                        <div className="border-t border-zinc-100 my-4"></div>
+                        
+                        <Link href="/about" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            About
                         </Link>
-                        {/* <Link href="/products" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 rounded-xl transition-all font-bold">
-                            All Products
-                        </Link> */}
+                        <Link href="/contact" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            Contact
+                        </Link>
+                        <Link href="/faq" onClick={closeOffcanvas} className="block py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            Help & FAQ
+                        </Link>
+
+                        {isLoggedIn && (
+                            <>
+                                <div className="border-t border-zinc-100 my-4"></div>
+                                <Link href="/profile" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                                    <Store01Icon size={20} />
+                                    My Store
+                                </Link>
+                            </>
+                        )}
 
                         <div className="border-t border-zinc-100 my-6"></div>
 
