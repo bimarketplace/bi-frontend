@@ -239,7 +239,7 @@ export default function Vendors({
   const isEmptyState = !isInitialLoading && uniqueVendors.length === 0;
 
   return (
-    <div className="w-full pt-25 bg-white min-h-screen">
+    <div className={`w-full bg-white min-h-screen transition-all duration-300 ${session && !((session.user as any)?.is_verified ?? (session.user as any)?.email_verified ?? true) ? 'pt-[170px] md:pt-[125px]' : 'pt-[130px] md:pt-[90px]'}`}>
       <Container className="mt-2 pb-16">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-5 ">Find the best vendors for your needs</h1>
         {/* Search Bar Container */}

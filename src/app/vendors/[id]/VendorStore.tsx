@@ -112,7 +112,7 @@ export default function VendorStore({ id, initialProducts, categoriesData }: { i
   const isEmptyState = products.length === 0 || filteredProducts.length === 0;
 
   return (
-    <div className="w-full pt-25 bg-white min-h-screen">
+    <div className={`w-full bg-white min-h-screen transition-all duration-300 ${session && !((session.user as any)?.is_verified ?? (session.user as any)?.email_verified ?? true) ? 'pt-[170px] md:pt-[125px]' : 'pt-[130px] md:pt-[90px]'}`}>
       <Container>
         <div className="w-full">
           <div className="flex items-center gap-4 mb-4">
@@ -174,20 +174,32 @@ export default function VendorStore({ id, initialProducts, categoriesData }: { i
         </div>
 
         <div className="w-full mt-8 mb-5">
-          <div className="flex gap-4 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="flex gap-2 overflow-x-auto pb-4 pt-1 px-1 mt-4 no-scrollbar scroll-smooth snap-x">
             <button
               onClick={() => setSelectedCategoryId(null)}
-              className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 ${selectedCategoryId === null ? "text-white bg-[#008000]" : "bg-white border-gray-200"}`}
+              className={`flex-none py-2 px-4 rounded-full border transition-all duration-300 snap-start
+                ${selectedCategoryId === null
+                  ? "bg-[#008000] text-white shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
+                  : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                }`}
             >
-              All Products
+              <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === null ? "text-white" : "text-gray-700"}`}>
+                All Products
+              </span>
             </button>
             {categoriesState.map((category) => (
               <button
                 key={category.id}
                 onClick={() => setSelectedCategoryId(category.id)}
-                className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 ${selectedCategoryId === category.id ? "text-white bg-[#008000]" : "bg-white border-gray-200"}`}
+                className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
+                  ${selectedCategoryId === category.id
+                    ? "text-white bg-[#008000] shadow-[0_4px_15_rgba(0,128,0,0.1)]"
+                    : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
+                  }`}
               >
-                {category.name}
+                <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === category.id ? "text-white" : "text-gray-700"}`}>
+                  {category.name}
+                </span>
               </button>
             ))}
           </div>

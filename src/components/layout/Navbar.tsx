@@ -138,6 +138,8 @@ export default function Navbar() {
     };
 
     const [showSearch, setShowSearch] = useState(true);
+    const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+    const isSearchablePage = pathname === '/' || pathname === '/vendors' || pathname.startsWith('/vendors/') || pathname.startsWith('/products');
 
     useEffect(() => {
         const handleScroll = () => {
@@ -201,29 +203,31 @@ export default function Navbar() {
                         </div>
 
                         {/* Central Search Bar (Desktop) */}
-                        <form 
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                handleSearch(searchQuery);
-                            }}
-                            className={`hidden md:flex flex-1 max-w-2xl mx-12 transition-all duration-300 ${showSearch ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
-                        >
-                            <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
-                                <input
-                                    type="text"
-                                    placeholder="Search BI Marketplace"
-                                    className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
-                                    value={searchQuery}
-                                    onChange={(e) => handleSearch(e.target.value)}
-                                />
-                                <button 
-                                    type="submit"
-                                    className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-gray-50 shrink-0"
-                                >
-                                    <Search02Icon size={18} />
-                                </button>
-                            </div>
-                        </form>
+                        {isSearchablePage && (
+                            <form 
+                                onSubmit={(e) => {
+                                    e.preventDefault();
+                                    handleSearch(searchQuery);
+                                }}
+                                className={`hidden md:flex flex-1 max-w-2xl mx-12 transition-all duration-300 ${showSearch ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
+                            >
+                                <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
+                                    <input
+                                        type="text"
+                                        placeholder="Search BI Marketplace"
+                                        className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
+                                        value={searchQuery}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                    />
+                                    <button 
+                                        type="submit"
+                                        className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-gray-50 shrink-0"
+                                    >
+                                        <Search02Icon size={18} />
+                                    </button>
+                                </div>
+                            </form>
+                        )}
 
                         {/* Right side actions & Menu Toggle */}
                         <div className="flex items-center gap-2 sm:gap-4">
@@ -250,7 +254,15 @@ export default function Navbar() {
                                 </div>
                             )}
 
-                            <div className="flex items-center gap-4 border-gray-100 pl-4 ml-2">
+                            <div className="flex items-center gap-2 sm:gap-4 border-gray-100 pl-2 sm:pl-4 ml-1 sm:ml-2">
+                                {isSearchablePage && (
+                                    <button 
+                                        onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} 
+                                        className="md:hidden focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]"
+                                    >
+                                        <Search02Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-[#008000] transition-colors" />
+                                    </button>
+                                )}
                                 <div className="relative">
                                     {/* Mobile: Link to Notifications Page ... */}
                                     {/* <Link 
@@ -324,29 +336,32 @@ export default function Navbar() {
                     </div>
 
                     {/* Mobile Search Bar (Beneath Logo/Menu) */}
-                    <form 
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            handleSearch(searchQuery);
-                        }}
-                        className={`md:hidden w-full transition-all duration-300 overflow-hidden ${showSearch ? 'mt-3 h-auto opacity-100' : 'mt-0 h-0 opacity-0 pointer-events-none'}`}
-                    >
-                        <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
-                            <input
-                                type="text"
-                                placeholder="Search BI Marketplace"
-                                className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
-                                value={searchQuery}
-                                onChange={(e) => handleSearch(e.target.value)}
-                            />
-                            <button 
-                                type="submit"
-                                className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all flex items-center justify-center shrink-0"
-                            >
-                                <Search02Icon size={18} />
-                            </button>
-                        </div>
-                    </form>
+                    {isSearchablePage && (
+                        <form 
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                                handleSearch(searchQuery);
+                                setIsMobileSearchOpen(false);
+                            }}
+                            className={`md:hidden w-full transition-all duration-300 overflow-hidden ${isMobileSearchOpen ? 'mt-3 h-auto opacity-100' : 'mt-0 h-0 opacity-0 pointer-events-none'}`}
+                        >
+                            <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
+                                <input
+                                    type="text"
+                                    placeholder="Search BI Marketplace"
+                                    className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                />
+                                <button 
+                                    type="submit"
+                                    className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all flex items-center justify-center shrink-0"
+                                >
+                                    <Search02Icon size={18} />
+                                </button>
+                            </div>
+                        </form>
+                    )}
                 </Container>
             </header>
 

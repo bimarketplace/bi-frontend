@@ -10,7 +10,7 @@ interface AuthLayoutProps {
 
 export default function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
     return (
-        <div className="min-h-screen bg-zinc-50 flex flex-col justify-center items-center p-4">
+        <div className="min-h-screen bg-zinc-50 flex flex-col justify-center items-center p-4 pt-[130px] md:pt-[90px]">
             <div className="w-full max-w-md">
                 <div className="text-center mb-10">
                     {/* <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
