@@ -4,7 +4,8 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         
-        const backendUrl = 'https://bi-backend-1tf6.onrender.com/auth/registration/';
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bi-backend-1tf6.onrender.com';
+        const backendUrl = `${baseUrl}/auth/registration/`;
         console.log(`[API Proxy] Forwarding registration to: ${backendUrl}`);
         
         const response = await fetch(backendUrl, {

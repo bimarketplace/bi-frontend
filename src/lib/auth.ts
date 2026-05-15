@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BACKEND_URL = 'https://bi-backend-1tf6.onrender.com';
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bi-backend-1tf6.onrender.com';
 
 export const googleAuth = async (accessToken: string, code?: string) => {
     try {

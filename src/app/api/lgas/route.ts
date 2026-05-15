@@ -5,29 +5,39 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const stateId = searchParams.get('state');
         
-        let backendUrl = 'https://bi-backend-1tf6.onrender.com/api/lgas/';
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://bi-backend-1tf6.onrender.com';
+        let endpoint = `${baseUrl}/api/lgas/`;
         if (stateId) {
-            backendUrl += `?state=${stateId}`;
+            endpoint += `?state=${stateId}`;
         }
         
-        console.log(`[API Proxy] Forwarding GET to: ${backendUrl}`);
+        console.log(`[API Proxy] Forwarding GET to: ${endpoint}`);
         
-        const response = await fetch(backendUrl, {
-            headers: {
-                'Accept': 'application/json'
-            },
-            next: { revalidate: 3600 }
-        });
-        
-        const data = await response.json().catch(() => ([]));
-        
-        if (!response.ok) {
-            return NextResponse.json(data, { status: response.status });
+        let response: Response | null = null;
+        const maxRetries = 3;
+
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                response = await fetch(endpoint, {
+                    headers: { 'Accept': 'application/json' },
+                    next: { revalidate: 3600 }
+                });
+                if (response.ok) break;
+                console.warn(`[API Proxy] LGAs attempt ${i+1} failed with status ${response.status}`);
+            } catch (err) {
+                console.warn(`[API Proxy] LGAs attempt ${i+1} exception:`, err);
+                if (i < maxRetries - 1) await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+            }
+        }
+
+        if (!response || !response.ok) {
+            return NextResponse.json([], { status: response?.status || 500 });
         }
         
+        const data = await response.json();
         return NextResponse.json(data, { status: 200 });
     } catch (error: any) {
-        console.error('[API Proxy] LGAs fetch error:', error);
+        console.error('[API Proxy] LGAs final error:', error);
         return NextResponse.json([], { status: 500 });
     }
 }

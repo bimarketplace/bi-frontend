@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const getApiUrl = () => 'https://bi-backend-1tf6.onrender.com';
+const getApiUrl = () => process.env.NEXT_PUBLIC_API_URL || 'https://bi-backend-1tf6.onrender.com';
 
 export interface Product {
     id: number;
@@ -66,20 +66,50 @@ export const fetchProductsPage = async (url?: string, params?: Record<string, st
 
     console.log(`[Fetch] Fetching from: ${endpoint}`);
 
-    try {
-        const response = await fetch(endpoint, {
-            next: { revalidate: 0 }
-        });
-        if (!response.ok) {
-            console.error(`[Fetch Error] Status: ${response.status} for ${endpoint}`);
-            throw new Error('Failed to fetch products');
+    const maxRetries = 10;
+    let lastError: any;
+
+    for (let i = 0; i < maxRetries; i++) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
+        try {
+            const response = await fetch(endpoint, {
+                next: { revalidate: 0 },
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            
+            if (!response.ok) {
+                console.error(`[Fetch Error] Status: ${response.status} for ${endpoint}`);
+                throw new Error(`Failed to fetch products: ${response.status}`);
+            }
+            
+            const payload = await response.json();
+            return processPayload(payload);
+        } catch (err: any) {
+            clearTimeout(timeoutId);
+            lastError = err;
+            const errorMessage = err.message || String(err);
+            const errorCause = err.cause ? ` (Cause: ${err.cause})` : '';
+            console.warn(`[Fetch Attempt ${i + 1} Failed] ${errorMessage}${errorCause} for ${endpoint}. Retrying...`);
+            
+            // If it's the last attempt, don't wait, just throw
+            if (i < maxRetries - 1) {
+                // Wait for a duration before retrying - generous delay for cold starts
+                const delay = Math.min(2000 * (i + 1), 10000); // Max 10s delay
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
         }
-        const payload = await response.json();
-        return processPayload(payload);
-    } catch (err) {
-        console.error(`[Fetch Exception] ${err} for ${endpoint}`);
-        throw err;
     }
+
+    console.error(`[Fetch Exception] Final failure after ${maxRetries} attempts: ${lastError} for ${endpoint}`);
+    return {
+        count: 0,
+        next: null,
+        previous: null,
+        results: [],
+    };
 };
 
 // Extracted payload processing to keep fetchProductsPage clean

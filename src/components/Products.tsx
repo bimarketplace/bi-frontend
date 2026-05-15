@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, Location01Icon, ArrowDown01Icon } from "hugeicons-react";
+import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, Location01Icon, ArrowDown01Icon, UserCircleIcon } from "hugeicons-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
@@ -70,19 +70,17 @@ const ProductCard = ({ product, onSelect }: ProductCardProps) => {
             ₦{parseFloat(product.price || "0").toLocaleString()}
           </div>
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
-            </div>
-            <Link
-              href={`/vendors/${product.seller?.username}`}
-              onClick={(e) => e.stopPropagation()}
-              className="text-sm font-bold text-gray-900 truncate max-w-[120px] hover:underline hover:text-brand-green transition-colors"
-            >
+        <div className="flex items-center justify-between mt-1">
+          <Link
+            href={`/vendors/${product.seller?.username}`}
+            onClick={(e) => e.stopPropagation()}
+            className="flex items-center gap-1.5 px-2.5 py-1 bg-zinc-50 border border-zinc-100 rounded-full hover:bg-[#008000]/5 hover:border-[#008000]/20 transition-all group/seller"
+          >
+            <UserCircleIcon size={14} className="text-zinc-400 group-hover/seller:text-[#008000] transition-colors" />
+            <span className="text-[11px] font-bold text-zinc-600 group-hover/seller:text-[#008000] transition-colors truncate max-w-[100px]">
               {product.seller?.username || 'Seller'}
-            </Link>
-          </div>
+            </span>
+          </Link>
         </div>
       </div>
     </div>

@@ -18,7 +18,8 @@ import {
     WhatsappIcon,
     UserCircleIcon,
     Login01Icon,
-    Search02Icon
+    Search02Icon,
+    TruckIcon
 } from "hugeicons-react";
 import { resendEmail } from "@/lib/auth";
 import { Container } from './Container';
@@ -391,6 +392,10 @@ export default function Navbar() {
                         <Link href="/vendors" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
                             <Store01Icon size={20} />
                             Vendors
+                        </Link>
+                        <Link href="/logistics" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
+                            <TruckIcon size={20} />
+                            Logistic Service
                         </Link>
                         {isLoggedIn && (
                             <Link href="/profile" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-zinc-600 hover:text-primary-700 hover:bg-primary-50 rounded-xl transition-all font-bold">
