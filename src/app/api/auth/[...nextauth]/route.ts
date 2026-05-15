@@ -116,8 +116,33 @@ const authOptions: NextAuthOptions = {
             status: error.response?.status,
             data: error.response?.data,
           });
+          
+          // Extract detailed error message from backend
+          const backendError = error.response?.data;
+          let errorMessage = 'Invalid email or password';
+          
+          if (backendError) {
+              if (typeof backendError === 'string') {
+                  errorMessage = backendError;
+              } else if (backendError.non_field_errors) {
+                  errorMessage = backendError.non_field_errors[0];
+              } else if (backendError.detail) {
+                  errorMessage = backendError.detail;
+              } else if (backendError.message) {
+                  errorMessage = backendError.message;
+              } else if (typeof backendError === 'object') {
+                  // Catch any other field-specific errors
+                  const firstError = Object.values(backendError)[0];
+                  if (Array.isArray(firstError)) {
+                      errorMessage = firstError[0];
+                  } else if (typeof firstError === 'string') {
+                      errorMessage = firstError;
+                  }
+              }
+          }
+          
+          throw new Error(errorMessage);
         }
-        return null;
       },
     }),
     GoogleProvider({

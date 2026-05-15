@@ -38,17 +38,22 @@ function LoginContent() {
 
         try {
             const result = await signIn('credentials', {
-                redirect: true,
-                callbackUrl: '/',
+                redirect: false,
                 username: formData.email,
                 password: formData.password
             });
 
             if (result?.error) {
-                toast.error('Invalid email or password. Please try again.');
+                // result.error contains the message thrown in authorize()
+                setError(result.error);
+                toast.error(result.error);
                 setIsLoading(false);
+            } else if (result?.ok) {
+                router.push('/');
+                router.refresh();
             }
         } catch (err) {
+            setError('An unexpected error occurred. Please try again later.');
             toast.error('An unexpected error occurred. Please try again later.');
             setIsLoading(false);
         }
@@ -69,6 +74,20 @@ function LoginContent() {
 
 
             <form className="space-y-4" onSubmit={handleLogin}>
+                {error && (
+                    <div className="p-3 rounded-[12px] bg-red-50 border border-red-100 flex items-center gap-2 text-red-600 animate-in fade-in slide-in-from-top-1 duration-200">
+                        <AlertCircleIcon size={18} className="shrink-0" />
+                        <p className="text-xs font-semibold">{error}</p>
+                    </div>
+                )}
+                
+                {successMessage && (
+                    <div className="p-3 rounded-[12px] bg-green-50 border border-green-100 flex items-center gap-2 text-[#008000] animate-in fade-in slide-in-from-top-1 duration-200">
+                        <CheckmarkCircle01Icon size={18} className="shrink-0" />
+                        <p className="text-xs font-semibold">{successMessage}</p>
+                    </div>
+                )}
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
                     <div className="relative">

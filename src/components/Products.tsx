@@ -375,7 +375,7 @@ export default function Products({
 
   return (
     <div className="w-full">
-      <Container className="pb-16">
+      <div className="pb-16">
         {/* Search Bar Container */}
         {/* <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">
           <input
@@ -479,7 +479,7 @@ export default function Products({
             <EmptyState message="No matching products found" />
           ) : (
             <>
-              <div className={`grid gap-4 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
+              <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
                 {filteredProducts.map((product) => (
                   <ProductCard key={product.id} product={product} onSelect={setSelectedProduct} />
                 ))}
@@ -487,7 +487,7 @@ export default function Products({
 
               <div ref={observerTarget} className="mt-8 w-full flex justify-center pb-8">
                 {isFetchingPage && (
-                  <div className={`grid gap-4 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
+                  <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
                     {Array.from({ length: 4 }).map((_, index) => (
                       <div key={`skeleton-${index}`} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                         <div className="h-28 bg-gray-200 rounded-md mb-4" />
@@ -502,7 +502,7 @@ export default function Products({
             </>
           )}
         </div>
-      </Container>
+      </div>
       {selectedProduct && (
         <ProductModal
           product={selectedProduct}
