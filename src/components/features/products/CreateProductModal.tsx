@@ -5,7 +5,7 @@ import { Cancel01Icon } from "hugeicons-react";
 import { createProduct } from "@/lib/products";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
-import ProductForm from "./forms/ProductForm";
+import ProductForm from "@/components/forms/ProductForm";
 import { useRouter } from "next/navigation";
 
 interface CreateProductModalProps {

@@ -363,12 +363,12 @@ export default function Navbar() {
                         </div>
 
                         {/* Right side actions & Menu Toggle */}
-                        <div className="flex items-center gap-4 sm:gap-5">
+                        <div className="flex items-center gap-2 sm:gap-5">
                             {/* 1. Mobile Search Icon */}
                             {isSearchablePage && (
                                 <button 
                                     onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} 
-                                    className={`md:hidden focus:outline-none group p-1 transition-all duration-300 ${showSearch ? 'opacity-100 w-auto translate-y-0 scale-100' : 'opacity-0 w-0 -translate-y-2 scale-90 pointer-events-none'}`}
+                                    className={`md:hidden focus:outline-none group transition-all duration-300 ${showSearch ? 'opacity-100 w-auto translate-y-0 scale-100' : 'opacity-0 w-0 -translate-y-2 scale-90 pointer-events-none'}`}
                                 >
                                     <Search02Icon size={24} className="text-zinc-800 cursor-pointer group-hover:text-[#008000] transition-colors" />
                                 </button>

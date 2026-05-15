@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Products from '@/components/Products';
+import Products from '@/components/features/products/Products';
 import { Product as ProductType } from "@/lib/products";
 import { Category } from "@/lib/categories";
 

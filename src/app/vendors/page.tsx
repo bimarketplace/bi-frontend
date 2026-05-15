@@ -11,7 +11,7 @@ import { Category } from "@/lib/categories";
 import { Container } from "@/components/layout/Container";
 import { fetchProductsPage, Product as ProductType } from "@/lib/products";
 import toast from "react-hot-toast";
-import Tabs from '@/components/Tabs';
+import Tabs from '@/components/common/Tabs';
 
 // Simple Alert icon component
 const AlertIcon = () => (

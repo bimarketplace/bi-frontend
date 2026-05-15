@@ -1,8 +1,7 @@
 import React, { Suspense } from "react";
-import HomePageClient from "./HomePageClient";
 import { fetchProductsPage, Product } from "@/lib/products";
 import { fetchCategories, Category } from "@/lib/categories";
-import Marketplace from "@/components/Marketplace"
+import Marketplace from '@/components/features/marketplace/Marketplace'
 
 export const revalidate = 60; // Revalidate the page every 60 seconds
 

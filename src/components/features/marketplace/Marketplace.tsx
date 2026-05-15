@@ -3,8 +3,8 @@ import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Product as ProductType } from "@/lib/products";
 import { Category } from "@/lib/categories";
-import Products from '@/components/Products';
-import { Container } from './layout/Container';
+import Products from '@/components/features/products/Products';
+import { Container } from '@/components/layout/Container';
 
 export default function Marketplace({ initialProducts, categories, initialNext, initialPrev, initialCount }: { initialProducts: ProductType[] | null | undefined; categories: Category[] | null | undefined; initialNext?: string | null; initialPrev?: string | null; initialCount?: number; }) {
   const { data: session } = useSession();
@@ -24,6 +24,7 @@ export default function Marketplace({ initialProducts, categories, initialNext, 
   return (
     <div className="min-h-screen bg-white font-sans">
       <Container as="main" className={`transition-all duration-300 ${paddingTopClass} pb-16`}>
+        {/* SEO Header */}
         <h1 className="sr-only">BI Marketplace - Buy and Sell Products Effectively</h1>
         <Products 
           initialProducts={initialProducts}

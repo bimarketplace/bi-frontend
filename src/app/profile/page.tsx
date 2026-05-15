@@ -22,8 +22,8 @@ import { toast } from "react-hot-toast";
 import { fetchUserProfile } from "@/lib/auth";
 import { Container } from "@/components/layout/Container";
 import { Avatar } from "@/components/layout/Navbar";
-import CreateProductModal from "@/components/CreateProductModal";
-import ProfileSettingsModal from "@/components/ProfileSettingsModal";
+import CreateProductModal from '@/components/features/products/CreateProductModal';
+import ProfileSettingsModal from '@/components/features/profile/ProfileSettingsModal';
 
 // Simple Alert icon component
 const AlertIcon = () => (

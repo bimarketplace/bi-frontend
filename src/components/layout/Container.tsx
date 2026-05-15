@@ -12,7 +12,7 @@ export const Container = ({
     as: Component = "div" 
 }: ContainerProps) => {
     return (
-        <Component className={`max-w-screen-2xl mx-auto px-6 sm:px-12 ${className}`}>
+        <Component className={`max-w-screen-2xl mx-auto px-6 ${className}`}>
             {children}
         </Component>
     );
