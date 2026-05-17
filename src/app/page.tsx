@@ -1,6 +1,6 @@
 import React, { Suspense } from "react";
 import HomePageClient from "./HomePageClient";
-import { fetchProductsPage, Product } from "@/lib/products";
+import { fetchProductsPage, fetchActiveFlashSales, Product, FlashSale } from "@/lib/products";
 import { fetchCategories, Category } from "@/lib/categories";
 import Marketplace from "@/components/Marketplace"
 
@@ -12,17 +12,20 @@ export default async function Home() {
   let prevPage: string | null = null;
   let totalCount = 0;
   let categories: Category[] = [];
+  let flashSales: FlashSale[] = [];
   
   try {
-    const [productsData, categoriesData] = await Promise.all([
+    const [productsData, categoriesData, flashSalesData] = await Promise.all([
       fetchProductsPage(),
-      fetchCategories()
+      fetchCategories(),
+      fetchActiveFlashSales()
     ]);
     products = productsData.results;
     nextPage = productsData.next;
     prevPage = productsData.previous;
     totalCount = productsData.count;
     categories = categoriesData;
+    flashSales = flashSalesData;
   } catch (error: any) {
     console.error("Failed to fetch initial data on server:", error);
     // Try fallback...
@@ -30,7 +33,14 @@ export default async function Home() {
 
   return (
     <Suspense fallback={<div>Loading marketplace...</div>}>
-      <Marketplace initialProducts={products} initialPrev={prevPage} initialNext={nextPage} initialCount={totalCount} categories={categories} />
+      <Marketplace 
+        initialProducts={products} 
+        initialPrev={prevPage} 
+        initialNext={nextPage} 
+        initialCount={totalCount} 
+        categories={categories} 
+        initialFlashSales={flashSales}
+      />
     </Suspense>
   );
 }

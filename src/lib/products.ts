@@ -238,3 +238,28 @@ export const shareProduct = async (productId: number) => {
     const response = await axios.post(`${getApiUrl()}/api/products/${productId}/share/`, {});
     return response.data;
 };
+
+export interface FlashSale {
+    id: number;
+    product: Product;
+    discount_price: string;
+    start_time: string;
+    end_time: string;
+    active: boolean;
+    is_currently_active: boolean;
+}
+
+export const fetchActiveFlashSales = async (): Promise<FlashSale[]> => {
+    try {
+        const response = await fetch(`${getApiUrl()}/api/flash-sales/?active_only=true`, {
+            next: { revalidate: 0 }
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch flash sales: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error("fetchActiveFlashSales error:", error);
+        return [];
+    }
+};

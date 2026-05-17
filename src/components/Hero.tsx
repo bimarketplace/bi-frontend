@@ -3,19 +3,43 @@
 import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { ArrowRight01Icon, ArrowLeft01Icon, SparklesIcon } from "hugeicons-react";
-import { Product as ProductType } from "@/lib/products";
+import { Product as ProductType, FlashSale as FlashSaleType } from "@/lib/products";
 
 interface HeroProps {
   products?: ProductType[];
+  flashSales?: FlashSaleType[];
   onProductClick?: (product: ProductType) => void;
 }
 
-export default function Hero({ products, onProductClick }: HeroProps) {
+export default function Hero({ products, flashSales, onProductClick }: HeroProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
-  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string | number, boolean>>({});
 
   const carouselItems = useMemo(() => {
+    // 1. Prioritize active flash sales
+    if (flashSales && flashSales.length > 0) {
+      const gradients = [
+        "from-red-950 via-rose-900 to-amber-950",
+        "from-rose-950 via-red-900 to-orange-950",
+        "from-red-950 via-orange-900 to-rose-950",
+        "from-orange-950 via-rose-950 to-red-900",
+        "from-rose-900 via-red-950 to-orange-900"
+      ];
+      return flashSales.slice(0, 5).map((sale, index) => ({
+        id: `flash-${sale.id}`,
+        title: sale.product.name,
+        description: sale.product.description || "No description available for this product.",
+        badge: "⚡ FLASH SALE",
+        gradient: gradients[index % gradients.length],
+        image: sale.product.image_url || "/assets/images/placeholder.png",
+        price: sale.discount_price,
+        originalPrice: sale.product.price,
+        rawProduct: sale.product
+      }));
+    }
+
+    // 2. Fall back to standard listed products
     if (products && products.length > 0) {
       const gradients = [
         "from-emerald-950 via-green-900 to-teal-950",
@@ -25,51 +49,55 @@ export default function Hero({ products, onProductClick }: HeroProps) {
         "from-green-900 via-emerald-950 to-teal-900"
       ];
       return products.slice(0, 5).map((prod, index) => ({
-        id: prod.id,
+        id: `product-${prod.id}`,
         title: prod.name,
         description: prod.description || "No description available for this product.",
         badge: "FEATURED DEAL",
         gradient: gradients[index % gradients.length],
         image: prod.image_url || "/assets/images/placeholder.png",
         price: prod.price,
+        originalPrice: null,
         rawProduct: prod
       }));
     }
 
-    // Fallback to static slides if no products are available
+    // 3. Educational fallback slides if no products or sales
     return [
       {
-        id: 1,
+        id: "fallback-1",
         title: "Premium Tech & Campus Essentials",
         description: "Upgrade your gear with the best deals on electronics, laptop stands, power banks, and accessories from verified peers.",
         badge: "Student Favourites",
         gradient: "from-emerald-600 via-green-600 to-teal-700",
         image: "/assets/images/sale-fast.png",
         price: null,
+        originalPrice: null,
         rawProduct: null
       },
       {
-        id: 2,
+        id: "fallback-2",
         title: "100% Verified Local Sellers",
         description: "Shop with absolute peace of mind. Every vendor in our community is vetted to ensure safe, high-quality, and authentic products.",
         badge: "Trusted Commerce",
         gradient: "from-green-600 via-emerald-600 to-cyan-700",
         image: "/assets/images/search_banner.jpg",
         price: null,
+        originalPrice: null,
         rawProduct: null
       },
       {
-        id: 3,
+        id: "fallback-3",
         title: "Seamless WhatsApp Checkout",
         description: "Found something you like? Finalize details and order directly through a quick WhatsApp message to the seller with pre-filled details.",
         badge: "Instant Purchase",
         gradient: "from-emerald-600 via-teal-600 to-green-700",
         image: "/assets/images/bi.png",
         price: null,
+        originalPrice: null,
         rawProduct: null
       }
     ];
-  }, [products]);
+  }, [products, flashSales]);
 
   useEffect(() => {
     if (isHovered || carouselItems.length <= 1) return;
@@ -79,7 +107,7 @@ export default function Hero({ products, onProductClick }: HeroProps) {
     return () => clearInterval(interval);
   }, [isHovered, carouselItems]);
 
-  // Reset current slide if carousel items count changes
+  // Reset slide index if products/sales array changes
   useEffect(() => {
     setCurrentSlide(0);
   }, [carouselItems.length]);
@@ -170,7 +198,7 @@ export default function Hero({ products, onProductClick }: HeroProps) {
           <div className="relative w-full h-full bg-zinc-950">
             {carouselItems.map((slide, index) => {
               const isActive = index === currentSlide;
-              const hasImage = slide.image && !imageErrors[index];
+              const hasImage = slide.image && !imageErrors[slide.id];
               
               return (
                 <div
@@ -195,7 +223,7 @@ export default function Hero({ products, onProductClick }: HeroProps) {
                         sizes="(max-w-768px) 100vw, 33vw"
                         priority={index === 0}
                         onError={() => {
-                          setImageErrors((prev) => ({ ...prev, [index]: true }));
+                          setImageErrors((prev) => ({ ...prev, [slide.id]: true }));
                         }}
                       />
                       {/* Premium overlay for readability */}
@@ -216,9 +244,16 @@ export default function Hero({ products, onProductClick }: HeroProps) {
                         {slide.badge}
                       </span>
                       {slide.price && (
-                        <span className="px-3 py-1 bg-[#008000] rounded-full text-[10px] font-black tracking-wider text-white">
-                          ₦{parseFloat(slide.price || "0").toLocaleString()}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="px-3 py-1 bg-[#008000] rounded-full text-[10px] font-black tracking-wider text-white">
+                            ₦{parseFloat(slide.price || "0").toLocaleString()}
+                          </span>
+                          {slide.originalPrice && (
+                            <span className="text-[11px] font-bold text-white/50 line-through">
+                              ₦{parseFloat(slide.originalPrice || "0").toLocaleString()}
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                     <h3 className="text-2xl md:text-3xl font-black text-white leading-tight tracking-tight line-clamp-2">
