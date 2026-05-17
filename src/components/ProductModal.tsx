@@ -19,6 +19,7 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
   const [isOpening, setIsOpening] = useState(false);
   const { addToCart } = useCart();
   const [step, setStep] = useState<'product' | 'details'>('product');
+  const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -39,8 +40,8 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
   };
 
   const handleAddToCart = () => {
-    addToCart(product);
-    toast.success(`${product.name} added to cart!`, {
+    addToCart(product, quantity);
+    toast.success(`${quantity}x ${product.name} added to cart!`, {
       style: {
         borderRadius: "12px",
         background: "#ffffff",
@@ -66,6 +67,8 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
 
     setIsSubmitting(true);
 
+    const total = parseFloat(product.price || "0") * quantity;
+
     // 1. Send to backend
     const backendData = {
       full_name: formData.fullName,
@@ -76,9 +79,9 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
         id: product.id,
         name: product.name,
         price: product.price,
-        quantity: 1
+        quantity: quantity
       }],
-      total_price: parseFloat(product.price || "0")
+      total_price: total
     };
 
     await submitCheckout(backendData);
@@ -93,7 +96,7 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
 ${formData.notes ? `- Notes: ${formData.notes}` : ''}
 `;
 
-    const message = `Hello, I'm interested in purchasing the following item listed on BI Marketplace:\n\n- ${product.name} (Qty: 1)\n\nPrice: ₦${parseFloat(product.price || "0").toLocaleString()}\n${deliveryInfo}`;
+    const message = `Hello, I'm interested in purchasing the following item listed on BI Marketplace:\n\n- ${product.name} (Qty: ${quantity})\n\nPrice: ₦${total.toLocaleString()}\n${deliveryInfo}`;
     const encodedMessage = encodeURIComponent(message);
 
     toast.success("Proceeding to WhatsApp...", {
@@ -167,6 +170,33 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
                     </span>
                   </div>
                 )}
+
+                {/* Quantity Selector */}
+                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="font-bold text-gray-900 text-sm">Quantity</span>
+                    <span className="text-xs text-zinc-500">Select number of items</span>
+                  </div>
+                  <div className="flex items-center gap-4 bg-gray-50 p-1.5 rounded-full border border-gray-100">
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                      className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-600 font-bold hover:bg-gray-100 active:scale-90 transition-all shadow-sm border border-gray-100"
+                    >
+                      -
+                    </button>
+                    <span className="text-base font-bold w-6 text-center text-gray-900">
+                      {quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setQuantity((prev) => prev + 1)}
+                      className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-600 font-bold hover:bg-gray-100 active:scale-90 transition-all shadow-sm border border-gray-100"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
 
                 <div className="mt-4 flex flex-col gap-2">
                   <h3 className="font-bold text-gray-900">Description</h3>
@@ -242,7 +272,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
           {step === 'details' && (
              <div className="flex justify-between items-center mb-4 px-1">
                 <span className="text-gray-500 text-xs font-bold tracking-wider uppercase">Estimated Total</span>
-                <span className="text-2xl font-black text-gray-900">₦{parseFloat(product.price || "0").toLocaleString()}</span>
+                <span className="text-2xl font-black text-gray-900">₦{(parseFloat(product.price || "0") * quantity).toLocaleString()}</span>
              </div>
           )}
 
