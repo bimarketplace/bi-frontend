@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { Product as ProductType, FlashSale as FlashSaleType } from "@/lib/products";
+import { Product as ProductType, FlashSale as FlashSaleType, fetchActiveFlashSales } from "@/lib/products";
 import { Category } from "@/lib/categories";
 import Products from '@/components/Products';
 import { Container } from './layout/Container';
@@ -26,9 +26,23 @@ export default function Marketplace({
   const { data: session } = useSession();
   const [isMounted, setIsMounted] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
+  const [flashSales, setFlashSales] = useState<FlashSaleType[]>(initialFlashSales || []);
 
   useEffect(() => {
     setIsMounted(true);
+    
+    // Fetch live active flash sales on mount to bypass server-side caching
+    const loadLiveSales = async () => {
+      try {
+        const liveSales = await fetchActiveFlashSales();
+        if (liveSales && liveSales.length > 0) {
+          setFlashSales(liveSales);
+        }
+      } catch (err) {
+        console.error("Failed to load live flash sales:", err);
+      }
+    };
+    loadLiveSales();
   }, []);
 
   const user = session?.user;
@@ -39,7 +53,6 @@ export default function Marketplace({
   const paddingTopClass = (isMounted && isLoggedIn && !isVerified) ? 'pt-[170px] md:pt-[125px]' : 'pt-[130px] md:pt-20';
 
   const heroProducts = initialProducts || [];
-  const flashSales = initialFlashSales || [];
 
   return (
     <div className="min-h-screen bg-white font-sans">

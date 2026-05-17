@@ -257,7 +257,19 @@ export const fetchActiveFlashSales = async (): Promise<FlashSale[]> => {
         if (!response.ok) {
             throw new Error(`Failed to fetch flash sales: ${response.status}`);
         }
-        return await response.json();
+        const payload = await response.json();
+        
+        // Handle paginated or direct array payload
+        if (Array.isArray(payload)) {
+            return payload;
+        }
+        if (payload && Array.isArray(payload.results)) {
+            return payload.results;
+        }
+        if (payload && Array.isArray(payload.data)) {
+            return payload.data;
+        }
+        return [];
     } catch (error) {
         console.error("fetchActiveFlashSales error:", error);
         return [];
