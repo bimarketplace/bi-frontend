@@ -8,6 +8,7 @@ import Navbar from "@/components/layout/Navbar";
 import CartFloat from "@/components/layout/CartFloat";
 import InstallPrompt from '@/components/layout/InstallPrompt';
 import OfflineFallback from '@/components/layout/OfflineFallback';
+import { Analytics } from "@vercel/analytics/next";
 
 const outfit = Outfit({
   variable: "--font-outfit",
@@ -69,6 +70,7 @@ export default function RootLayout({
           {/* <WhatsAppFloat /> */}
           <InstallPrompt />
           {/* <OfflineFallback /> */}
+          <Analytics />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{

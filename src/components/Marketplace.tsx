@@ -5,6 +5,7 @@ import { Product as ProductType } from "@/lib/products";
 import { Category } from "@/lib/categories";
 import Products from '@/components/Products';
 import { Container } from './layout/Container';
+import Hero from "@/components/Hero";
 
 export default function Marketplace({ initialProducts, categories, initialNext, initialPrev, initialCount }: { initialProducts: ProductType[] | null | undefined; categories: Category[] | null | undefined; initialNext?: string | null; initialPrev?: string | null; initialCount?: number; }) {
   const { data: session } = useSession();
@@ -25,6 +26,7 @@ export default function Marketplace({ initialProducts, categories, initialNext, 
     <div className="min-h-screen bg-white font-sans">
       <Container as="main" className={`transition-all duration-300 ${paddingTopClass} pb-16`}>
         <h1 className="sr-only">BI Marketplace - Buy and Sell Products Effectively</h1>
+        <Hero />
         <Products 
           initialProducts={initialProducts}
           categories={categories}
