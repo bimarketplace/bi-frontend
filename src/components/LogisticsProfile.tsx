@@ -72,10 +72,10 @@ export default function LogisticsProfile({ company }: { company: LogisticsCompan
                         <p><span className="font-semibold text-gray-900">Contact:</span> {company.contact_person}</p>
                       ) : null}
                       {company.contact_phone ? (
-                        <p className="flex items-center gap-2"><Phone01Icon size={16} className="text-[#008000]" />{company.contact_phone}</p>
+                        <p className="flex items-center gap-2"><AiPhone01Icon size={16} className="text-[#008000]" />{company.contact_phone}</p>
                       ) : null}
                       {company.contact_email ? (
-                        <p className="flex items-center gap-2"><MailIcon size={16} className="text-[#008000]" />{company.contact_email}</p>
+                        <p className="flex items-center gap-2"><AiMailIcon size={16} className="text-[#008000]" />{company.contact_email}</p>
                       ) : null}
                       {company.website ? (
                         <p className="flex items-center gap-2"><Link01Icon size={16} className="text-[#008000]" /><a href={company.website} target="_blank" rel="noreferrer" className="underline text-[#064E3B]">Visit website</a></p>
