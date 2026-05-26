@@ -237,6 +237,9 @@ export default function Navbar() {
                                     <Link href="/cart" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Shopping Bag">
                                         <ShoppingBag01Icon size={24} />
                                     </Link>
+                                    <Link href="/logistics" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Logistics">
+                                        <TruckIcon size={24} />
+                                    </Link>
                                     <Link href="/vendors" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Vendors">
                                         <Store01Icon size={24} />
                                     </Link>
