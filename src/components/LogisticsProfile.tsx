@@ -5,7 +5,7 @@ import Link from "next/link";
 import React from "react";
 import { LogisticsCompany } from "@/lib/logistics";
 import { Container } from "@/components/layout/Container";
-import { ArrowLeft02Icon, Location01Icon, TruckIcon, Link01Icon, MailIcon, Phone01Icon } from "hugeicons-react";
+import { ArrowLeft02Icon, Location01Icon, TruckIcon, Link01Icon, AiMailIcon, AiPhone01Icon } from "hugeicons-react";
 
 export default function LogisticsProfile({ company }: { company: LogisticsCompany }) {
   return (
@@ -22,9 +22,21 @@ export default function LogisticsProfile({ company }: { company: LogisticsCompan
                 <div className="flex flex-col items-start gap-6">
                   <div className="rounded-3xl bg-white border border-gray-100 p-6 shadow-sm w-full">
                     <div className="flex items-center gap-4">
-                      <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#ECFDF3] text-[#047857]">
-                        <TruckIcon size={26} />
-                      </div>
+                      {company.logo_url ? (
+                        <div className="relative h-16 w-16 rounded-3xl overflow-hidden bg-[#ECFDF3] flex items-center justify-center">
+                          <Image
+                            src={company.logo_url}
+                            alt={company.name}
+                            width={64}
+                            height={64}
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#ECFDF3] text-[#047857]">
+                          <TruckIcon size={26} />
+                        </div>
+                      )}
                       <div>
                         <p className="text-xs uppercase tracking-[0.3em] text-[#047857] font-bold">Logistics Company</p>
                         <h1 className="text-3xl font-black text-gray-900 mt-2">{company.name}</h1>

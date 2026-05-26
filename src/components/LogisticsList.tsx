@@ -19,7 +19,17 @@ const LogisticsCard = ({ company }: { company: LogisticsCompany }) => {
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-[#f5f7f9] flex items-center justify-center">
         <div className="absolute inset-0 bg-gradient-to-br from-[#008000]/10 to-white" />
-        <TruckIcon size={54} className="relative text-[#008000]/80" />
+        {company.logo_url ? (
+          <Image
+            src={company.logo_url}
+            alt={company.name}
+            width={200}
+            height={125}
+            className="relative object-contain h-full w-full p-4"
+          />
+        ) : (
+          <TruckIcon size={54} className="relative text-[#008000]/80" />
+        )}
       </div>
 
       <div className="flex-1 p-5 flex flex-col gap-3">

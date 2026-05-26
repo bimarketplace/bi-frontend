@@ -4,6 +4,8 @@ export interface LogisticsCompany {
     id: number;
     name: string;
     description: string;
+    logo?: string | null;
+    logo_url?: string | null;
     contact_person?: string;
     contact_email?: string;
     contact_phone?: string;
