@@ -68,17 +68,26 @@ export default function LogisticsProfile({ company }: { company: LogisticsCompan
             >
               Copy Profile Link
             </button>
-            {(company.contact_email || company.contact_phone) && (
+            {company.contact_phone ? (
               <a 
-                href={company.contact_email ? `mailto:${company.contact_email}` : `tel:${company.contact_phone}`}
+                href={`https://wa.me/${company.contact_phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`Hello ${company.name}, I am contacting you from BI Marketplace.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="px-5 py-2.5 cursor-pointer bg-[#008000] text-white text-[14px] font-bold rounded-[10px] hover:bg-[#006000] transition-all inline-flex items-center justify-center"
               >
                 Contact Us
               </a>
-            )}
+            ) : company.contact_email ? (
+              <a 
+                href={`mailto:${company.contact_email}`}
+                className="px-5 py-2.5 cursor-pointer bg-[#008000] text-white text-[14px] font-bold rounded-[10px] hover:bg-[#006000] transition-all inline-flex items-center justify-center"
+              >
+                Contact Us
+              </a>
+            ) : null}
           </div>
 
-          <p className="text-sm font-medium text-gray-900 mb-8 whitespace-pre-wrap">
+          <p className="text-sm font-medium text-gray-900 mb-4 whitespace-pre-wrap">
             {company.description || "Reliable and verified logistics service."}
           </p>
 

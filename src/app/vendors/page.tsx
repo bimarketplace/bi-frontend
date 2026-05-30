@@ -260,7 +260,7 @@ export default function Vendors({
           </div>
         </div>
 
-        <div className="w-full">
+        <div className="w-full mt-8">
           {pageError && (
             <div className="mb-4 p-4 rounded-lg bg-red-50 border border-red-200 text-red-700">
               {pageError}
