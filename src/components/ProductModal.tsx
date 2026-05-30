@@ -116,13 +116,13 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
   return (
     <div className="fixed inset-0 z-[120] flex items-end sm:items-stretch sm:justify-end overflow-hidden">
       {/* Backdrop */}
-      <div 
+      <div
         className={`absolute inset-0 bg-[#008000]/5 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
         onClick={handleClose}
       />
-      
+
       {/* Drawer */}
-      <div 
+      <div
         className={`relative w-full sm:w-[400px] bg-white h-[90vh] sm:h-full shadow-2xl transition-transform duration-300 ease-out flex flex-col
           ${(!isOpening || isClosing) ? 'translate-y-full sm:translate-x-full' : 'translate-y-0 sm:translate-x-0'}`}
       >
@@ -134,7 +134,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
         {/* Header */}
         <div className="p-4 sm:p-6 flex items-center justify-between shrink-0">
           <h3 className="text-xl font-medium text-gray-900">Product Details</h3>
-          <button 
+          <button
             onClick={handleClose}
             className="p-2 hover:bg-gray-100 bg-gray-50 rounded-full text-gray-900 transition-colors"
           >
@@ -209,8 +209,8 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
           ) : (
             <div className="flex flex-col gap-6 animate-in slide-in-from-right duration-300">
               <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => setStep('product')} 
+                <button
+                  onClick={() => setStep('product')}
                   className="p-2 -ml-2 hover:bg-gray-50 rounded-full transition-all text-gray-900 active:scale-90"
                   title="Back"
                 >
@@ -227,7 +227,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
                     placeholder="Full name"
                     className="w-full px-5 py-4 bg-zinc-50 border border-zinc-100 rounded-[18px] text-sm focus:outline-none focus:ring-4 focus:ring-[#008000]/5 focus:bg-white focus:border-[#008000] transition-all font-medium"
                     value={formData.fullName}
-                    onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   />
                 </div>
 
@@ -238,7 +238,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
                     placeholder="Street, number, city"
                     className="w-full px-5 py-4 bg-zinc-50 border border-zinc-100 rounded-[18px] text-sm focus:outline-none focus:ring-4 focus:ring-[#008000]/5 focus:bg-white focus:border-[#008000] transition-all font-medium"
                     value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                   />
                 </div>
 
@@ -249,7 +249,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
                     placeholder="e.g. +234 ..."
                     className="w-full px-5 py-4 bg-zinc-50 border border-zinc-100 rounded-[18px] text-sm focus:outline-none focus:ring-4 focus:ring-[#008000]/5 focus:bg-white focus:border-[#008000] transition-all font-medium"
                     value={formData.phone}
-                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   />
                 </div>
 
@@ -259,7 +259,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
                     placeholder="Delivery notes (optional)"
                     className="w-full px-5 py-4 bg-zinc-50 border border-zinc-100 rounded-[18px] text-sm focus:outline-none focus:ring-4 focus:ring-[#008000]/5 focus:bg-white focus:border-[#008000] transition-all font-medium min-h-[100px] resize-none"
                     value={formData.notes}
-                    onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   />
                 </div>
               </div>
@@ -270,14 +270,14 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
         {/* Footer Actions */}
         <div className="p-4 sm:p-6 bg-white shrink-0 mb-4 px-8 border-t border-gray-50">
           {step === 'details' && (
-             <div className="flex justify-between items-center mb-4 px-1">
-                <span className="text-gray-500 text-xs font-bold tracking-wider uppercase">Estimated Total</span>
-                <span className="text-2xl font-black text-gray-900">₦{(parseFloat(product.price || "0") * quantity).toLocaleString()}</span>
-             </div>
+            <div className="flex justify-between items-center mb-4 px-1">
+              <span className="text-gray-500 text-xs font-bold tracking-wider uppercase">Estimated Total</span>
+              <span className="text-2xl font-black text-gray-900">₦{(parseFloat(product.price || "0") * quantity).toLocaleString()}</span>
+            </div>
           )}
 
           {showAddToCart && step === 'product' ? (
-            <button 
+            <button
               onClick={handleAddToCart}
               className="w-full bg-[#008000] text-white py-4 rounded-[18px] font-black hover:bg-[#006000] transition-colors flex items-center justify-center gap-3 shadow-xl shadow-[#008000]/10"
             >
@@ -285,7 +285,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
             </button>
           ) : (
             <div className="flex flex-col gap-3">
-              <button 
+              <button
                 onClick={handleWhatsAppCheckout}
                 disabled={isSubmitting}
                 className="w-full bg-[#008000] text-white py-5 rounded-[18px] font-black transition-all flex flex-col items-center justify-center gap-1 shadow-2xl shadow-[#008000]/20 hover:bg-[#006000] active:scale-[0.98] disabled:opacity-50"
@@ -293,16 +293,16 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
                 <span className="uppercase tracking-widest text-[13px]">
                   {isSubmitting ? 'Processing...' : (step === 'product' ? 'Checkout via WhatsApp' : 'Confirm Order via WhatsApp')}
                 </span>
-                {step === 'details' && !isSubmitting && (
-                  <span className="text-[10px] opacity-80 font-medium normal-case">
-                    Opens WhatsApp to complete your purchase.
-                  </span>
-                )}
               </button>
-              
+              {step === 'details' && !isSubmitting && (
+                <span className="text-[10px] text-gray-600  font-medium normal-case">
+                  Opens WhatsApp to complete your purchase.
+                </span>
+              )}
+
               {step === 'product' && (
                 <a href={`/vendors/${product.seller?.username}`} className="w-full">
-                  <button 
+                  <button
                     className="w-full bg-[#f5f5f5] text-gray-900 py-4 rounded-[18px] font-bold hover:bg-[#e5e5e5] transition-colors flex items-center justify-center gap-3"
                   >
                     Open Store
