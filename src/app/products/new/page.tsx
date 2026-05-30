@@ -57,7 +57,7 @@ export default function CreateProductPage() {
             setIsCheckingProfile(false);
         }
     }, [session, router]);
-    
+
     useEffect(() => {
         const loadCategories = async () => {
             try {

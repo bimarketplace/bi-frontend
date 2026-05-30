@@ -99,7 +99,7 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
             await castVote(product.id, value, (session as any).access_token);
             const updatedProduct = await fetchProductById(product.id, (session as any).access_token);
             setProduct(updatedProduct);
-            
+
             if (newUserVote === 0) {
                 toast.success("Vote removed");
             } else {
@@ -211,7 +211,7 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
                                         <Avatar name={product.seller.username} size="md" />
                                         <div>
                                             <p className="text-xs font-bold text-zinc-400 uppercase tracking-tighter">Seller</p>
-                                            <Link 
+                                            <Link
                                                 href={`/vendors/${product.seller.username}`}
                                                 className="font-bold text-zinc-900 leading-none hover:underline hover:text-brand-green transition-colors"
                                             >
@@ -223,22 +223,20 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
                                     <div className="flex gap-2 ml-auto">
                                         <button
                                             onClick={() => handleVote(1)}
-                                            className={`h-14 px-6 gap-2 rounded-2xl flex items-center justify-center transition-all font-bold border ${
-                                                product.user_vote === 1 
-                                                ? "bg-green-50 text-green-600 border-green-200 shadow-sm" 
-                                                : "bg-zinc-50 hover:bg-zinc-100 text-zinc-900 border-zinc-100"
-                                            }`}
+                                            className={`h-14 px-6 gap-2 rounded-2xl flex items-center justify-center transition-all font-bold border ${product.user_vote === 1
+                                                    ? "bg-green-50 text-green-600 border-green-200 shadow-sm"
+                                                    : "bg-zinc-50 hover:bg-zinc-100 text-zinc-900 border-zinc-100"
+                                                }`}
                                         >
                                             <ThumbsUpIcon size={20} fill={product.user_vote === 1 ? "currentColor" : "none"} />
                                             <span>{product.vote_score}</span>
                                         </button>
                                         <button
                                             onClick={() => handleVote(-1)}
-                                            className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-all border ${
-                                                product.user_vote === -1 
-                                                ? "bg-red-50 text-red-600 border-red-200 shadow-sm" 
-                                                : "bg-zinc-50 hover:bg-red-50 hover:text-red-500 text-zinc-400 border-zinc-100"
-                                            }`}
+                                            className={`h-14 w-14 rounded-2xl flex items-center justify-center transition-all border ${product.user_vote === -1
+                                                    ? "bg-red-50 text-red-600 border-red-200 shadow-sm"
+                                                    : "bg-zinc-50 hover:bg-red-50 hover:text-red-500 text-zinc-400 border-zinc-100"
+                                                }`}
                                         >
                                             <ThumbsDownIcon size={20} fill={product.user_vote === -1 ? "currentColor" : "none"} />
                                         </button>

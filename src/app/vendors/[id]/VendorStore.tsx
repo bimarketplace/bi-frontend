@@ -3,19 +3,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { 
-    FavouriteIcon, 
-    StarIcon, 
-    ThumbsUpIcon, 
-    ThumbsDownIcon, 
-    Message01Icon, 
-    Search02Icon, 
-    GridIcon, 
-    ArrowRight01Icon, 
-    ArrowLeft02Icon, 
-    ArrowRight02Icon, 
-    Cancel01Icon, 
-    Location01Icon 
+import {
+  FavouriteIcon,
+  StarIcon,
+  ThumbsUpIcon,
+  ThumbsDownIcon,
+  Message01Icon,
+  Search02Icon,
+  GridIcon,
+  ArrowRight01Icon,
+  ArrowLeft02Icon,
+  ArrowRight02Icon,
+  Cancel01Icon,
+  Location01Icon
 } from "hugeicons-react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -116,11 +116,11 @@ export default function VendorStore({ id, initialProducts, categoriesData }: { i
       <Container>
         <div className="w-full">
           <div className="flex items-center gap-4 mb-4">
-            <Avatar 
-                name={storeName.charAt(0).toUpperCase()} 
-                size="lg"
-                variant="light"
-                className="ring-1 ring-gray-100 rounded-xxl"
+            <Avatar
+              name={storeName.charAt(0).toUpperCase()}
+              size="lg"
+              variant="light"
+              className="ring-1 ring-gray-100 rounded-xxl"
             />
             <div className="flex flex-col">
               <span className="text-lg font-bold text-gray-900 uppercase">
@@ -154,8 +154,8 @@ export default function VendorStore({ id, initialProducts, categoriesData }: { i
             Copy Profile Link
           </button>
           <p className="text-sm font-medium text-gray-900 mb-4 whitespace-pre-wrap">
-            {products.length > 0 && products[0].seller.bio 
-              ? products[0].seller.bio 
+            {products.length > 0 && products[0].seller.bio
+              ? products[0].seller.bio
               : `Welcome to ${storeName}'s store. We provide the best products at competitive prices.`}
           </p>
 

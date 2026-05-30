@@ -27,28 +27,28 @@ import ProfileSettingsModal from "@/components/ProfileSettingsModal";
 
 // Simple Alert icon component
 const AlertIcon = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-      <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+    <path d="M12 8V12M12 16H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+  </svg>
+);
 
 const EmptyState = ({ onAdd }: { onAdd: () => void }) => (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <div className="bg-gray-100 rounded-full p-6 mb-4">
-        <AlertIcon />
-      </div>
-      <h3 className="text-lg font-semibold text-gray-700 mb-2">No products yet</h3>
-      <p className="text-sm text-gray-500 mb-8">Start your marketplace journey by creating your first product.</p>
-      <button
-        onClick={onAdd}
-        className="flex items-center gap-2 bg-[#008000] text-white px-8 py-3.5 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.02]"
-      >
-        <PlusSignIcon size={20} />
-        Add First Product
-      </button>
+  <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+    <div className="bg-gray-100 rounded-full p-6 mb-4">
+      <AlertIcon />
     </div>
-  );
+    <h3 className="text-lg font-semibold text-gray-700 mb-2">No products yet</h3>
+    <p className="text-sm text-gray-500 mb-8">Start your marketplace journey by creating your first product.</p>
+    <button
+      onClick={onAdd}
+      className="flex items-center gap-2 bg-[#008000] text-white px-8 py-3.5 rounded-[12px] font-bold hover:bg-zinc-800 transition-all hover:scale-[1.02]"
+    >
+      <PlusSignIcon size={20} />
+      Add First Product
+    </button>
+  </div>
+);
 
 export default function ProfilePage() {
   const { data: session } = useSession();
@@ -75,13 +75,13 @@ export default function ProfilePage() {
     try {
       const username = (session.user as any).username || session.user?.name;
       const fetchCategories = await import("@/lib/categories").then(m => m.fetchCategories);
-      
+
       const [productsData, profile, categoriesData] = await Promise.all([
         fetchProductsPage(undefined, { seller__username: username }),
         fetchUserProfile((session as any).access_token),
         fetchCategories()
       ]);
-      
+
       const allProducts = productsData.results;
 
       const myProducts = allProducts.filter((p: any) =>
@@ -153,8 +153,8 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <Avatar 
-                  name={storeName.charAt(0).toUpperCase()} 
+                <Avatar
+                  name={storeName.charAt(0).toUpperCase()}
                   size="lg"
                   variant="light"
                   className="ring-1 ring-gray-100 rounded-xxl"
@@ -170,26 +170,26 @@ export default function ProfilePage() {
                   </span>
                 )}
                 <p className="text-sm font-medium text-gray-500">
-                    {products.length} Products listed
+                  {products.length} Products listed
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-                <button
-                    onClick={() => setIsModalOpen(true)}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 px-5 py-2.5 rounded-xl text-gray-700 text-[14px] font-bold hover:bg-gray-50 transition-all"
-                >
-                    <Settings01Icon size={18} />
-                    Settings
-                </button>
-                <button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#008000] text-white px-5 py-2.5 rounded-xl text-[14px] font-bold hover:bg-primary-700 transition-all shadow-sm"
-                >
-                    <PlusSignIcon size={18} />
-                    Add Product
-                </button>
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 px-5 py-2.5 rounded-xl text-gray-700 text-[14px] font-bold hover:bg-gray-50 transition-all"
+              >
+                <Settings01Icon size={18} />
+                Settings
+              </button>
+              <button
+                onClick={() => setIsCreateModalOpen(true)}
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#008000] text-white px-5 py-2.5 rounded-xl text-[14px] font-bold hover:bg-primary-700 transition-all shadow-sm"
+              >
+                <PlusSignIcon size={18} />
+                Add Product
+              </button>
             </div>
           </div>
 
@@ -216,7 +216,7 @@ export default function ProfilePage() {
         <div className="w-full mt-8 mb-5">
           <div className="flex justify-end items-end mb-6">
             <div className="hidden sm:flex gap-2">
-              <button 
+              <button
                 onClick={() => {
                   const el = document.getElementById('categories-scroll');
                   if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
@@ -288,59 +288,59 @@ export default function ProfilePage() {
             <EmptyState onAdd={() => setIsCreateModalOpen(true)} />
           ) : (
             <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
-                {filteredProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="group relative w-full bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full"
-                  >
-                    <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-                        <Image
-                            src={product.image_url || "/assets/images/placeholder.png"}
-                            alt={product.name}
-                            fill
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                            unoptimized
-                        />
-                         <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg font-bold text-[12px] shadow-sm border border-gray-100">
-                            ₦{parseFloat(product.price).toLocaleString()}
-                        </div>
-                    </div>
-
-                    <div className="flex-1 p-3 flex flex-col gap-2">
-                        <h3 className="text-[14px] font-medium text-gray-900 line-clamp-2 leading-snug">
-                            {product.name}
-                        </h3>
-                        
-                        <div className="mt-auto pt-2 flex flex-col gap-3">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <div className="relative">
-                                        <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
-                                    </div>
-                                    <span className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
-                                        {storeName}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Link
-                                    href={`/products/edit/${product.id}`}
-                                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gray-50 text-gray-900 rounded-lg text-[12px] font-bold hover:bg-gray-100 transition-colors border border-gray-100"
-                                >
-                                    <PencilEdit01Icon size={14} />
-                                    Edit
-                                </Link>
-                                <button
-                                    onClick={() => handleDelete(product.id)}
-                                    className="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 rounded-lg hover:bg-red-50 hover:text-red-500 transition-all border border-gray-100"
-                                >
-                                    <Delete02Icon size={16} />
-                                </button>
-                            </div>
-                        </div>
+              {filteredProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="group relative w-full bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+                    <Image
+                      src={product.image_url || "/assets/images/placeholder.png"}
+                      alt={product.name}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      unoptimized
+                    />
+                    <div className="absolute top-2 right-2 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg font-bold text-[12px] shadow-sm border border-gray-100">
+                      ₦{parseFloat(product.price).toLocaleString()}
                     </div>
                   </div>
-                ))}
+
+                  <div className="flex-1 p-3 flex flex-col gap-2">
+                    <h3 className="text-[14px] font-medium text-gray-900 line-clamp-2 leading-snug">
+                      {product.name}
+                    </h3>
+
+                    <div className="mt-auto pt-2 flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="relative">
+                            <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
+                          </div>
+                          <span className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
+                            {storeName}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/products/edit/${product.id}`}
+                          className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-gray-50 text-gray-900 rounded-lg text-[12px] font-bold hover:bg-gray-100 transition-colors border border-gray-100"
+                        >
+                          <PencilEdit01Icon size={14} />
+                          Edit
+                        </Link>
+                        <button
+                          onClick={() => handleDelete(product.id)}
+                          className="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 rounded-lg hover:bg-red-50 hover:text-red-500 transition-all border border-gray-100"
+                        >
+                          <Delete02Icon size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
         </div>
@@ -348,17 +348,17 @@ export default function ProfilePage() {
 
       {/* Profile Settings Modal */}
       {isModalOpen && (
-        <ProfileSettingsModal 
-            initialData={profileData} 
-            onClose={() => setIsModalOpen(false)} 
-            onSuccess={refreshData}
+        <ProfileSettingsModal
+          initialData={profileData}
+          onClose={() => setIsModalOpen(false)}
+          onSuccess={refreshData}
         />
       )}
       {/* Create Product Modal */}
       {isCreateModalOpen && (
-        <CreateProductModal 
-            onClose={() => setIsCreateModalOpen(false)} 
-            onSuccess={refreshData}
+        <CreateProductModal
+          onClose={() => setIsCreateModalOpen(false)}
+          onSuccess={refreshData}
         />
       )}
     </div>

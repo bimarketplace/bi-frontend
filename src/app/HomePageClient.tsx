@@ -211,7 +211,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
   useEffect(() => {
     const querySearch = searchParams.get('search') || "";
     const queryCategory = searchParams.get('category');
-    
+
     const fetchFiltered = async () => {
       setIsInitialLoading(true);
       setPageError(null);
@@ -219,7 +219,7 @@ export default function HomePageClient({ initialProducts, categories, initialNex
         const params: Record<string, string | number> = {};
         if (querySearch) params.search = querySearch;
         if (queryCategory) params.category = queryCategory;
-        
+
         const response = await fetchProductsPage(undefined, params);
         setProducts(response.results);
         setNextPageUrl(response.next);

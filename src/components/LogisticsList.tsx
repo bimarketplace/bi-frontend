@@ -92,7 +92,7 @@ export default function LogisticsList({ initialCompanies }: LogisticsListProps) 
     <div className={`w-full bg-white min-h-screen transition-all duration-300 ${session && !((session.user as any)?.is_verified ?? (session.user as any)?.email_verified ?? true) ? 'pt-[170px] md:pt-[125px]' : 'pt-[130px] md:pt-[90px]'}`}>
       <Container className="mt-2 pb-16">
         <h1 className="text-2xl font-bold text-gray-900 tracking-tight mb-5 ">Find the best logistics partners</h1>
-        
+
         {/* Search Bar Container */}
         <div className="mx-auto ">
           <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden">

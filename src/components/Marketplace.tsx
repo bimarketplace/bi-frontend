@@ -8,19 +8,19 @@ import { Container } from './layout/Container';
 import Hero from "@/components/Hero";
 import ProductModal from "@/components/ProductModal";
 
-export default function Marketplace({ 
-  initialProducts, 
-  categories, 
-  initialNext, 
-  initialPrev, 
+export default function Marketplace({
+  initialProducts,
+  categories,
+  initialNext,
+  initialPrev,
   initialCount,
   initialFlashSales
-}: { 
-  initialProducts: ProductType[] | null | undefined; 
-  categories: Category[] | null | undefined; 
-  initialNext?: string | null; 
-  initialPrev?: string | null; 
-  initialCount?: number; 
+}: {
+  initialProducts: ProductType[] | null | undefined;
+  categories: Category[] | null | undefined;
+  initialNext?: string | null;
+  initialPrev?: string | null;
+  initialCount?: number;
   initialFlashSales?: FlashSaleType[];
 }) {
   const { data: session } = useSession();
@@ -30,7 +30,7 @@ export default function Marketplace({
 
   useEffect(() => {
     setIsMounted(true);
-    
+
     // Fetch live active flash sales on mount to bypass server-side caching
     const loadLiveSales = async () => {
       try {
@@ -59,13 +59,13 @@ export default function Marketplace({
       <Container as="main" className={`transition-all duration-300 ${paddingTopClass} pb-16`}>
         <h1 className="sr-only">BI Marketplace - Buy and Sell Products Effectively</h1>
         <Hero products={heroProducts} flashSales={flashSales} onProductClick={setSelectedProduct} />
-        <Products 
+        <Products
           initialProducts={initialProducts}
           categories={categories}
           initialNext={initialNext}
           initialPrev={initialPrev}
           initialCount={initialCount}
-        />     
+        />
       </Container>
 
       {selectedProduct && (

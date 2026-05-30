@@ -158,11 +158,19 @@ export default function Navbar() {
         setSearchQuery(searchParams.get('search') || '');
     }, [searchParams]);
 
+    useEffect(() => {
+        if (isMobileSearchOpen) {
+            document.documentElement.style.setProperty('--search-height', '60px');
+        } else {
+            document.documentElement.style.setProperty('--search-height', '0px');
+        }
+    }, [isMobileSearchOpen]);
+
     return (
         <>
             {/* Email Verification Banner */}
             {isLoggedIn && !isVerified && (
-                <div className="fixed top-0 left-0 w-full bg-[#008000] text-white py-2 px-4 z-[60] flex items-center justify-center gap-3">
+                <div id="verification-banner" className="fixed top-0 left-0 w-full bg-[#008000] text-white py-2 px-4 z-[60] flex items-center justify-center gap-3">
                     {resendStatus === 'success' ? (
                         <div className="flex items-center gap-2 text-green-400 animate-in fade-in duration-300">
                             <CheckmarkCircle01Icon size={18} />

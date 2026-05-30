@@ -54,8 +54,8 @@ const VendorCard = ({ vendor }: VendorCardProps) => {
           alt={vendor.username}
           fill
           className={`transition-transform duration-500 group-hover:scale-105 ${vendor.banner_url
-              ? "object-cover" // FULL banner
-              : "object-contain p-6" // logo fallback
+            ? "object-cover" // FULL banner
+            : "object-contain p-6" // logo fallback
             }`}
           onError={(e) => {
             const target = e.target as HTMLImageElement;
