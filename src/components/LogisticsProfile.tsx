@@ -5,126 +5,173 @@ import Link from "next/link";
 import React from "react";
 import { LogisticsCompany } from "@/lib/logistics";
 import { Container } from "@/components/layout/Container";
-import { ArrowLeft02Icon, Location01Icon, TruckIcon, Link01Icon, AiMailIcon, AiPhone01Icon } from "hugeicons-react";
+import { Location01Icon, TruckIcon, Link01Icon, AiMailIcon, AiPhone01Icon, InformationCircleIcon } from "hugeicons-react";
+import { Avatar } from "@/components/layout/Navbar";
+import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export default function LogisticsProfile({ company }: { company: LogisticsCompany }) {
+  const { data: session } = useSession();
+
   return (
-    <div className="min-h-screen bg-white pt-32 pb-16">
+    <div className={`w-full bg-white min-h-screen transition-all duration-300 ${session && !((session.user as any)?.is_verified ?? (session.user as any)?.email_verified ?? true) ? 'pt-[170px] md:pt-[125px]' : 'pt-[130px] md:pt-[90px]'}`}>
       <Container>
-        <div className="max-w-6xl mx-auto">
-          <Link href="/logistics" className="inline-flex items-center gap-2 text-sm font-semibold text-[#008000] hover:text-[#005500] mb-6">
-            <ArrowLeft02Icon size={18} /> Back to logistics services
-          </Link>
-
-          <div className="overflow-hidden rounded-[32px] border border-gray-200 shadow-xl">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-0 lg:gap-8">
-              <div className="relative bg-[#F0FDF4] p-10">
-                <div className="flex flex-col items-start gap-6">
-                  <div className="rounded-3xl bg-white border border-gray-100 p-6 shadow-sm w-full">
-                    <div className="flex items-center gap-4">
-                      {company.logo_url ? (
-                        <div className="relative h-16 w-16 rounded-3xl overflow-hidden bg-[#ECFDF3] flex items-center justify-center">
-                          <Image
-                            src={company.logo_url}
-                            alt={company.name}
-                            width={64}
-                            height={64}
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[#ECFDF3] text-[#047857]">
-                          <TruckIcon size={26} />
-                        </div>
-                      )}
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-[#047857] font-bold">Logistics Company</p>
-                        <h1 className="text-3xl font-black text-gray-900 mt-2">{company.name}</h1>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[28px] bg-white border border-gray-100 p-6 shadow-sm w-full">
-                    <div className="grid gap-4">
-                      <div className="flex items-center gap-3 text-gray-600">
-                        <Location01Icon size={20} className="text-[#008000]" />
-                        <p className="text-sm">{company.pickup_address || "No pickup address specified."}</p>
-                      </div>
-                      {company.coverage_area ? (
-                        <div className="flex items-center gap-3 text-gray-600">
-                          <TruckIcon size={20} className="text-[#008000]" />
-                          <p className="text-sm">Coverage: {company.coverage_area}</p>
-                        </div>
-                      ) : null}
-                      {company.estimated_delivery_time ? (
-                        <div className="flex items-center gap-3 text-gray-600">
-                          <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-[#EFF6FF] text-[#1D4ED8]">⏱️</span>
-                          <p className="text-sm">Est. delivery: {company.estimated_delivery_time}</p>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[28px] bg-white border border-gray-100 p-6 shadow-sm w-full">
-                    <h2 className="text-sm font-bold uppercase tracking-[0.26em] text-[#008000] mb-4">Contact</h2>
-                    <div className="space-y-3 text-gray-700">
-                      {company.contact_person ? (
-                        <p><span className="font-semibold text-gray-900">Contact:</span> {company.contact_person}</p>
-                      ) : null}
-                      {company.contact_phone ? (
-                        <p className="flex items-center gap-2"><AiPhone01Icon size={16} className="text-[#008000]" />{company.contact_phone}</p>
-                      ) : null}
-                      {company.contact_email ? (
-                        <p className="flex items-center gap-2"><AiMailIcon size={16} className="text-[#008000]" />{company.contact_email}</p>
-                      ) : null}
-                      {company.website ? (
-                        <p className="flex items-center gap-2"><Link01Icon size={16} className="text-[#008000]" /><a href={company.website} target="_blank" rel="noreferrer" className="underline text-[#064E3B]">Visit website</a></p>
-                      ) : null}
-                    </div>
-                  </div>
-                </div>
+        <div className="w-full">
+          <div className="flex items-center gap-4 mb-4">
+            {company.logo_url ? (
+              <div className="relative h-16 w-16 bg-[#ECFDF3] flex items-center justify-center ring-1 ring-gray-100">
+                <Image
+                  src={company.logo_url.replace("http://", "https://")}
+                  alt={company.name}
+                  width={64}
+                  height={64}
+                  unoptimized
+                  className="object-cover"
+                />
               </div>
+            ) : (
+              <Avatar 
+                name={company.name.charAt(0).toUpperCase()} 
+                size="lg"
+                variant="light"
+                className="ring-1 ring-gray-100 rounded-none"
+              />
+            )}
+            
+            <div className="flex flex-col">
+              <span className="text-lg font-bold text-gray-900 uppercase">
+                {company.name}
+              </span>
+              <span className="text-sm font-medium text-gray-500">
+                Logistics Partner
+              </span>
+              {company.pickup_address && (
+                <div className="flex items-center gap-1 text-zinc-500 mt-0.5">
+                  <Location01Icon size={14} />
+                  <span className="text-xs font-medium">
+                    {company.pickup_address}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
 
-              <div className="bg-white p-10 lg:p-14">
-                <div className="space-y-8">
+          <div className="flex flex-wrap items-center gap-3 my-4">
+            <button
+              onClick={() => {
+                const url = `${window.location.origin}/logistics/${company.id}`;
+                const message = `🚚 Check out ${company.name} on BI Marketplace! Browse their services here: ${url}`;
+                navigator.clipboard.writeText(message);
+                toast.success("Logistics link copied!");
+              }}
+              className="px-5 py-2.5 cursor-pointer bg-[#f5f5f5] text-gray-900 text-[14px] font-bold rounded-[10px] hover:bg-[#e5e5e5] transition-all"
+            >
+              Copy Profile Link
+            </button>
+            {(company.contact_email || company.contact_phone) && (
+              <a 
+                href={company.contact_email ? `mailto:${company.contact_email}` : `tel:${company.contact_phone}`}
+                className="px-5 py-2.5 cursor-pointer bg-[#008000] text-white text-[14px] font-bold rounded-[10px] hover:bg-[#006000] transition-all inline-flex items-center justify-center"
+              >
+                Contact Us
+              </a>
+            )}
+          </div>
+
+          <p className="text-sm font-medium text-gray-900 mb-8 whitespace-pre-wrap">
+            {company.description || "Reliable and verified logistics service."}
+          </p>
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {/* Service Details */}
+            <div className="bg-[#fcfcfc] rounded-2xl p-6 border border-gray-100">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4 flex items-center gap-2">
+                <TruckIcon size={18} className="text-[#008000]" /> Services & Coverage
+              </h3>
+              <div className="space-y-4 text-sm text-gray-600">
+                {company.service_types && (
                   <div>
-                    <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#008000]">About</p>
-                    <p className="mt-4 text-gray-700 leading-8">{company.description || "No company description available yet. Please contact them for full service details."}</p>
+                    <span className="block font-semibold text-gray-900 mb-1">Service Types</span>
+                    {company.service_types}
                   </div>
-
-                  <div className="grid gap-4 sm:grid-cols-2">
-                    {company.service_types ? (
-                      <div className="rounded-3xl border border-gray-100 bg-[#F8FAFC] p-6">
-                        <p className="text-sm font-semibold text-gray-900 mb-3">Service types</p>
-                        <p className="text-sm text-gray-600">{company.service_types}</p>
-                      </div>
-                    ) : null}
-
-                    {company.delivery_options ? (
-                      <div className="rounded-3xl border border-gray-100 bg-[#F8FAFC] p-6">
-                        <p className="text-sm font-semibold text-gray-900 mb-3">Delivery options</p>
-                        <p className="text-sm text-gray-600">{company.delivery_options}</p>
-                      </div>
-                    ) : null}
+                )}
+                {company.coverage_area && (
+                  <div>
+                    <span className="block font-semibold text-gray-900 mb-1">Coverage Area</span>
+                    {company.coverage_area}
                   </div>
+                )}
+                {company.delivery_options && (
+                  <div>
+                    <span className="block font-semibold text-gray-900 mb-1">Delivery Options</span>
+                    {company.delivery_options}
+                  </div>
+                )}
+                {company.estimated_delivery_time && (
+                  <div>
+                    <span className="block font-semibold text-gray-900 mb-1">Estimated Delivery Time</span>
+                    {company.estimated_delivery_time}
+                  </div>
+                )}
+              </div>
+            </div>
 
-                  {company.pricing_notes ? (
-                    <div className="rounded-3xl border border-gray-100 bg-[#F8FAFC] p-6">
-                      <p className="text-sm font-semibold text-gray-900 mb-3">Pricing notes</p>
-                      <p className="text-sm text-gray-600">{company.pricing_notes}</p>
-                    </div>
-                  ) : null}
+            {/* Contact Details */}
+            <div className="bg-[#fcfcfc] rounded-2xl p-6 border border-gray-100">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4 flex items-center gap-2">
+                <AiMailIcon size={18} className="text-[#008000]" /> Contact Information
+              </h3>
+              <div className="space-y-4 text-sm text-gray-600">
+                {company.contact_person && (
+                  <div>
+                    <span className="block font-semibold text-gray-900 mb-1">Contact Person</span>
+                    {company.contact_person}
+                  </div>
+                )}
+                {company.contact_phone && (
+                  <div className="flex items-center gap-2">
+                    <AiPhone01Icon size={16} className="text-gray-400" />
+                    <span>{company.contact_phone}</span>
+                  </div>
+                )}
+                {company.contact_email && (
+                  <div className="flex items-center gap-2">
+                    <AiMailIcon size={16} className="text-gray-400" />
+                    <span>{company.contact_email}</span>
+                  </div>
+                )}
+                {company.website && (
+                  <div className="flex items-center gap-2">
+                    <Link01Icon size={16} className="text-gray-400" />
+                    <a href={company.website} target="_blank" rel="noreferrer" className="text-[#008000] hover:underline">
+                      Visit Website
+                    </a>
+                  </div>
+                )}
+              </div>
+            </div>
 
-                  <div className="rounded-[32px] border border-gray-100 bg-[#F8FAFC] p-6">
-                    <div className="flex items-center justify-between gap-4">
-                      <div>
-                        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#008000]">Status</p>
-                        <p className="mt-2 text-lg font-bold text-gray-900">{company.is_active ? "Active" : "Not Active"}</p>
-                      </div>
-                      <div className={`rounded-full px-4 py-2 text-sm font-semibold ${company.tracking_available ? "bg-[#ECFDF5] text-[#166534]" : "bg-[#FEF3C7] text-[#92400E]"}`}>
-                        {company.tracking_available ? "Tracking available" : "Tracking unavailable"}
-                      </div>
-                    </div>
+            {/* Additional Info */}
+            <div className="bg-[#fcfcfc] rounded-2xl p-6 border border-gray-100">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-gray-900 mb-4 flex items-center gap-2">
+                <InformationCircleIcon size={18} className="text-[#008000]" /> Additional Information
+              </h3>
+              <div className="space-y-4 text-sm text-gray-600">
+                {company.pricing_notes && (
+                  <div>
+                    <span className="block font-semibold text-gray-900 mb-1">Pricing Notes</span>
+                    {company.pricing_notes}
+                  </div>
+                )}
+                <div>
+                  <span className="block font-semibold text-gray-900 mb-2">Status</span>
+                  <div className="flex flex-wrap gap-2">
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${company.is_active ? "bg-[#008000]/10 text-[#008000]" : "bg-red-100 text-red-700"}`}>
+                      {company.is_active ? "Active" : "Inactive"}
+                    </span>
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${company.tracking_available ? "bg-[#008000]/10 text-[#008000]" : "bg-gray-100 text-gray-700"}`}>
+                      {company.tracking_available ? "Tracking Available" : "Tracking Unavailable"}
+                    </span>
                   </div>
                 </div>
               </div>
