@@ -9,18 +9,49 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
-  
+  let bio = `Shop the best deals at ${id}'s official store on BI Marketplace. Discover exclusive products, secure payments, and fast delivery.`;
+  let avatarUrl = "/icon512_rounded.png";
+
+  try {
+    const productsData = await fetchProductsPage(undefined, { seller__username: id, page_size: 1 });
+    if (productsData.results && productsData.results.length > 0) {
+      const seller = productsData.results[0].seller;
+      if (seller.bio) {
+        bio = seller.bio;
+      }
+      if (seller.avatar_url) {
+        avatarUrl = seller.avatar_url;
+      } else if (seller.avatar) {
+        avatarUrl = seller.avatar;
+      }
+    }
+  } catch (error) {
+    console.error("Failed to load seller info for metadata:", error);
+  }
+
   return {
     title: `${id}'s Store | BI Marketplace`,
-    description: `Shop the best deals at ${id}'s official store on BI Marketplace. Discover exclusive products, secure payments, and fast delivery.`,
+    description: bio,
     openGraph: {
       title: `${id} Store - BI Marketplace`,
-      description: `Browse products from ${id} on the ultimate marketplace.`,
+      description: bio,
       url: `/vendors/${id}`,
-      type: "website",
+      images: [
+        {
+          url: avatarUrl,
+        },
+      ],
+      type: "profile",
+    },
+    twitter: {
+      card: "summary",
+      title: `${id} Store - BI Marketplace`,
+      description: bio,
+      images: [avatarUrl],
     },
   };
 }
+
 
 export default async function Page({ params }: Props) {
   const { id } = await params;
