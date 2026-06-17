@@ -2,11 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Cancel01Icon, Location01Icon, ArrowLeft01Icon } from "hugeicons-react";
+import { Cancel01Icon, Location01Icon, ArrowLeft01Icon, Message02Icon } from "hugeicons-react";
 import { Product as ProductType } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import toast from "react-hot-toast";
 import { submitCheckout } from "@/lib/checkout";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { startConversation } from "@/lib/chat";
 
 interface ProductModalProps {
   product: ProductType;
@@ -15,10 +18,13 @@ interface ProductModalProps {
 }
 
 const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalProps) => {
+  const { data: session } = useSession();
+  const router = useRouter();
   const [isClosing, setIsClosing] = useState(false);
   const [isOpening, setIsOpening] = useState(false);
   const { addToCart } = useCart();
   const [step, setStep] = useState<'product' | 'details'>('product');
+  const [isStartingChat, setIsStartingChat] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -50,6 +56,29 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
       },
     });
     handleClose();
+  };
+
+  const handleChatSeller = async () => {
+    if (!session?.access_token) {
+      toast.error("Please sign in to chat with the seller");
+      return;
+    }
+
+    setIsStartingChat(true);
+    const toastId = toast.loading("Starting chat...");
+    try {
+      const conversation = await startConversation(
+        product.seller.id,
+        product.id,
+        (session as any).access_token
+      );
+      toast.success("Chat started", { id: toastId });
+      handleClose();
+      router.push(`/chat/${conversation.id}`);
+    } catch (error) {
+      toast.error("Failed to start chat", { id: toastId });
+      setIsStartingChat(false);
+    }
   };
 
   const handleWhatsAppCheckout = async () => {
@@ -277,12 +306,26 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
           )}
 
           {showAddToCart && step === 'product' ? (
-            <button
-              onClick={handleAddToCart}
-              className="w-full bg-[#008000] text-white py-4 rounded-[18px] font-black hover:bg-[#006000] transition-colors flex items-center justify-center gap-3 shadow-xl shadow-[#008000]/10"
-            >
-              Add to Cart
-            </button>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleAddToCart}
+                className="w-full bg-[#008000] text-white py-4 rounded-[18px] font-black hover:bg-[#006000] transition-colors flex items-center justify-center gap-3 shadow-xl shadow-[#008000]/10"
+              >
+                Add to Cart
+              </button>
+              <button
+                onClick={handleChatSeller}
+                disabled={isStartingChat}
+                className="flex items-center justify-center gap-3 w-full py-4 bg-zinc-900 text-white rounded-[18px] font-black hover:scale-[1.02] transition-all shadow-xl shadow-zinc-900/10 disabled:opacity-50"
+              >
+                {isStartingChat ? (
+                  <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                ) : (
+                  <Message02Icon size={20} />
+                )}
+                Chat with Seller
+              </button>
+            </div>
           ) : (
             <div className="flex flex-col gap-3">
               <button
@@ -301,13 +344,27 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
               )}
 
               {step === 'product' && (
-                <a href={`/vendors/${product.seller?.username}`} className="w-full">
+                <>
                   <button
-                    className="w-full bg-[#f5f5f5] text-gray-900 py-4 rounded-[18px] font-bold hover:bg-[#e5e5e5] transition-colors flex items-center justify-center gap-3"
+                    onClick={handleChatSeller}
+                    disabled={isStartingChat}
+                    className="flex items-center justify-center gap-3 w-full py-4 bg-zinc-900 text-white rounded-[18px] font-black hover:scale-[1.02] transition-all shadow-xl shadow-zinc-900/10 disabled:opacity-50"
                   >
-                    Open Store
+                    {isStartingChat ? (
+                      <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                    ) : (
+                      <Message02Icon size={20} />
+                    )}
+                    Chat with Seller
                   </button>
-                </a>
+                  <a href={`/vendors/${product.seller?.username}`} className="w-full">
+                    <button
+                      className="w-full bg-[#f5f5f5] text-gray-900 py-4 rounded-[18px] font-bold hover:bg-[#e5e5e5] transition-colors flex items-center justify-center gap-3"
+                    >
+                      Open Store
+                    </button>
+                  </a>
+                </>
               )}
             </div>
           )}

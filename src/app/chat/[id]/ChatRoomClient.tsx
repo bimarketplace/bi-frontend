@@ -15,6 +15,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
     const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
     const [ws, setWs] = useState<WebSocket | null>(null);
+    const [isWsOpen, setIsWsOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const user = session?.user;
@@ -43,7 +44,10 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
         const wsUrl = getWebSocketUrl(conversationId, (session as any).access_token);
         const socket = new WebSocket(wsUrl);
 
-        socket.onopen = () => console.log(`WebSocket connected for chat ${conversationId}`);
+        socket.onopen = () => {
+            console.log(`WebSocket connected for chat ${conversationId}`);
+            setIsWsOpen(true);
+        };
         socket.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
@@ -59,7 +63,10 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
                 console.error("Failed to parse WS message", err);
             }
         };
-        socket.onclose = () => console.log(`WebSocket disconnected for chat ${conversationId}`);
+        socket.onclose = () => {
+            console.log(`WebSocket disconnected for chat ${conversationId}`);
+            setIsWsOpen(false);
+        };
 
         setWs(socket);
 
@@ -76,7 +83,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || !ws || ws.readyState !== WebSocket.OPEN) return;
+        if (!newMessage.trim() || !ws || !isWsOpen) return;
 
         const payload = {
             body: newMessage.trim()
@@ -205,7 +212,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
                     </div>
                     <button
                         type="submit"
-                        disabled={!newMessage.trim() || !ws || ws.readyState !== WebSocket.OPEN}
+                        disabled={!newMessage.trim() || !ws || !isWsOpen}
                         className="w-12 h-12 rounded-full bg-[#008000] text-white flex items-center justify-center shrink-0 hover:bg-primary-700 hover:scale-105 active:scale-95 transition-all shadow-md shadow-[#008000]/20 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none"
                     >
                         <SentIcon size={20} />
