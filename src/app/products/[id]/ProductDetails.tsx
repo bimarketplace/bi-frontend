@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchProductById, addComment, castVote, shareProduct } from "@/lib/products";
+import { startConversation } from "@/lib/chat";
 import { toast } from "react-hot-toast";
 import {
     ArrowLeft02Icon,
@@ -35,6 +36,7 @@ interface Product {
     id: number;
     name: string;
     seller: {
+        id: number;
         username: string;
         email: string;
         avatar_url?: string;
@@ -57,6 +59,7 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
     const [commentText, setCommentText] = useState("");
     const [isSubmittingComment, setIsSubmittingComment] = useState(false);
     const [isSharing, setIsSharing] = useState(false);
+    const [isStartingChat, setIsStartingChat] = useState(false);
 
     useEffect(() => {
         // Refresh product data if session changes (for user specific votes)
@@ -137,6 +140,29 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
             console.error("Share error:", error);
         } finally {
             setIsSharing(false);
+        }
+    };
+
+    const handleChatSeller = async () => {
+        if (!session?.access_token) {
+            toast.error("Please sign in to chat with the seller");
+            // Optional: router.push('/auth/login')
+            return;
+        }
+
+        setIsStartingChat(true);
+        const toastId = toast.loading("Starting chat...");
+        try {
+            const conversation = await startConversation(
+                product.seller.id,
+                product.id,
+                (session as any).access_token
+            );
+            toast.success("Chat started", { id: toastId });
+            router.push(`/chat/${conversation.id}`);
+        } catch (error) {
+            toast.error("Failed to start chat", { id: toastId });
+            setIsStartingChat(false);
         }
     };
 
@@ -265,9 +291,22 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
                                         className="mt-8 flex items-center justify-center gap-3 w-full py-5 bg-[#008000] text-white rounded-[20px] font-black text-lg hover:scale-[1.02] transition-all shadow-xl shadow-primary-900/10"
                                     >
                                         <WhatsappIcon size={24} className="text-[#25D366]" />
-                                        Purchase & Inquire
+                                        Purchase & Inquire (WhatsApp)
                                     </a>
                                 )}
+
+                                <button
+                                    onClick={handleChatSeller}
+                                    disabled={isStartingChat}
+                                    className="mt-4 flex items-center justify-center gap-3 w-full py-5 bg-zinc-900 text-white rounded-[20px] font-black text-lg hover:scale-[1.02] transition-all shadow-xl shadow-zinc-900/10 disabled:opacity-50"
+                                >
+                                    {isStartingChat ? (
+                                        <div className="w-6 h-6 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                    ) : (
+                                        <Message02Icon size={24} />
+                                    )}
+                                    Chat with Seller
+                                </button>
                             </div>
                         </div>
                     </div>
