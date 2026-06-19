@@ -4,9 +4,24 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { fetchMessages, fetchConversation, getWebSocketUrl, Message, Conversation } from "@/lib/chat";
 import { Avatar } from "@/components/layout/Navbar";
-import { ArrowLeft02Icon, SentIcon, Store01Icon } from "hugeicons-react";
+import { ArrowLeft02Icon, SentIcon, Store01Icon, Attachment01Icon } from "hugeicons-react";
 import Link from "next/link";
 import Image from "next/image";
+
+const formatDividerDate = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    if (d.toDateString() === today.toDateString()) {
+        return "Today";
+    } else if (d.toDateString() === yesterday.toDateString()) {
+        return "Yesterday";
+    } else {
+        return d.toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric', year: d.getFullYear() !== today.getFullYear() ? 'numeric' : undefined });
+    }
+};
 
 export default function ChatRoomClient({ conversationId }: { conversationId: number }) {
     const { data: session } = useSession();
@@ -155,43 +170,74 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
             )}
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
-                {messages.map((msg, index) => {
-                    const isMe = msg.sender.username === currentUsername;
-                    const showAvatar = !isMe && (index === 0 || messages[index - 1].sender.username !== msg.sender.username);
-                    
-                    return (
-                        <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
-                            <div className={`flex gap-3 max-w-[85%] md:max-w-[70%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-                                {!isMe && (
-                                    <div className="w-8 shrink-0 flex items-end">
-                                        {showAvatar && <Avatar name={msg.sender.username} size="sm" />}
+            <div className={`flex-1 overflow-y-auto p-4 md:p-6 ${messages.length === 0 ? 'flex flex-col items-center justify-center bg-zinc-50/50' : 'space-y-6'}`}>
+                {messages.length === 0 ? (
+                    <div className="text-center py-12 flex flex-col items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-sm mx-auto">
+                        <div className="w-16 h-16 bg-[#008000]/10 rounded-full flex items-center justify-center text-[#008000] mb-4 shadow-sm border border-green-100">
+                            <SentIcon size={28} />
+                        </div>
+                        <h4 className="text-zinc-800 font-extrabold text-lg mb-1 tracking-tight">No messages yet</h4>
+                        <p className="text-zinc-500 text-sm font-semibold leading-relaxed">Start the conversation by typing your first message below 👋</p>
+                    </div>
+                ) : (
+                    messages.map((msg, index) => {
+                        const isMe = msg.sender.username === currentUsername;
+                        const showAvatar = !isMe && (index === 0 || messages[index - 1].sender.username !== msg.sender.username);
+                        
+                        const msgDate = new Date(msg.created_at).toDateString();
+                        const prevMsgDate = index > 0 ? new Date(messages[index - 1].created_at).toDateString() : null;
+                        const showDateDivider = msgDate !== prevMsgDate;
+                        
+                        return (
+                            <div key={msg.id} className="space-y-6">
+                                {showDateDivider && (
+                                    <div className="flex justify-center my-6">
+                                        <span className="bg-white text-zinc-500 text-[11px] font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm border border-zinc-150">
+                                            {formatDividerDate(msg.created_at)}
+                                        </span>
                                     </div>
                                 )}
-                                <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                                    <div className={`
-                                        px-5 py-3 rounded-[20px] shadow-sm relative
-                                        ${isMe 
-                                            ? 'bg-[#008000] text-white rounded-br-sm' 
-                                            : 'bg-white text-zinc-800 border border-zinc-100 rounded-bl-sm'
-                                        }
-                                    `}>
-                                        <p className="text-[15px] font-medium whitespace-pre-wrap leading-relaxed">{msg.body}</p>
+                                <div className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
+                                    <div className={`flex gap-3 max-w-[85%] md:max-w-[70%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
+                                        {!isMe && (
+                                            <div className="w-8 shrink-0 flex items-end">
+                                                {showAvatar && <Avatar name={msg.sender.username} size="sm" />}
+                                            </div>
+                                        )}
+                                        <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                                            <div className={`
+                                                px-5 py-3 rounded-[20px] shadow-sm relative
+                                                ${isMe 
+                                                    ? 'bg-[#008000] text-white rounded-br-sm' 
+                                                    : 'bg-white text-zinc-800 border border-zinc-100 rounded-bl-sm'
+                                                }
+                                            `}>
+                                                <p className="text-[15px] font-medium whitespace-pre-wrap leading-relaxed">{msg.body}</p>
+                                            </div>
+                                            <span className="text-[10px] font-bold text-zinc-400 mt-1.5 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <span className="text-[10px] font-bold text-zinc-400 mt-1.5 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                    </span>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })
+                )}
                 <div ref={messagesEndRef} />
             </div>
 
             {/* Input Area */}
             <div className="p-4 bg-white border-t border-zinc-100 shrink-0 z-20 relative">
                 <form onSubmit={handleSendMessage} className="relative flex items-end gap-3 max-w-4xl mx-auto">
+                    <button
+                        type="button"
+                        onClick={() => alert("Attachments coming soon!")}
+                        className="w-12 h-12 rounded-full border border-zinc-200 bg-zinc-50 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 flex items-center justify-center shrink-0 transition-all active:scale-95 shadow-sm"
+                        title="Attach files or images"
+                    >
+                        <Attachment01Icon size={20} />
+                    </button>
                     <div className="flex-1 bg-zinc-50 border border-zinc-200 rounded-[24px] focus-within:border-[#008000] focus-within:ring-4 focus-within:ring-[#008000]/10 transition-all flex items-center px-2 py-1 relative">
                         <textarea
                             value={newMessage}
@@ -204,7 +250,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
                             }}
                             placeholder="Type your message..."
                             rows={1}
-                            className="w-full bg-transparent border-none focus:ring-0 resize-none max-h-[120px] py-3 px-4 text-[15px] font-medium text-zinc-800 placeholder-zinc-400 min-h-[44px] scrollbar-thin"
+                            className="w-full bg-transparent border-none focus:ring-0 ring-none resize-none max-h-[120px] py-3 px-4 text-[15px] font-medium text-zinc-800 placeholder-zinc-400 min-h-[44px] scrollbar-thin"
                             style={{
                                 height: "auto",
                             }}
@@ -213,7 +259,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
                     <button
                         type="submit"
                         disabled={!newMessage.trim() || !ws || !isWsOpen}
-                        className="w-12 h-12 rounded-full bg-[#008000] text-white flex items-center justify-center shrink-0 hover:bg-primary-700 hover:scale-105 active:scale-95 transition-all shadow-md shadow-[#008000]/20 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none"
+                        className="w-12 h-12 rounded-full bg-[#008000] text-white flex items-center justify-center shrink-0 hover:bg-[#006400] hover:scale-105 active:scale-95 transition-all shadow-md shadow-[#008000]/20 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none"
                     >
                         <SentIcon size={20} />
                     </button>

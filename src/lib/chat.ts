@@ -89,9 +89,8 @@ export const getWebSocketUrl = (conversationId: number, token?: string) => {
         wsBase += '/';
     }
     
-    // Django channels endpoint: ws/chat/<conversation_id>/
-    // Depending on auth, token might be sent as query param or the websocket uses session.
-    // If we need token auth over WS:
-    // return `${wsBase}ws/chat/${conversationId}/?token=${token}`;
+    if (token) {
+        return `${wsBase}ws/chat/${conversationId}/?token=${token}`;
+    }
     return `${wsBase}ws/chat/${conversationId}/`;
 };

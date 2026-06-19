@@ -56,8 +56,8 @@ export const Avatar = ({ name, size = "md", variant = "primary", className = "" 
             {getInitials(name)}
         </div>
     );
-    
-   
+
+
 };
 
 // Shared Close icon
@@ -193,11 +193,11 @@ export default function Navbar() {
                     <div className="flex items-center justify-between w-full gap-4">
                         <div className="flex items-center gap-8">
                             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                                <Image 
-                                    src="/assets/images/bi.png" 
-                                    alt="BIMARKETPLACE" 
-                                    width={200} 
-                                    height={120} 
+                                <Image
+                                    src="/assets/images/bi.png"
+                                    alt="BIMARKETPLACE"
+                                    width={200}
+                                    height={120}
                                     className="h-8 w-auto object-contain"
                                 />
                                 <span className="text-[#008102] text-sm font-medium">BIMARKETPLACE</span>
@@ -206,7 +206,7 @@ export default function Navbar() {
 
                         {/* Central Search Bar (Desktop) */}
                         {isSearchablePage && (
-                            <form 
+                            <form
                                 onSubmit={(e) => {
                                     e.preventDefault();
                                     handleSearch(searchQuery);
@@ -221,7 +221,7 @@ export default function Navbar() {
                                         value={searchQuery}
                                         onChange={(e) => handleSearch(e.target.value)}
                                     />
-                                    <button 
+                                    <button
                                         type="submit"
                                         className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-gray-50 shrink-0"
                                     >
@@ -264,8 +264,8 @@ export default function Navbar() {
 
                             <div className="flex items-center gap-2 sm:gap-4 border-gray-100 pl-2 sm:pl-4 ml-1 sm:ml-2">
                                 {isSearchablePage && (
-                                    <button 
-                                        onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)} 
+                                    <button
+                                        onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
                                         className="md:hidden focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]"
                                     >
                                         <Search02Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-[#008000] transition-colors" />
@@ -345,7 +345,7 @@ export default function Navbar() {
 
                     {/* Mobile Search Bar (Beneath Logo/Menu) */}
                     {isSearchablePage && (
-                        <form 
+                        <form
                             onSubmit={(e) => {
                                 e.preventDefault();
                                 handleSearch(searchQuery);
@@ -361,7 +361,7 @@ export default function Navbar() {
                                     value={searchQuery}
                                     onChange={(e) => handleSearch(e.target.value)}
                                 />
-                                <button 
+                                <button
                                     type="submit"
                                     className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all flex items-center justify-center shrink-0"
                                 >
