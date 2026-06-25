@@ -58,6 +58,13 @@ export default function ProfilePage() {
   // Profile settings states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  
+  // Control the "Contact Admin" info modal
+  const [isVerificationModalOpen, setIsVerificationModalOpen] = useState(false);
+  
+  // Verification tracker state
+  const [isVerified, setIsVerified] = useState(false);
+
   const [profileData, setProfileData] = useState({
     whatsapp_number: '',
     bio: '',
@@ -88,8 +95,12 @@ export default function ProfilePage() {
         p.seller?.username === (session.user as any).username ||
         p.seller?.username === session.user?.name
       );
+      
       setProducts(myProducts);
       setCategoriesState(categoriesData);
+      
+      setIsVerified(profile.is_verified || false);
+
       setProfileData({
         whatsapp_number: profile.whatsapp_number || '',
         bio: profile.bio || '',
@@ -149,7 +160,7 @@ export default function ProfilePage() {
     <div className="w-full pt-25 pb-20 bg-white min-h-screen">
       <Container>
         <div className="w-full">
-          {/* Seller profile (Matching Vendor Page Style) */}
+          {/* Seller profile */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
             <div className="flex items-center gap-4">
               <div className="relative">
@@ -160,16 +171,34 @@ export default function ProfilePage() {
                   className="ring-1 ring-gray-100 rounded-xxl"
                 />
               </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-bold text-gray-900 uppercase">
-                  {storeName}
-                </span>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-lg font-bold text-gray-900 uppercase tracking-tight">
+                    {storeName}
+                  </span>
+                  
+                  {isVerified ? (
+                    <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-[11px] px-2 py-0.5 rounded-full font-bold border border-blue-200 uppercase tracking-wider shrink-0">
+                      <svg className="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                      </svg>
+                      Verified
+                    </span>
+                  ) : (
+                    <button 
+                      onClick={() => setIsVerificationModalOpen(true)}
+                      className="text-[11px] font-bold text-gray-500 border border-gray-300 rounded-full px-2.5 py-0.5 hover:bg-gray-50 transition cursor-pointer uppercase tracking-wider shrink-0"
+                    >
+                      Get Verified
+                    </button>
+                  )}
+                </div>
                 {(profileData.first_name || profileData.last_name) && (
-                  <span className="text-sm font-medium text-gray-500 mb-1">
+                  <span className="text-sm font-medium text-gray-500">
                     {`${profileData.first_name} ${profileData.last_name}`.trim()}
                   </span>
                 )}
-                <p className="text-sm font-medium text-gray-500">
+                <p className="text-sm font-medium text-gray-400">
                     {products.length} Products listed
                 </p>
               </div>
@@ -178,14 +207,14 @@ export default function ProfilePage() {
             <div className="flex items-center gap-3">
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 px-5 py-2.5 rounded-xl text-gray-700 text-[14px] font-bold hover:bg-gray-50 transition-all"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 px-5 py-2.5 rounded-xl text-gray-700 text-[14px] font-bold hover:bg-gray-50 transition-all cursor-pointer"
                 >
                     <Settings01Icon size={18} />
                     Settings
                 </button>
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#008000] text-white px-5 py-2.5 rounded-xl text-[14px] font-bold hover:bg-primary-700 transition-all shadow-sm"
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#008000] text-white px-5 py-2.5 rounded-xl text-[14px] font-bold hover:bg-zinc-800 transition-all shadow-sm cursor-pointer"
                 >
                     <PlusSignIcon size={18} />
                     Add Product
@@ -193,12 +222,12 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <p className="text-sm font-medium text-gray-900 mb-8 max-w-3xl leading-relaxed">
+          <p className="text-sm font-medium text-gray-600 mb-8 max-w-3xl leading-relaxed">
             {profileData.bio || `Welcome to ${storeName}'s store. Manage your listings and profile settings below.`}
           </p>
 
-          {/* Search Bar Container (Matching Vendor Page Style) */}
-          <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl group-within:ring-4 group-within:ring-white/10 transition-all h-[52px] sm:h-[58px] overflow-hidden border border-gray-100">
+          {/* Search Bar Container */}
+          <div className="flex items-center w-full max-w-2xl bg-white rounded-lg sm:rounded-xl p-1 shadow-2xl transition-all h-[52px] sm:h-[58px] overflow-hidden border border-gray-100">
             <input
               type="text"
               placeholder="Search in your store..."
@@ -212,7 +241,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Categories Bar (Matching Vendor Page Style) */}
+        {/* Categories Bar */}
         <div className="w-full mt-8 mb-5">
           <div className="flex justify-end items-end mb-6">
             <div className="hidden sm:flex gap-2">
@@ -221,7 +250,7 @@ export default function ProfilePage() {
                   const el = document.getElementById('categories-scroll');
                   if (el) el.scrollBy({ left: -300, behavior: 'smooth' });
                 }}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
+                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all cursor-pointer"
               >
                 <ArrowLeft02Icon size={20} />
               </button>
@@ -230,7 +259,7 @@ export default function ProfilePage() {
                   const el = document.getElementById('categories-scroll');
                   if (el) el.scrollBy({ left: 300, behavior: 'smooth' });
                 }}
-                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all"
+                className="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:border-gray-900 transition-all cursor-pointer"
               >
                 <ArrowRight02Icon size={20} />
               </button>
@@ -243,7 +272,7 @@ export default function ProfilePage() {
           >
             <button
               onClick={() => setSelectedCategoryId(null)}
-              className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
+              className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group cursor-pointer
                 ${selectedCategoryId === null
                   ? "text-white bg-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
                   : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
@@ -258,7 +287,7 @@ export default function ProfilePage() {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategoryId(category.id)}
-                className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
+                className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group cursor-pointer
                   ${selectedCategoryId === category.id
                     ? "text-white bg-[#008000] shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
                     : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
@@ -274,7 +303,7 @@ export default function ProfilePage() {
 
         <div className="w-full mt-5">
           {loading ? (
-            <div className={`grid gap-6 justify-items-center grid-cols-2 lg:grid-cols-4 w-full`}>
+            <div className="grid gap-6 justify-items-center grid-cols-2 lg:grid-cols-4 w-full">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="w-full rounded-[12px] bg-white border border-gray-200/40 shadow-sm p-4 animate-pulse">
                   <div className="h-28 bg-gray-200 rounded-md mb-4" />
@@ -287,7 +316,7 @@ export default function ProfilePage() {
           ) : filteredProducts.length === 0 ? (
             <EmptyState onAdd={() => setIsCreateModalOpen(true)} />
           ) : (
-            <div className={`grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full`}>
+            <div className="grid gap-6 justify-items-center transition-all duration-300 grid-cols-2 lg:grid-cols-4 w-full">
                 {filteredProducts.map((product) => (
                   <div
                     key={product.id}
@@ -314,9 +343,6 @@ export default function ProfilePage() {
                         <div className="mt-auto pt-2 flex flex-col gap-3">
                             <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-2">
-                                    <div className="relative">
-                                        <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full border-2 border-white"></div>
-                                    </div>
                                     <span className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
                                         {storeName}
                                     </span>
@@ -332,7 +358,7 @@ export default function ProfilePage() {
                                 </Link>
                                 <button
                                     onClick={() => handleDelete(product.id)}
-                                    className="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 rounded-lg hover:bg-red-50 hover:text-red-500 transition-all border border-gray-100"
+                                    className="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 rounded-lg hover:bg-red-50 hover:text-red-500 transition-all border border-gray-100 cursor-pointer"
                                 >
                                     <Delete02Icon size={16} />
                                 </button>
@@ -360,6 +386,33 @@ export default function ProfilePage() {
             onClose={() => setIsCreateModalOpen(false)} 
             onSuccess={refreshData}
         />
+      )}
+
+      {isVerificationModalOpen && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-sm w-full p-6 shadow-xl relative animate-in fade-in zoom-in-95 duration-150">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Get Verified Badge</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              To maintain absolute safety on BI Marketplace, account verifications are managed directly by human personnel. Contact Administration to get verified after proper scrutinization.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setIsVerificationModalOpen(false)}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm font-medium rounded-lg transition cursor-pointer"
+              >
+                Close
+              </button>
+              <a
+                href="https://wa.me/YOUR_ADMIN_NUMBER" 
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition text-center cursor-pointer"
+              >
+                Contact Admin
+              </a>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

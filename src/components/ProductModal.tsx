@@ -328,45 +328,49 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              <button
-                onClick={handleWhatsAppCheckout}
-                disabled={isSubmitting}
-                className="w-full bg-[#008000] text-white py-5 rounded-[18px] font-black transition-all flex flex-col items-center justify-center gap-1 shadow-2xl shadow-[#008000]/20 hover:bg-[#006000] active:scale-[0.98] disabled:opacity-50"
-              >
-                <span className="uppercase tracking-widest text-[13px]">
-                  {isSubmitting ? 'Processing...' : (step === 'product' ? 'Checkout via WhatsApp' : 'Confirm Order via WhatsApp')}
-                </span>
-              </button>
-              {step === 'details' && !isSubmitting && (
-                <span className="text-[10px] text-gray-600  font-medium normal-case">
-                  Opens WhatsApp to complete your purchase.
-                </span>
-              )}
+  <button
+    onClick={handleWhatsAppCheckout}
+    disabled={isSubmitting}
+    className="w-full bg-[#008000] text-white py-5 rounded-[18px] font-black transition-all flex flex-col items-center justify-center gap-1 shadow-2xl shadow-[#008000]/20 hover:bg-[#006000] active:scale-[0.98] disabled:opacity-50"
+  >
+    <span className="uppercase tracking-widest text-[13px]">
+      {isSubmitting ? 'Processing...' : (step === 'product' ? 'Checkout via WhatsApp' : 'Confirm Order via WhatsApp')}
+    </span>
+  </button>
+  
+  {step === 'details' && !isSubmitting && (
+    <span className="text-[10px] text-gray-600 font-medium normal-case">
+      Opens WhatsApp to complete your purchase.
+    </span>
+  )}
 
-              {step === 'product' && (
-                <>
-                  <button
-                    onClick={handleChatSeller}
-                    disabled={isStartingChat}
-                    className="flex items-center justify-center gap-3 w-full py-4 bg-zinc-900 text-white rounded-[18px] font-black hover:scale-[1.02] transition-all shadow-xl shadow-zinc-900/10 disabled:opacity-50"
-                  >
-                    {isStartingChat ? (
-                      <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                    ) : (
-                      <Message02Icon size={20} />
-                    )}
-                    Chat with Seller
-                  </button>
-                  <a href={`/vendors/${product.seller?.username}`} className="w-full">
-                    <button
-                      className="w-full bg-[#f5f5f5] text-gray-900 py-4 rounded-[18px] font-bold hover:bg-[#e5e5e5] transition-colors flex items-center justify-center gap-3"
-                    >
-                      Open Store
-                    </button>
-                  </a>
-                </>
-              )}
-            </div>
+  {step === 'product' && (
+    <div className="flex items-center gap-2 w-full">
+      {/* Open Store - Main wide button */}
+      <a href={`/vendors/${product.seller?.username}`} className="flex-1">
+        <button
+          className="w-full bg-[#f5f5f5] text-gray-900 py-4 rounded-[18px] font-bold hover:bg-[#e5e5e5] transition-colors flex items-center justify-center gap-3 cursor-pointer"
+        >
+          Open Store
+        </button>
+      </a>
+
+      {/* Chat with Seller - Icon only button with subtle white/gray shade */}
+      <button
+        onClick={handleChatSeller}
+        disabled={isStartingChat}
+        title="Chat with Seller"
+        className="flex items-center justify-center w-[52px] h-[52px] shrink-0 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-[18px] transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
+      >
+        {isStartingChat ? (
+          <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin"></div>
+        ) : (
+          <Message02Icon size={22} />
+        )}
+      </button>
+    </div>
+  )}
+</div>
           )}
         </div>
       </div>

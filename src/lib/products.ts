@@ -16,6 +16,7 @@ export interface Product {
         last_name?: string;
         state_details?: { id: number; name: string };
         lga_details?: { id: number; name: string };
+        is_verified?: boolean;
     };
     name: string;
     price: string;
