@@ -16,7 +16,8 @@ import {
   CheckmarkCircle01Icon,
   Search02Icon,
   ArrowLeft02Icon,
-  ArrowRight02Icon
+  ArrowRight02Icon,
+  IdVerifiedIcon
 } from "hugeicons-react";
 import { toast } from "react-hot-toast";
 import { fetchUserProfile } from "@/lib/auth";
