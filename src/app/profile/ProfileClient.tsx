@@ -17,7 +17,8 @@ import {
   Search02Icon,
   ArrowLeft02Icon,
   ArrowRight02Icon,
-  IdVerifiedIcon
+  IdVerifiedIcon,
+  CheckmarkBadge01Icon
 } from "hugeicons-react";
 import { toast } from "react-hot-toast";
 import { fetchUserProfile } from "@/lib/auth";
@@ -100,7 +101,9 @@ export default function ProfilePage() {
       setProducts(myProducts);
       setCategoriesState(categoriesData);
       
-      setIsVerified(profile.is_verified || false);
+      // Check the profile object, fallback to checking your own products' seller data
+      const verifiedStatus = profile.is_verified || profile.user?.is_verified || myProducts[0]?.seller?.is_verified || false;
+      setIsVerified(verifiedStatus);
 
       setProfileData({
         whatsapp_number: profile.whatsapp_number || '',
@@ -179,10 +182,10 @@ export default function ProfilePage() {
                   </span>
                   
                   {isVerified ? (
-                    <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-[11px] px-2 py-0.5 rounded-full font-bold border border-blue-200 uppercase tracking-wider shrink-0">
-                      <svg className="w-3.5 h-3.5 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
-                      </svg>
+                    <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#008000] bg-emerald-50 rounded-full px-2.5 py-0.5 uppercase tracking-wider shrink-0">
+                      <CheckmarkBadge01Icon 
+                        className="w-3.5 h-3.5 shrink-0 animate-in fade-in zoom-in duration-200" 
+                      />
                       Verified
                     </span>
                   ) : (

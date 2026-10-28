@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, Location01Icon, ArrowDown01Icon, UserCircleIcon, IdVerifiedIcon } from "hugeicons-react";
+import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, Location01Icon, ArrowDown01Icon, UserCircleIcon, CheckmarkBadge01Icon } from "hugeicons-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Avatar } from "@/components/layout/Navbar";
@@ -86,7 +86,7 @@ const ProductCard = ({ product, onSelect }: ProductCardProps) => {
             
             {/* Render Verification Badge if Seller is Verified */}
             {isSellerVerified && (
-              <IdVerifiedIcon 
+              <CheckmarkBadge01Icon 
                 className="w-3.5 h-3.5 text-green-800 shrink-0 ml-0.5 animate-in fade-in zoom-in duration-200" 
               
               />
@@ -301,8 +301,10 @@ export default function Products({
       setProducts(data.results || []);
       setNextPageUrl(data.next);
       setTotalCount(data.count || 0);
+      setPageError(null);
     } catch (error) {
       console.error("Refresh products error:", error);
+      setPageError("Unable to refresh products. Please try again.");
     } finally {
       setIsFetchingPage(false);
     }
@@ -368,7 +370,7 @@ export default function Products({
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && nextPageUrl && !isFetchingPage) {
+        if (entries[0].isIntersecting && nextPageUrl && !isFetchingPage && !pageError) {
           loadMore();
         }
       },
@@ -380,7 +382,7 @@ export default function Products({
     }
 
     return () => observer.disconnect();
-  }, [nextPageUrl, isFetchingPage, loadMore]);
+  }, [nextPageUrl, isFetchingPage, pageError, loadMore]);
 
   const isEmptyState = !isInitialLoading && products.length === 0;
 
@@ -508,6 +510,15 @@ export default function Products({
                       </div>
                     ))}
                   </div>
+                )}
+                {!isFetchingPage && nextPageUrl && (
+                  <button
+                    type="button"
+                    onClick={loadMore}
+                    className="rounded-full border border-gray-200 px-6 py-3 text-sm font-semibold text-gray-700 transition-colors hover:border-[#008000] hover:text-[#008000]"
+                  >
+                    Load more products
+                  </button>
                 )}
               </div>
             </>

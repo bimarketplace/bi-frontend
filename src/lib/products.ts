@@ -50,9 +50,16 @@ export interface ProductCreateData {
 }
 
 export const fetchProductsPage = async (url?: string, params?: Record<string, string | number>): Promise<PaginatedProductsResponse> => {
-    let endpoint = url;
+    let endpoint: string;
     
-    if (!endpoint) {
+    if (url) {
+        const apiUrl = new URL(getApiUrl());
+        const pageUrl = new URL(url, apiUrl);
+        if (pageUrl.hostname === apiUrl.hostname) {
+            pageUrl.protocol = apiUrl.protocol;
+        }
+        endpoint = pageUrl.toString();
+    } else {
         const searchParams = new URLSearchParams();
         if (params) {
             Object.entries(params).forEach(([key, value]) => {
@@ -67,12 +74,12 @@ export const fetchProductsPage = async (url?: string, params?: Record<string, st
 
     console.log(`[Fetch] Fetching from: ${endpoint}`);
 
-    const maxRetries = 10;
-    let lastError: any;
+    const maxAttempts = 2;
+    let lastError: unknown;
 
-    for (let i = 0; i < maxRetries; i++) {
+    for (let i = 0; i < maxAttempts; i++) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
 
         try {
             const response = await fetch(endpoint, {
@@ -93,24 +100,16 @@ export const fetchProductsPage = async (url?: string, params?: Record<string, st
             lastError = err;
             const errorMessage = err.message || String(err);
             const errorCause = err.cause ? ` (Cause: ${err.cause})` : '';
-            console.warn(`[Fetch Attempt ${i + 1} Failed] ${errorMessage}${errorCause} for ${endpoint}. Retrying...`);
+            console.warn(`[Fetch Attempt ${i + 1} Failed] ${errorMessage}${errorCause} for ${endpoint}`);
             
-            // If it's the last attempt, don't wait, just throw
-            if (i < maxRetries - 1) {
-                // Wait for a duration before retrying - generous delay for cold starts
-                const delay = Math.min(2000 * (i + 1), 10000); // Max 10s delay
-                await new Promise(resolve => setTimeout(resolve, delay));
+            if (i < maxAttempts - 1) {
+                await new Promise(resolve => setTimeout(resolve, 750));
             }
         }
     }
 
-    console.error(`[Fetch Exception] Final failure after ${maxRetries} attempts: ${lastError} for ${endpoint}`);
-    return {
-        count: 0,
-        next: null,
-        previous: null,
-        results: [],
-    };
+    console.error(`[Fetch Exception] Failed after ${maxAttempts} attempts: ${lastError} for ${endpoint}`);
+    throw lastError instanceof Error ? lastError : new Error(`Failed to fetch products from ${endpoint}`);
 };
 
 // Extracted payload processing to keep fetchProductsPage clean

@@ -1,5 +1,5 @@
-import { fetchProductsPage } from "@/lib/products";
-import { fetchCategories } from "@/lib/categories";
+import { fetchProductsPage, type PaginatedProductsResponse } from "@/lib/products";
+import { fetchCategories, type Category } from "@/lib/categories";
 import VendorStore from "./VendorStore";
 import { Metadata } from "next";
 
@@ -55,12 +55,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Page({ params }: Props) {
   const { id } = await params;
-  
+
+  let productsData: PaginatedProductsResponse = {
+    count: 0,
+    next: null,
+    previous: null,
+    results: [],
+  };
+  let categoriesData: Category[] = [];
+
   // Fetch data on the server for better SEO (SSR)
-  const [productsData, categoriesData] = await Promise.all([
-    fetchProductsPage(undefined, { seller__username: id }), 
-    fetchCategories()
-  ]);
+  try {
+    [productsData, categoriesData] = await Promise.all([
+      fetchProductsPage(undefined, { seller__username: id }),
+      fetchCategories()
+    ]);
+  } catch (error) {
+    console.error("Failed to load vendor store data:", error);
+  }
 
   // Filter products to only include those from the current vendor
   // (In case the API returns a mix, though seller__username filter is used)
