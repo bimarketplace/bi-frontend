@@ -4,21 +4,22 @@ import { useSession, signOut } from "next-auth/react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
-    Menu01Icon,
+    // Menu01Icon,
     Alert01Icon,
     Logout01Icon,
     CheckmarkCircle01Icon,
     PlusSignIcon,
-    Notification03Icon,
-    FavouriteIcon,
+    Home01Icon,
+    Notification01Icon,
     ShoppingBag01Icon,
+    ShoppingCart02Icon,
     Store01Icon,
     WhatsappIcon,
     UserCircleIcon,
     Login01Icon,
-    Search02Icon,
+    Search01Icon,
     TruckIcon,
     Message02Icon
 } from "hugeicons-react";
@@ -70,25 +71,7 @@ export const CloseIcon = () => (
 export default function Navbar() {
     const { data: session } = useSession();
     const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
-    const [isNotificationOpen, setIsNotificationOpen] = useState(false);
     const [resendStatus, setResendStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-    const [isScrollingDown, setIsScrollingDown] = useState(false);
-    const [lastScrollY, setLastScrollY] = useState(0);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY > lastScrollY && currentScrollY > 50) {
-                setIsScrollingDown(true);
-            } else if (currentScrollY < lastScrollY) {
-                setIsScrollingDown(false);
-            }
-            setLastScrollY(currentScrollY);
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, [lastScrollY]);
 
     const user = session?.user;
     const isLoggedIn = !!session;
@@ -114,7 +97,7 @@ export default function Navbar() {
         }
     };
 
-    const toggleOffcanvas = () => setIsOffcanvasOpen(!isOffcanvasOpen);
+    // const toggleOffcanvas = () => setIsOffcanvasOpen(!isOffcanvasOpen);
     const closeOffcanvas = () => setIsOffcanvasOpen(false);
 
     const phoneNumber = "2349124848282";
@@ -123,9 +106,12 @@ export default function Navbar() {
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
 
     const router = useRouter();
-    const searchParams = useSearchParams();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
     const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+    const isAuthPage = pathname.startsWith('/auth/');
+    const isChatRoom = pathname.startsWith('/chat/') && pathname !== '/chat';
+    const showMobileBottomNav = !isAuthPage && !isChatRoom;
 
     const handleSearch = (value: string) => {
         setSearchQuery(value);
@@ -139,21 +125,7 @@ export default function Navbar() {
         router.push(`/?${params.toString()}`);
     };
 
-    const [showSearch, setShowSearch] = useState(true);
     const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-    const isSearchablePage = pathname === '/' || pathname === '/vendors' || pathname.startsWith('/vendors/') || pathname.startsWith('/products');
-
-    useEffect(() => {
-        const handleScroll = () => {
-            if (window.scrollY > 10) {
-                setShowSearch(false);
-            } else {
-                setShowSearch(true);
-            }
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     useEffect(() => {
         setSearchQuery(searchParams.get('search') || '');
@@ -188,51 +160,22 @@ export default function Navbar() {
             )}
 
             {/* Fixed Header */}
-            <header className={`fixed top-0 left-0 w-full z-50 bg-white/95 backdrop-blur-sm transition-all duration-300 shadow-sm ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
-                <Container className="flex flex-col py-3 md:py-4">
+            <header className={`fixed top-0 left-0 w-full z-50 bg-white transition-all duration-300 shadow-sm ${isLoggedIn && !isVerified ? 'mt-[40px]' : ''}`}>
+                <Container className="!px-8 sm:!px-10 flex flex-col py-0">
                     <div className="flex items-center justify-between w-full gap-4">
-                        <div className="flex items-center gap-8">
-                            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                                <Image
-                                    src="/assets/images/bi.png"
-                                    alt="BIMARKETPLACE"
-                                    width={200}
-                                    height={120}
-                                    className="h-8 w-auto object-contain"
-                                />
-                                <span className="text-[#008102] text-sm font-medium">BIMARKETPLACE</span>
-                            </Link>
-                        </div>
-
-                        {/* Central Search Bar (Desktop) */}
-                        {isSearchablePage && (
-                            <form
-                                onSubmit={(e) => {
-                                    e.preventDefault();
-                                    handleSearch(searchQuery);
-                                }}
-                                className={`hidden md:flex flex-1 max-w-2xl mx-12 transition-all duration-300 ${showSearch ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}
-                            >
-                                <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
-                                    <input
-                                        type="text"
-                                        placeholder="Search BI Marketplace"
-                                        className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
-                                        value={searchQuery}
-                                        onChange={(e) => handleSearch(e.target.value)}
-                                    />
-                                    <button
-                                        type="submit"
-                                        className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all hover:scale-105 active:scale-95 flex items-center justify-center border border-gray-50 shrink-0"
-                                    >
-                                        <Search02Icon size={18} />
-                                    </button>
-                                </div>
-                            </form>
-                        )}
+                        <Link href="/" aria-label="BI Marketplace home" className="-ml-4 flex h-[60px] items-center hover:opacity-80 transition-opacity">
+                            <Image
+                                src="/assets/images/bi.png"
+                                alt="BI Marketplace"
+                                width={84}
+                                height={84}
+                                className="h-[44px] w-[44px] object-contain"
+                            />
+                        </Link>
 
                         {/* Right side actions & Menu Toggle */}
-                        <div className="flex items-center gap-2 sm:gap-4">
+                        <div className="flex items-center gap-4 sm:gap-2">
+                            {/* Previous desktop navigation, kept for the redesign rollback.
                             {isLoggedIn ? (
                                 <div className="hidden md:flex items-center gap-1 sm:gap-3">
                                     <Link href="/cart" className="p-2 text-zinc-800 hover:text-[#008000] transition-colors" title="Shopping Bag">
@@ -261,17 +204,33 @@ export default function Navbar() {
                                     </Link>
                                 </div>
                             )}
+                            */}
 
-                            <div className="flex items-center gap-2 sm:gap-4 border-gray-100 pl-2 sm:pl-4 ml-1 sm:ml-2">
-                                {isSearchablePage && (
-                                    <button
-                                        onClick={() => setIsMobileSearchOpen(!isMobileSearchOpen)}
-                                        className="md:hidden focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]"
-                                    >
-                                        <Search02Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-[#008000] transition-colors" />
-                                    </button>
-                                )}
-                                <div className="relative">
+                            <div className="flex gap-6 items-center justify-end max-[639px]:w-auto max-[639px]:gap-6">
+                                <button
+                                    type="button"
+                                    onClick={() => setIsMobileSearchOpen((isOpen) => !isOpen)}
+                                    aria-label="Search"
+                                    aria-expanded={isMobileSearchOpen}
+                                    className="flex w-fit items-center justify-center text-black transition-opacity hover:opacity-60"
+                                >
+                                    <Search01Icon size={24} strokeWidth={1.7} />
+                                </button>
+                                <Link
+                                    href="/cart"
+                                    aria-label="Shopping cart"
+                                    className="flex w-fit items-center justify-center text-black transition-opacity hover:opacity-60"
+                                >
+                                    <ShoppingCart02Icon size={24} strokeWidth={1.7} />
+                                </Link>
+                                <Link
+                                    href="/notifications"
+                                    aria-label="Notifications"
+                                    className="flex w-fit items-center justify-center text-black transition-opacity hover:opacity-60"
+                                >
+                                    <Notification01Icon size={24} strokeWidth={1.7} />
+                                </Link>
+                                <div className="relative hidden">
                                     {/* Mobile: Link to Notifications Page ... */}
                                     {/* <Link 
                                         href="/notifications"
@@ -336,40 +295,46 @@ export default function Navbar() {
                                         </>
                                     )} */}
                                 </div>
-                                <button onClick={toggleOffcanvas} className="focus:outline-none group bg-[#F3F4F6] p-[8px] rounded-[9px]">
-                                    <Menu01Icon size={22} className="text-gray-500 cursor-pointer group-hover:text-primary-600 transition-colors" />
-                                </button>
+                                {/* <button
+                                    type="button"
+                                    onClick={toggleOffcanvas}
+                                    aria-label="Open menu"
+                                    className="hidden max-[639px]:flex h-10 w-10 items-center justify-center text-black"
+                                >
+                                    <Menu01Icon size={28} />
+                                </button> */}
                             </div>
                         </div>
                     </div>
 
                     {/* Mobile Search Bar (Beneath Logo/Menu) */}
-                    {isSearchablePage && (
-                        <form
-                            onSubmit={(e) => {
-                                e.preventDefault();
-                                handleSearch(searchQuery);
-                                setIsMobileSearchOpen(false);
-                            }}
-                            className={`md:hidden w-full transition-all duration-300 overflow-hidden ${isMobileSearchOpen ? 'mt-3 h-auto opacity-100' : 'mt-0 h-0 opacity-0 pointer-events-none'}`}
-                        >
-                            <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
-                                <input
-                                    type="text"
-                                    placeholder="Search BI Marketplace"
-                                    className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
-                                    value={searchQuery}
-                                    onChange={(e) => handleSearch(e.target.value)}
-                                />
-                                <button
-                                    type="submit"
-                                    className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all flex items-center justify-center shrink-0"
-                                >
-                                    <Search02Icon size={18} />
-                                </button>
-                            </div>
-                        </form>
-                    )}
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSearch(searchQuery);
+                            setIsMobileSearchOpen(false);
+                        }}
+                        className={`w-full overflow-hidden transition-all duration-300 ${isMobileSearchOpen ? 'mt-3 h-auto opacity-100' : 'mt-0 h-0 opacity-0 pointer-events-none'}`}
+                    >
+                        <div className="relative w-full flex items-center bg-[#F3F4F6] rounded-[5px] p-[5px] transition-all">
+                            <input
+                                type="text"
+                                placeholder="Search BI Marketplace"
+                                aria-label="Search BI Marketplace"
+                                autoFocus={isMobileSearchOpen}
+                                className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none text-gray-800 placeholder:text-gray-400 font-medium"
+                                value={searchQuery}
+                                onChange={(e) => handleSearch(e.target.value)}
+                            />
+                            <button
+                                type="submit"
+                                aria-label="Submit search"
+                                className="p-[5px] rounded-[5px] text-zinc-900 hover:text-[#008000] transition-all flex items-center justify-center shrink-0"
+                            >
+                                <Search01Icon size={18} />
+                            </button>
+                        </div>
+                    </form>
                 </Container>
             </header>
 
@@ -469,6 +434,39 @@ export default function Navbar() {
                 </div>
             </div>
 
+            {showMobileBottomNav && (
+                <nav
+                    aria-label="Primary navigation"
+                    className="fixed inset-x-0 bottom-0 z-[60] border-t border-zinc-200 bg-white shadow-[0_-4px_16px_rgba(0,0,0,0.04)] md:hidden"
+                    style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+                >
+                    <div className="mx-auto flex h-16 max-w-lg items-center justify-around px-2">
+                        {[
+                            { label: "Home", href: "/", Icon: Home01Icon, active: pathname === "/" },
+                            { label: "Categories", href: "/categories", Icon: ShoppingBag01Icon, active: pathname.startsWith("/categories") },
+                            { label: "Messages", href: "/chat", Icon: Message02Icon, active: pathname.startsWith("/chat") },
+                            { label: "Profile", href: "/profile", Icon: UserCircleIcon, active: pathname.startsWith("/profile") },
+                        ].map(({ label, href, Icon, active }) => (
+                            <Link
+                                key={label}
+                                href={href}
+                                aria-label={label}
+                                aria-current={active ? "page" : undefined}
+                                className={`flex h-full flex-1 flex-col items-center justify-center gap-1 text-[13px] transition-colors ${
+                                    active ? "text-black" : "text-zinc-500 hover:text-zinc-800"
+                                }`}
+                            >
+                                <span className={`flex h-9 w-[52px] items-center justify-center rounded-full transition-colors ${
+                                    active ? "bg-[#008000] text-white" : "text-zinc-500"
+                                }`}>
+                                    <Icon size={24} strokeWidth={1.7} />
+                                </span>
+                                <span className="leading-none">{label}</span>
+                            </Link>
+                        ))}
+                    </div>
+                </nav>
+            )}
 
         </>
     );

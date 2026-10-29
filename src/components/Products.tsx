@@ -403,34 +403,34 @@ export default function Products({
           </div>
         </div> */}
 
-        {/* Categories Horizontal Scroll */}
-        <div className="flex gap-2 overflow-x-auto pb-4 pt-1 px-1 mt-4 no-scrollbar scroll-smooth snap-x">
+        <h2 className="mb-4 mt-4 text-base font-semibold text-zinc-950">Best Deals For You</h2>
+        <div className="no-scrollbar flex snap-x gap-6 overflow-x-auto px-1 pb-3 pt-1">
           <button
+            type="button"
+            aria-pressed={selectedCategoryId === null}
             onClick={() => setSelectedCategoryId(null)}
-            className={`flex-none py-2 px-4 rounded-full border transition-all duration-300 snap-start
-              ${selectedCategoryId === null
-                ? "bg-[#008000] text-white shadow-[0_4px_15px_rgba(0,128,0,0.1)]"
-                : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
-              }`}
+            className={`flex-none snap-start rounded-full border border-black px-3 py-2 text-sm font-medium leading-5 shadow-[0_2px_0_#000] transition-transform active:translate-y-0.5 ${
+              selectedCategoryId === null
+                ? "bg-[#008000] text-white"
+                : "bg-white text-zinc-950 hover:bg-zinc-50"
+            }`}
           >
-            <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === null ? "text-white" : "text-gray-700"}`}>
-              All Products
-            </span>
+            All
           </button>
 
           {categoriesState.map((category) => (
             <button
               key={category.id}
+              type="button"
+              aria-pressed={selectedCategoryId === category.id}
               onClick={() => setSelectedCategoryId(category.id)}
-              className={`flex-none w-fit py-2 px-4 rounded-full border transition-all duration-300 flex items-center gap-3 text-left group
-                ${selectedCategoryId === category.id
-                  ? "text-white bg-[#008000] shadow-[0_4px_15_rgba(0,128,0,0.1)]"
-                  : "bg-white border-gray-200 hover:border-gray-300 hover:shadow-sm"
-                }`}
+              className={`flex-none snap-start rounded-full border border-black px-3 py-2 text-sm font-medium leading-5 shadow-[0_2px_0_#000] transition-transform active:translate-y-0.5 ${
+                selectedCategoryId === category.id
+                  ? "bg-[#008000] text-white"
+                  : "bg-white text-zinc-950 hover:bg-zinc-50"
+              }`}
             >
-              <span className={`text-[12px] font-medium transition-colors ${selectedCategoryId === category.id ? "text-white" : "text-gray-700"}`}>
-                {category.name}
-              </span>
+              {category.name}
             </button>
           ))}
         </div>

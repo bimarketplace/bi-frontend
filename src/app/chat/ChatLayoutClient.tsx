@@ -48,7 +48,7 @@ export default function ChatLayoutClient({ children }: { children: React.ReactNo
     const isMobileChatView = pathname !== '/chat' && pathname.startsWith('/chat/');
 
     return (
-      <div className="min-h-screen bg-[#FAFAFA] pt-20 pb-8 flex flex-col">
+      <div className="min-h-screen bg-[#FAFAFA] pt-[60px] pb-8 flex flex-col md:pt-20">
     <div className="flex-1 flex flex-col w-full h-[calc(100vh-9rem)] max-h-[870px]">
         <div className="bg-white overflow-hidden border border-gray-100 shadow-xl shadow-zinc-200/50 flex flex-1 w-full h-full relative">
             {/* Sidebar (Conversations List) */}

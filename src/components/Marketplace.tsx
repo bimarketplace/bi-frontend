@@ -50,7 +50,9 @@ export default function Marketplace({
   const isVerified = (user as any)?.is_verified ?? (user as any)?.email_verified ?? true;
 
   // Use server-side default padding first to avoid hydration mismatch
-  const paddingTopClass = (isMounted && isLoggedIn && !isVerified) ? 'pt-[170px] md:pt-[125px]' : 'pt-[130px] md:pt-20';
+  const paddingTopClass = (isMounted && isLoggedIn && !isVerified)
+    ? 'pt-[110px] md:pt-[125px]'
+    : 'pt-[70px] md:pt-20';
 
   const heroProducts = initialProducts || [];
 
@@ -58,7 +60,9 @@ export default function Marketplace({
     <div className="min-h-screen bg-white font-sans">
       <Container as="main" className={`transition-all duration-300 ${paddingTopClass} pb-16`}>
         <h1 className="sr-only">BI Marketplace - Buy and Sell Products Effectively</h1>
-        <Hero products={heroProducts} flashSales={flashSales} onProductClick={setSelectedProduct} />
+        <div className="hidden md:block">
+          <Hero products={heroProducts} flashSales={flashSales} onProductClick={setSelectedProduct} />
+        </div>
         <Products 
           initialProducts={initialProducts}
           categories={categories}
