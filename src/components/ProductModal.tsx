@@ -237,7 +237,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
                   </button>
                   <a
                     href={`/vendors/${product.seller?.username}`}
-                    className="rounded-full border border-black px-4 py-2 text-sm font-semibold shadow-[0_2px_0_#000]"
+                    className="rounded-full border border-black px-4 py-2 text-sm font-semibold text-black shadow-[0_2px_0_#000]"
                   >
                     View store
                   </a>
