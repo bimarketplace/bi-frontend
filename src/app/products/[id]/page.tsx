@@ -17,12 +17,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       product.image_url || "/assets/images/sale-fast.png",
       siteUrl
     ).toString();
+    const shareTitle = `${product.name} | ${product.seller?.username || "BI Marketplace"}`;
     
     return {
-      title: `${product.name} | BI Marketplace`,
+      title: shareTitle,
       description: product.description,
       openGraph: {
-        title: `${product.name} | BI Marketplace`,
+        title: shareTitle,
         description: product.description,
         url: new URL(`/products/${id}?openModal=1`, siteUrl).toString(),
         images: [{ url: imageUrl, alt: product.name }],
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
       twitter: {
         card: "summary_large_image",
-        title: `${product.name} | BI Marketplace`,
+        title: shareTitle,
         description: product.description,
         images: [{ url: imageUrl, alt: product.name }],
       },
