@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { Cancel01Icon, Location01Icon, ArrowLeft01Icon, Message02Icon } from "hugeicons-react";
+import { Cancel01Icon, Location01Icon, ArrowLeft01Icon, MinusSignIcon, PlusSignIcon, Share01Icon } from "hugeicons-react";
 import { Product as ProductType } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
 import toast from "react-hot-toast";
@@ -14,10 +14,9 @@ import { startConversation } from "@/lib/chat";
 interface ProductModalProps {
   product: ProductType;
   onClose: () => void;
-  showAddToCart?: boolean;
 }
 
-const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalProps) => {
+const ProductModal = ({ product, onClose }: ProductModalProps) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [isClosing, setIsClosing] = useState(false);
@@ -56,6 +55,34 @@ const ProductModal = ({ product, onClose, showAddToCart = true }: ProductModalPr
       },
     });
     handleClose();
+  };
+
+  const handleShare = async () => {
+    const productUrl = new URL(`/products/${product.id}?openModal=1`, window.location.origin).toString();
+    const shareData = {
+      title: product.name,
+      text: product.name,
+      url: productUrl,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        console.error("Failed to share product:", error);
+        toast.error("Unable to share this product");
+      }
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(productUrl);
+      toast.success("Product link copied");
+    } catch (error) {
+      console.error("Failed to copy product link:", error);
+      toast.error("Unable to share or copy the product link");
+    }
   };
 
   const handleChatSeller = async () => {
@@ -143,7 +170,7 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
   };
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-end sm:items-stretch sm:justify-end overflow-hidden">
+    <div className="fixed inset-0 z-[120] flex items-end overflow-hidden sm:items-stretch sm:justify-end">
       {/* Backdrop */}
       <div
         className={`absolute inset-0 bg-[#008000]/5 backdrop-blur-sm transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
@@ -152,102 +179,146 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
 
       {/* Drawer */}
       <div
-        className={`relative w-full sm:w-[400px] bg-white h-[90vh] sm:h-full shadow-2xl transition-transform duration-300 ease-out flex flex-col
+        role="dialog"
+        aria-modal="true"
+        aria-label={`${product.name} details`}
+        className={`relative flex h-[100dvh] w-full flex-col bg-white pt-[env(safe-area-inset-top)] shadow-2xl transition-transform duration-300 ease-out sm:h-full sm:w-[480px]
           ${(!isOpening || isClosing) ? 'translate-y-full sm:translate-x-full' : 'translate-y-0 sm:translate-x-0'}`}
       >
-        {/* Mobile Handle */}
-        <div className="sm:hidden w-full flex justify-center py-3 shrink-0">
-          <div className="w-12 h-1.5 bg-gray-300 rounded-full" />
-        </div>
-
-        {/* Header */}
-        <div className="p-4 sm:p-6 flex items-center justify-between shrink-0">
-          <h3 className="text-xl font-medium text-gray-900">Product Details</h3>
+        <div className="flex h-[60px] shrink-0 items-center gap-3 border-b border-zinc-200 px-5 sm:justify-between sm:px-6">
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-gray-100 bg-gray-50 rounded-full text-gray-900 transition-colors"
+            aria-label="Close product details"
+            className="flex h-9 w-6 items-center justify-start text-zinc-900 transition-colors hover:text-[#008000]"
           >
-            <Cancel01Icon size={24} />
+            <ArrowLeft01Icon size={22} />
+          </button>
+          <h3 className="text-lg font-semibold text-gray-900">Product Details</h3>
+          <button
+            onClick={handleClose}
+            aria-label="Close product details"
+            className="ml-auto hidden rounded-full bg-gray-50 p-2 text-gray-900 transition-colors hover:bg-gray-100 sm:block"
+          >
+            <Cancel01Icon size={22} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
+        <div className="flex-1 overflow-y-auto overscroll-contain pb-5">
           {step === 'product' ? (
             <>
-              <div className="relative w-64 aspect-square mx-auto rounded-xl overflow-hidden bg-gray-100 shrink-0 shadow-sm">
-                <Image
-                  src={product.image_url || "/assets/images/placeholder.png"}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
+              <div className="flex min-h-[72px] items-center justify-between gap-3 border-b border-zinc-200 px-5 py-3">
+                <span className="flex min-w-0 items-center gap-2.5">
+                  <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#008000]/10 text-sm font-bold text-[#008000]">
+                    {product.seller?.avatar_url || product.seller?.avatar ? (
+                      <Image
+                        src={product.seller.avatar_url || product.seller.avatar || ""}
+                        alt=""
+                        fill
+                        unoptimized
+                        className="object-cover"
+                      />
+                    ) : (
+                      product.seller?.username?.charAt(0).toUpperCase() || "S"
+                    )}
+                  </span>
+                  <span className="truncate text-sm font-medium text-zinc-900">
+                    {product.seller?.username || "Seller"}
+                  </span>
+                </span>
+                <div className="flex shrink-0 items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={handleShare}
+                    aria-label={`Share ${product.name}`}
+                    title="Share product"
+                    className="flex h-10 w-10 items-center justify-center rounded-full text-zinc-900 transition-colors hover:bg-zinc-100"
+                  >
+                    <Share01Icon size={20} />
+                  </button>
+                  <a
+                    href={`/vendors/${product.seller?.username}`}
+                    className="rounded-full border border-black px-4 py-2 text-sm font-semibold shadow-[0_2px_0_#000]"
+                  >
+                    View store
+                  </a>
+                </div>
               </div>
 
-              <div className="flex flex-col gap-3 text-start px-3">
-                <h1 className="text-2xl font-bold text-gray-900">{product.name}</h1>
-                <div className="text-2xl font-black text-[#008000]">
-                  ₦{parseFloat(product.price || "0").toLocaleString()}
+              <div className="mx-5 mt-5 flex aspect-square max-h-[360px] items-center justify-center overflow-hidden rounded-[30px] bg-zinc-100 sm:mx-6">
+                <div className="relative h-full w-full">
+                  <Image
+                    src={product.image_url || "/assets/images/placeholder.png"}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 640px) 90vw, 430px"
+                    className="object-contain p-4"
+                    unoptimized
+                  />
                 </div>
+              </div>
 
-                {product.seller.state_details && (
-                  <div className="flex items-center gap-1.5 text-zinc-500 mt-1">
+              <div className="px-5 pt-5 sm:px-6">
+                <h1 className="text-lg font-semibold text-zinc-950">{product.name}</h1>
+                <p className="mt-1 text-lg font-semibold text-[#008000]">
+                  ₦{parseFloat(product.price || "0").toLocaleString()}
+                </p>
+                {product.category?.name && (
+                  <p className="mt-1 text-sm text-zinc-600">{product.category.name}</p>
+                )}
+                {(product.seller?.lga_details?.name || product.seller?.state_details?.name) && (
+                  <p className="mt-2 flex items-center gap-1.5 text-sm text-zinc-500">
                     <Location01Icon size={16} />
-                    <span className="text-sm font-medium">
-                      {product.seller.lga_details?.name ? `${product.seller.lga_details.name}, ` : ''}
-                      {product.seller.state_details.name}
-                    </span>
-                  </div>
+                    {[product.seller.lga_details?.name, product.seller.state_details?.name]
+                      .filter(Boolean)
+                      .join(", ")}
+                  </p>
                 )}
 
-                {/* Quantity Selector */}
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                  <div className="flex flex-col">
-                    <span className="font-bold text-gray-900 text-sm">Quantity</span>
-                    <span className="text-xs text-zinc-500">Select number of items</span>
-                  </div>
-                  <div className="flex items-center gap-4 bg-gray-50 p-1.5 rounded-full border border-gray-100">
+                <div className="mt-5 flex items-center justify-between border-y border-zinc-200 py-4">
+                  <span className="text-sm font-medium text-zinc-900">Quantity</span>
+                  <div className="flex items-center gap-3 rounded-full border border-zinc-300 px-2 py-1">
                     <button
                       type="button"
+                      aria-label="Decrease quantity"
                       onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                      className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-600 font-bold hover:bg-gray-100 active:scale-90 transition-all shadow-sm border border-gray-100"
+                      className="flex h-7 w-7 items-center justify-center text-zinc-500 disabled:opacity-40"
+                      disabled={quantity <= 1}
                     >
-                      -
+                      <MinusSignIcon size={16} />
                     </button>
-                    <span className="text-base font-bold w-6 text-center text-gray-900">
-                      {quantity}
-                    </span>
+                    <span className="w-5 text-center text-sm font-medium text-zinc-900">{quantity}</span>
                     <button
                       type="button"
+                      aria-label="Increase quantity"
                       onClick={() => setQuantity((prev) => prev + 1)}
-                      className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-gray-600 font-bold hover:bg-gray-100 active:scale-90 transition-all shadow-sm border border-gray-100"
+                      className="flex h-7 w-7 items-center justify-center text-zinc-500"
                     >
-                      +
+                      <PlusSignIcon size={16} />
                     </button>
                   </div>
                 </div>
 
-                <div className="mt-4 flex flex-col gap-2">
-                  <h3 className="font-bold text-gray-900">Description</h3>
-                  <p className="text-gray-600 leading-relaxed text-sm">
+                <section className="border-b border-zinc-200 py-5">
+                  <h2 className="text-sm font-semibold text-zinc-950">Description</h2>
+                  <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-zinc-700">
                     {product.description || "No description available for this product."}
                   </p>
-                </div>
+                </section>
               </div>
             </>
           ) : (
-            <div className="flex flex-col gap-6 animate-in slide-in-from-right duration-300">
-              <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-6 px-5 pt-6 animate-in slide-in-from-right duration-300 sm:px-6">
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setStep('product')}
-                  className="p-2 -ml-2 hover:bg-gray-50 rounded-full transition-all text-gray-900 active:scale-90"
-                  title="Back"
+                  type="button"
+                  onClick={() => setStep("product")}
+                  aria-label="Back to product details"
+                  className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-zinc-100"
                 >
-                  <ArrowLeft01Icon size={24} />
+                  <ArrowLeft01Icon size={20} />
                 </button>
-                <h3 className="text-2xl font-bold text-gray-900">Delivery details</h3>
+                <h3 className="text-xl font-bold text-gray-900">Delivery details</h3>
               </div>
-
               <div className="space-y-4">
                 <div className="space-y-1.5 text-left">
                   <label className="text-xs font-bold text-zinc-900 tracking-wider uppercase">Full Name</label>
@@ -297,80 +368,48 @@ ${formData.notes ? `- Notes: ${formData.notes}` : ''}
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 sm:p-6 bg-white shrink-0 mb-4 px-8 border-t border-gray-50">
+        <div className="shrink-0 border-t border-zinc-200 bg-white px-5 pb-[calc(env(safe-area-inset-bottom)+16px)] pt-4 sm:px-6 sm:py-5">
           {step === 'details' && (
-            <div className="flex justify-between items-center mb-4 px-1">
-              <span className="text-gray-500 text-xs font-bold tracking-wider uppercase">Estimated Total</span>
-              <span className="text-2xl font-black text-gray-900">₦{(parseFloat(product.price || "0") * quantity).toLocaleString()}</span>
+            <div className="mb-3 flex items-center justify-between px-1">
+              <span className="text-sm font-medium text-zinc-600">Estimated total</span>
+              <span className="text-lg font-bold text-gray-900">₦{(parseFloat(product.price || "0") * quantity).toLocaleString()}</span>
             </div>
           )}
 
-          {showAddToCart && step === 'product' ? (
+          {step === 'product' ? (
             <div className="flex flex-col gap-3">
               <button
+                type="button"
+                onClick={handleWhatsAppCheckout}
+                className="min-h-[52px] w-full rounded-full border border-black bg-[#008000] text-sm font-semibold text-white shadow-[0_3px_0_#000] transition-transform active:translate-y-0.5"
+              >
+                Buy Now
+              </button>
+              <button
+                type="button"
                 onClick={handleAddToCart}
-                className="w-full bg-[#008000] text-white py-4 rounded-[18px] font-black hover:bg-[#006000] transition-colors flex items-center justify-center gap-3 shadow-xl shadow-[#008000]/10"
+                className="min-h-[52px] w-full rounded-full border border-black bg-white text-sm font-semibold text-zinc-950 shadow-[0_3px_0_#000] transition-transform active:translate-y-0.5"
               >
                 Add to Cart
               </button>
               <button
+                type="button"
                 onClick={handleChatSeller}
                 disabled={isStartingChat}
-                className="flex items-center justify-center gap-3 w-full py-4 bg-zinc-900 text-white rounded-[18px] font-black hover:scale-[1.02] transition-all shadow-xl shadow-zinc-900/10 disabled:opacity-50"
+                className="flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full border border-black bg-white text-sm font-semibold text-zinc-950 shadow-[0_3px_0_#000] transition-transform active:translate-y-0.5 disabled:opacity-50"
               >
-                {isStartingChat ? (
-                  <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
-                ) : (
-                  <Message02Icon size={20} />
-                )}
-                Chat with Seller
+                {isStartingChat ? "Starting chat..." : "Message Vendor"}
               </button>
             </div>
           ) : (
-            <div className="flex flex-col gap-3">
-  <button
-    onClick={handleWhatsAppCheckout}
-    disabled={isSubmitting}
-    className="w-full bg-[#008000] text-white py-5 rounded-[18px] font-black transition-all flex flex-col items-center justify-center gap-1 shadow-2xl shadow-[#008000]/20 hover:bg-[#006000] active:scale-[0.98] disabled:opacity-50"
-  >
-    <span className="uppercase tracking-widest text-[13px]">
-      {isSubmitting ? 'Processing...' : (step === 'product' ? 'Checkout via WhatsApp' : 'Confirm Order via WhatsApp')}
-    </span>
-  </button>
-  
-  {step === 'details' && !isSubmitting && (
-    <span className="text-[10px] text-gray-600 font-medium normal-case">
-      Opens WhatsApp to complete your purchase.
-    </span>
-  )}
-
-  {step === 'product' && (
-    <div className="flex items-center gap-2 w-full">
-      {/* Open Store - Main wide button */}
-      <a href={`/vendors/${product.seller?.username}`} className="flex-1">
-        <button
-          className="w-full bg-[#f5f5f5] text-gray-900 py-4 rounded-[18px] font-bold hover:bg-[#e5e5e5] transition-colors flex items-center justify-center gap-3 cursor-pointer"
-        >
-          Open Store
-        </button>
-      </a>
-
-      {/* Chat with Seller - Icon only button with subtle white/gray shade */}
-      <button
-        onClick={handleChatSeller}
-        disabled={isStartingChat}
-        title="Chat with Seller"
-        className="flex items-center justify-center w-[52px] h-[52px] shrink-0 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 rounded-[18px] transition-all active:scale-95 disabled:opacity-50 cursor-pointer"
-      >
-        {isStartingChat ? (
-          <div className="w-5 h-5 border-2 border-zinc-300 border-t-zinc-800 rounded-full animate-spin"></div>
-        ) : (
-          <Message02Icon size={22} />
-        )}
-      </button>
-    </div>
-  )}
-</div>
+            <button
+              type="button"
+              onClick={handleWhatsAppCheckout}
+              disabled={isSubmitting}
+              className="min-h-[52px] w-full rounded-full border border-black bg-[#008000] text-sm font-semibold text-white shadow-[0_3px_0_#000] transition-transform active:translate-y-0.5 disabled:opacity-50"
+            >
+              {isSubmitting ? "Processing..." : "Confirm Order"}
+            </button>
           )}
         </div>
       </div>

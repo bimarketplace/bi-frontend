@@ -1,32 +1,38 @@
 import { fetchProductById } from "@/lib/products";
 import ProductDetails from "./ProductDetails";
 import { Metadata } from "next";
-import { headers } from "next/headers";
+import SharedProductModal from "./SharedProductModal";
 
 type Props = {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ openModal?: string }>;
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   try {
     const product = await fetchProductById(parseInt(id));
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.bimarketplace.org";
+    const imageUrl = new URL(
+      product.image_url || "/assets/images/sale-fast.png",
+      siteUrl
+    ).toString();
     
     return {
       title: `${product.name} | BI Marketplace`,
       description: product.description,
       openGraph: {
-        title: product.name,
+        title: `${product.name} | BI Marketplace`,
         description: product.description,
-        url: `/products/${id}`,
-        images: [{ url: product.image_url || "/assets/images/sale-fast.png" }],
+        url: new URL(`/products/${id}?openModal=1`, siteUrl).toString(),
+        images: [{ url: imageUrl, alt: product.name }],
         type: "article",
       },
       twitter: {
         card: "summary_large_image",
-        title: product.name,
+        title: `${product.name} | BI Marketplace`,
         description: product.description,
-        images: [product.image_url || "/assets/images/sale-fast.png"],
+        images: [{ url: imageUrl, alt: product.name }],
       },
     };
   } catch (error) {
@@ -36,8 +42,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function Page({ params }: Props) {
+export default async function Page({ params, searchParams }: Props) {
   const { id } = await params;
+  const { openModal } = await searchParams;
   const product = await fetchProductById(parseInt(id));
 
   // JSON-LD for Product
@@ -66,7 +73,11 @@ export default async function Page({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <ProductDetails initialProduct={product} id={id} />
+      {openModal === "1" ? (
+        <SharedProductModal product={product} />
+      ) : (
+        <ProductDetails initialProduct={product} id={id} />
+      )}
     </>
   );
 }

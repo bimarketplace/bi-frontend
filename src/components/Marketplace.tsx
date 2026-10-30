@@ -76,7 +76,6 @@ export default function Marketplace({
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          showAddToCart={false}
         />
       )}
     </div>

@@ -529,7 +529,6 @@ export default function Products({
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          showAddToCart={false}
         />
       )}
     </div>
