@@ -59,9 +59,10 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
 
   const handleShare = async () => {
     const productUrl = new URL(`/products/${product.id}?openModal=1`, window.location.origin).toString();
+    const shareText = `${product.name} | ₦${parseFloat(product.price || "0").toLocaleString()}`;
     const shareData = {
-      title: product.name,
-      text: product.name,
+      title: shareText,
+      text: shareText,
       url: productUrl,
     };
 
