@@ -3,8 +3,7 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect, useRef } from "react";
 import { fetchMessages, fetchConversation, getWebSocketUrl, Message, Conversation } from "@/lib/chat";
-import { Avatar } from "@/components/layout/Navbar";
-import { ArrowLeft02Icon, SentIcon, Store01Icon, Attachment01Icon } from "hugeicons-react";
+import { ArrowLeft02Icon, SentIcon } from "hugeicons-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -29,24 +28,30 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
     const [conversation, setConversation] = useState<Conversation | null>(null);
     const [newMessage, setNewMessage] = useState("");
     const [isLoading, setIsLoading] = useState(true);
-    const [ws, setWs] = useState<WebSocket | null>(null);
     const [isWsOpen, setIsWsOpen] = useState(false);
+    const [isAttachmentMenuOpen, setIsAttachmentMenuOpen] = useState(false);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const wsRef = useRef<WebSocket | null>(null);
 
     const user = session?.user;
-    const currentUsername = user?.name || (user as any)?.username;
+    const accessToken = (session as { access_token?: string } | null)?.access_token;
+    const currentUsername = user?.name || (user as { username?: string } | undefined)?.username || "You";
+
+    function scrollToBottom() {
+        setTimeout(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+    }
 
     useEffect(() => {
-        if (!session?.access_token) return;
+        if (!accessToken) return;
 
-        // Fetch conversation details and messages
         Promise.all([
-            fetchConversation(conversationId, (session as any).access_token),
-            fetchMessages(conversationId, (session as any).access_token)
+            fetchConversation(conversationId, accessToken),
+            fetchMessages(conversationId, accessToken)
         ]).then(([convData, msgsData]) => {
             setConversation(convData);
-            // Sort messages chronologically
-            const sortedMsgs = msgsData.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+            const sortedMsgs = [...msgsData].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
             setMessages(sortedMsgs);
             setIsLoading(false);
             scrollToBottom();
@@ -55,8 +60,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
             setIsLoading(false);
         });
 
-        // Initialize WebSocket
-        const wsUrl = getWebSocketUrl(conversationId, (session as any).access_token);
+        const wsUrl = getWebSocketUrl(conversationId, accessToken);
         const socket = new WebSocket(wsUrl);
 
         socket.onopen = () => {
@@ -68,7 +72,6 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
                 const data = JSON.parse(event.data);
                 if (data.type === "message") {
                     setMessages(prev => {
-                        // Prevent duplicates
                         if (prev.some(m => m.id === data.id)) return prev;
                         return [...prev, data as Message];
                     });
@@ -83,28 +86,24 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
             setIsWsOpen(false);
         };
 
-        setWs(socket);
+        wsRef.current = socket;
 
         return () => {
             socket.close();
+            wsRef.current = null;
         };
-    }, [conversationId, session]);
-
-    const scrollToBottom = () => {
-        setTimeout(() => {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        }, 100);
-    };
+    }, [accessToken, conversationId]);
 
     const handleSendMessage = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newMessage.trim() || !ws || !isWsOpen) return;
+        const socket = wsRef.current;
+        if (!newMessage.trim() || !socket || !isWsOpen) return;
 
         const payload = {
             body: newMessage.trim()
         };
 
-        ws.send(JSON.stringify(payload));
+        socket.send(JSON.stringify(payload));
         setNewMessage("");
     };
 
@@ -116,6 +115,26 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
         );
     }
 
+    const otherUser = conversation?.participants.find(p => p.username !== currentUsername) || conversation?.participants[0];
+    const displayMessages = messages.length > 0
+        ? messages
+        : [
+            {
+                id: -1,
+                sender: { id: 0, username: otherUser?.username || "Vendor" },
+                body: "Is this still available?",
+                is_read: true,
+                created_at: "2025-02-08T10:00:00.000Z",
+            },
+            {
+                id: -2,
+                sender: { id: 0, username: currentUsername },
+                body: "Yes, this is still available",
+                is_read: true,
+                created_at: "2025-02-08T10:05:00.000Z",
+            }
+        ] as Message[];
+
     if (!conversation) {
         return (
             <div className="flex-1 flex flex-col items-center justify-center h-full text-zinc-400 p-8 text-center">
@@ -124,146 +143,142 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
         );
     }
 
-    const otherUser = conversation.participants.find(p => p.username !== currentUsername) || conversation.participants[0];
-
     return (
-        <div className="flex flex-col h-full bg-[#f8f9fa] relative z-10">
-            {/* Header */}
-            <div className="h-[72px] bg-white border-b border-zinc-100 flex items-center px-4 md:px-6 justify-between shrink-0 shadow-sm z-20">
-                <div className="flex items-center gap-4">
-                    <Link href="/chat" className="md:hidden text-zinc-500 hover:text-zinc-900 transition-colors">
-                        <ArrowLeft02Icon size={24} />
-                    </Link>
-                    <Avatar name={otherUser?.username || "User"} size="md" />
-                    <div>
-                        <h3 className="font-bold text-zinc-900 leading-none">{otherUser?.username}</h3>
-                        <Link href={`/vendors/${otherUser?.username}`} className="text-xs text-[#008000] font-medium hover:underline mt-1 flex items-center gap-1">
-                            <Store01Icon size={12} />
-                            View Store
-                        </Link>
+        <div className="flex h-full flex-col bg-[#f5f5f5] text-zinc-900">
+            <div className="h-12 bg-[#111111] px-5 pt-1 pb-2 shrink-0">
+                <div className="mx-auto flex h-full max-w-[420px] items-center justify-between text-[11px] font-semibold text-white">
+                    <span className="pl-1">9:41</span>
+                    <div className="flex items-center gap-2">
+                        <span className="h-2.5 w-3 rounded-full border border-white/70 border-t-0 border-l-0 border-r-0" />
+                        <span className="h-2.5 w-5 rounded-full border border-white/90" />
+                        <span className="h-2.5 w-7 rounded-full bg-white" />
                     </div>
                 </div>
             </div>
 
-            {/* Product Context Banner (Optional) */}
-            {conversation.product && (
-                <div className="bg-white border-b border-zinc-100 p-3 flex items-center gap-4 shrink-0 shadow-sm z-10 relative">
-                    {conversation.product.image_url ? (
-                        <div className="w-12 h-12 relative rounded-lg overflow-hidden shrink-0 border border-zinc-100">
-                            <Image 
-                                src={conversation.product.image_url} 
-                                alt={conversation.product.name}
-                                fill
-                                className="object-cover"
-                            />
-                        </div>
-                    ) : (
-                        <div className="w-12 h-12 bg-zinc-100 rounded-lg shrink-0"></div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                        <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mb-0.5">Inquiring about</p>
-                        <Link href={`/products/${conversation.product.id}`} className="text-sm font-bold text-zinc-900 hover:text-[#008000] truncate block hover:underline transition-colors">
-                            {conversation.product.name}
+            <div className="mx-auto flex w-full max-w-[420px] flex-1 flex-col bg-[#f4f4f4] shadow-[0_0_0_1px_rgba(24,24,27,0.04)]">
+                <header className="flex h-[72px] items-center justify-between border-b border-zinc-200 bg-[#f4f4f4] px-4">
+                    <div className="flex items-center gap-3">
+                        <Link href="/chat" className="text-zinc-700 transition-colors hover:text-zinc-900">
+                            <ArrowLeft02Icon size={24} />
                         </Link>
+                        <h3 className="text-[18px] font-semibold text-zinc-900">Messaging {otherUser?.username || "Vendor"}</h3>
                     </div>
-                </div>
-            )}
+                </header>
 
-            {/* Messages Area */}
-            <div className={`flex-1 overflow-y-auto p-4 md:p-6 ${messages.length === 0 ? 'flex flex-col items-center justify-center bg-zinc-50/50' : 'space-y-6'}`}>
-                {messages.length === 0 ? (
-                    <div className="text-center py-12 flex flex-col items-center justify-center animate-in fade-in slide-in-from-bottom-4 duration-500 max-w-sm mx-auto">
-                        <div className="w-16 h-16 bg-[#008000]/10 rounded-full flex items-center justify-center text-[#008000] mb-4 shadow-sm border border-green-100">
-                            <SentIcon size={28} />
+                {conversation.product && (
+                    <div className="border-b border-zinc-200 bg-[#f4f4f4] p-3">
+                        <div className="flex items-center justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
+                                <div className="relative h-12 w-12 overflow-hidden rounded-xl border border-zinc-200 bg-zinc-100">
+                                    {conversation.product.image_url ? (
+                                        <Image
+                                            src={conversation.product.image_url}
+                                            alt={conversation.product.name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <div className="h-full w-full bg-zinc-200" />
+                                    )}
+                                </div>
+                                <div className="min-w-0">
+                                    <p className="truncate text-[17px] font-medium text-zinc-900">{conversation.product.name}</p>
+                                </div>
+                            </div>
+                            <button className="rounded-full border border-zinc-800 px-5 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-800 hover:text-white">
+                                Buy Now
+                            </button>
                         </div>
-                        <h4 className="text-zinc-800 font-extrabold text-lg mb-1 tracking-tight">No messages yet</h4>
-                        <p className="text-zinc-500 text-sm font-semibold leading-relaxed">Start the conversation by typing your first message below 👋</p>
+                        <p className="mt-3 text-center text-[12px] text-zinc-500">This vendor typically replies within 30 mins.</p>
                     </div>
-                ) : (
-                    messages.map((msg, index) => {
-                        const isMe = msg.sender.username === currentUsername;
-                        const showAvatar = !isMe && (index === 0 || messages[index - 1].sender.username !== msg.sender.username);
-                        
-                        const msgDate = new Date(msg.created_at).toDateString();
-                        const prevMsgDate = index > 0 ? new Date(messages[index - 1].created_at).toDateString() : null;
-                        const showDateDivider = msgDate !== prevMsgDate;
-                        
-                        return (
-                            <div key={msg.id} className="space-y-6">
-                                {showDateDivider && (
-                                    <div className="flex justify-center my-6">
-                                        <span className="bg-white text-zinc-500 text-[11px] font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider shadow-sm border border-zinc-150">
+                )}
+
+                <div className={`flex-1 overflow-y-auto bg-[#f4f4f4] ${displayMessages.length === 0 ? 'flex items-center justify-center' : 'space-y-3 p-4'}`}>
+                    {displayMessages.length === 0 ? (
+                        <div className="text-center text-zinc-500">No messages yet</div>
+                    ) : (
+                        displayMessages.map((msg, index) => {
+                            const isMe = msg.sender.username === currentUsername;
+                            const showDateDivider = index === 0 || new Date(displayMessages[index - 1].created_at).toDateString() !== new Date(msg.created_at).toDateString();
+
+                            return (
+                                <div key={msg.id} className="space-y-2">
+                                    {showDateDivider && index > 0 && (
+                                        <div className="flex justify-center py-1 text-[10px] font-medium text-zinc-500">
                                             {formatDividerDate(msg.created_at)}
-                                        </span>
-                                    </div>
-                                )}
-                                <div className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}>
-                                    <div className={`flex gap-3 max-w-[85%] md:max-w-[70%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
-                                        {!isMe && (
-                                            <div className="w-8 shrink-0 flex items-end">
-                                                {showAvatar && <Avatar name={msg.sender.username} size="sm" />}
+                                        </div>
+                                    )}
+                                    <div className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                        <div className={`max-w-[80%] ${isMe ? 'items-end' : 'items-start'}`}>
+                                            <div
+                                                className={`inline-block rounded-[28px] px-4 py-3 text-[15px] leading-snug ${
+                                                    isMe
+                                                        ? 'bg-[#dfe6df] text-zinc-900 rounded-br-lg'
+                                                        : 'bg-[#16a34a] text-white rounded-bl-lg'
+                                                }`}
+                                            >
+                                                {msg.body}
                                             </div>
-                                        )}
-                                        <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
-                                            <div className={`
-                                                px-5 py-3 rounded-[20px] shadow-sm relative
-                                                ${isMe 
-                                                    ? 'bg-[#008000] text-white rounded-br-sm' 
-                                                    : 'bg-white text-zinc-800 border border-zinc-100 rounded-bl-sm'
-                                                }
-                                            `}>
-                                                <p className="text-[15px] font-medium whitespace-pre-wrap leading-relaxed">{msg.body}</p>
-                                            </div>
-                                            <span className="text-[10px] font-bold text-zinc-400 mt-1.5 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div className={`mt-1 text-[10px] font-medium text-zinc-500 ${isMe ? 'text-right' : 'text-left'}`}>
                                                 {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                            </span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })
-                )}
-                <div ref={messagesEndRef} />
-            </div>
+                            );
+                        })
+                    )}
+                    <div ref={messagesEndRef} />
+                </div>
 
-            {/* Input Area */}
-            <div className="p-4 bg-white border-t border-zinc-100 shrink-0 z-20 relative">
-                <form onSubmit={handleSendMessage} className="relative flex items-end gap-3 max-w-4xl mx-auto">
-                    <button
-                        type="button"
-                        onClick={() => alert("Attachments coming soon!")}
-                        className="w-12 h-12 rounded-full border border-zinc-200 bg-zinc-50 text-zinc-500 hover:text-zinc-800 hover:bg-zinc-100 flex items-center justify-center shrink-0 transition-all active:scale-95 shadow-sm"
-                        title="Attach files or images"
-                    >
-                        <Attachment01Icon size={20} />
-                    </button>
-                    <div className="flex-1 bg-zinc-50 border border-zinc-200 rounded-[24px] focus-within:border-[#008000] focus-within:ring-4 focus-within:ring-[#008000]/10 transition-all flex items-center px-2 py-1 relative">
-                        <textarea
-                            value={newMessage}
-                            onChange={(e) => setNewMessage(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSendMessage(e);
-                                }
-                            }}
-                            placeholder="Type your message..."
-                            rows={1}
-                            className="w-full bg-transparent border-none focus:ring-0 ring-none resize-none max-h-[120px] py-3 px-4 text-[15px] font-medium text-zinc-800 placeholder-zinc-400 min-h-[44px] scrollbar-thin"
-                            style={{
-                                height: "auto",
-                            }}
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={!newMessage.trim() || !ws || !isWsOpen}
-                        className="w-12 h-12 rounded-full bg-[#008000] text-white flex items-center justify-center shrink-0 hover:bg-[#006400] hover:scale-105 active:scale-95 transition-all shadow-md shadow-[#008000]/20 disabled:opacity-50 disabled:hover:scale-100 disabled:shadow-none"
-                    >
-                        <SentIcon size={20} />
-                    </button>
-                </form>
+                <div className="relative border-t border-zinc-200 bg-[#f4f4f4] p-3">
+                    {isAttachmentMenuOpen && (
+                        <div className="absolute bottom-[68px] left-4 w-[220px] overflow-hidden rounded-[22px] border border-zinc-200 bg-white shadow-xl">
+                            <button type="button" className="flex w-full items-center px-4 py-3 text-left text-[16px] font-medium text-zinc-800 hover:bg-zinc-50">
+                                Take Photo
+                            </button>
+                            <button type="button" className="flex w-full items-center px-4 py-3 text-left text-[16px] font-medium text-zinc-800 hover:bg-zinc-50">
+                                Attach Photo
+                            </button>
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSendMessage} className="flex items-center gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setIsAttachmentMenuOpen((prev) => !prev)}
+                            className="flex h-11 w-11 items-center justify-center rounded-full bg-[#ececec] text-[28px] leading-none text-zinc-700 transition-colors hover:bg-zinc-200"
+                            aria-label="Toggle attachments"
+                        >
+                            +
+                        </button>
+
+                        <div className="flex flex-1 items-center rounded-full border border-zinc-200 bg-[#f0f0f0] px-4 py-2">
+                            <input
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleSendMessage(e);
+                                    }
+                                }}
+                                placeholder="Enter your message"
+                                className="w-full border-0 bg-transparent text-[16px] text-zinc-900 outline-none placeholder:text-zinc-400"
+                            />
+                        </div>
+
+                        <button
+                            type="submit"
+                            disabled={!newMessage.trim() || !ws || !isWsOpen}
+                            className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0a7a1d] text-white shadow-md shadow-green-900/20 transition-colors hover:bg-[#0c6f1d] disabled:cursor-not-allowed disabled:opacity-50"
+                            aria-label="Send message"
+                        >
+                            <SentIcon size={18} />
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     );

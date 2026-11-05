@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { FavouriteIcon, StarIcon, ThumbsUpIcon, ThumbsDownIcon, Message01Icon, Search02Icon, GridIcon, ArrowRight01Icon, Location01Icon, ArrowDown01Icon, UserCircleIcon, CheckmarkBadge01Icon } from "hugeicons-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -41,57 +41,53 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product, onSelect }: ProductCardProps) => {
-  const { columns } = useGrid();
-
-  // Safeguard checking for seller verification boolean
-  const isSellerVerified = product.seller?.is_verified || false;
+  const sellerName = product.seller?.username || "Seller";
+  const sellerBadgeText = sellerName.charAt(0).toUpperCase() || "S";
 
   return (
     <div
       onClick={() => onSelect(product)}
-      className="group relative w-full bg-white rounded-xl overflow-hidden border border-transparent hover:border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full cursor-pointer"
+      className="group w-full cursor-pointer"
     >
-      <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
-        <Image
-          src={product.image_url || "/assets/images/sale-fast.png"}
-          alt={product.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.src = "/assets/images/placeholder.png";
-          }}
-        />
-      </div>
+      <div className="overflow-hidden rounded-[18px] border border-zinc-200 bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)] transition-colors hover:border-zinc-300">
+        <div className="relative aspect-[16/10] overflow-hidden bg-[#f3f4f6]">
+          <Image
+            src={product.image_url || "/assets/images/sale-fast.png"}
+            alt={product.name}
+            fill
+            className="object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/assets/images/placeholder.png";
+            }}
+          />
+        </div>
 
-      <div className="flex-1 p-3 flex flex-col gap-2">
-        <h3 className="text-[15px] font-normal text-gray-900 line-clamp-2 leading-snug hover:underline">
-          {product.name}
-        </h3>
-        <div className="mt-auto pt-2 flex flex-col">
-          <div className="text-lg font-bold text-gray-900">
+        <div className="space-y-2 p-3.5">
+          <h3 className="text-[15px] font-medium leading-snug text-zinc-950 line-clamp-2">
+            {product.name}
+          </h3>
+
+          <div className="text-[15px] font-bold text-zinc-950">
             ₦{parseFloat(product.price || "0").toLocaleString()}
           </div>
-        </div>
-        <div className="flex items-center justify-between mt-1">
-          <Link
-            href={`/vendors/${product.seller?.username}`}
-            onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1 px-2.5 py-1 bg-zinc-50 border border-zinc-100 rounded-full hover:bg-[#008000]/5 hover:border-[#008000]/20 transition-all group/seller"
-          >
-            <UserCircleIcon size={14} className="text-zinc-400 group-hover/seller:text-[#008000] transition-colors" />
-            <span className="text-[11px] font-bold text-zinc-600 group-hover/seller:text-[#008000] transition-colors truncate max-w-[90px]">
-              {product.seller?.username || 'Seller'}
+
+          <p className="text-[12px] text-zinc-600">
+            {product.category?.name || "Brand New (Sealed)"}
+          </p>
+
+          <p className="line-clamp-1 text-[12px] text-zinc-500">
+            {product.description || "14.2-inch Liquid Retina..."}
+          </p>
+
+          <div className="flex items-center gap-2 pt-1">
+            <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-gradient-to-br from-green-100 to-emerald-200 text-[10px] font-bold text-[#008000]">
+              {sellerBadgeText}
+            </div>
+            <span className="text-[12px] font-medium text-zinc-700 truncate">
+              {sellerName}
             </span>
-            
-            {/* Render Verification Badge if Seller is Verified */}
-            {isSellerVerified && (
-              <CheckmarkBadge01Icon 
-                className="w-3.5 h-3.5 text-green-800 shrink-0 ml-0.5 animate-in fade-in zoom-in duration-200" 
-              
-              />
-            )}
-          </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -435,40 +431,43 @@ export default function Products({
           ))}
         </div>
 
-        {/* Location Filters */}
-        <div className="flex flex-wrap items-center gap-3 mt-2">
-          <CustomDropdown 
-            placeholder="All States"
-            value={selectedStateId}
-            options={locationStates}
-            onSelect={handleStateChange}
-            isOpen={isStateOpen}
-            setIsOpen={setIsStateOpen}
-          />
+        {!session && <div className="h-2" />}
 
-          <CustomDropdown 
-            placeholder="All LGAs"
-            value={selectedLgaId}
-            options={locationLgas}
-            onSelect={setSelectedLgaId}
-            isOpen={isLgaOpen}
-            setIsOpen={setIsLgaOpen}
-            disabled={!selectedStateId}
-          />
+        {session && (
+          <div className="flex flex-wrap items-center gap-3 mt-2">
+            <CustomDropdown 
+              placeholder="All States"
+              value={selectedStateId}
+              options={locationStates}
+              onSelect={handleStateChange}
+              isOpen={isStateOpen}
+              setIsOpen={setIsStateOpen}
+            />
 
-          {(selectedStateId || selectedLgaId) && (
-            <button
-              onClick={() => {
-                setSelectedStateId("");
-                setSelectedLgaId("");
-                setLocationLgas([]);
-              }}
-              className="px-4 py-2 text-[12px] font-bold text-red-500 hover:bg-red-50 rounded-full transition-colors flex items-center gap-1"
-            >
-              <span>✕</span> Clear Filters
-            </button>
-          )}
-        </div>
+            <CustomDropdown 
+              placeholder="All LGAs"
+              value={selectedLgaId}
+              options={locationLgas}
+              onSelect={setSelectedLgaId}
+              isOpen={isLgaOpen}
+              setIsOpen={setIsLgaOpen}
+              disabled={!selectedStateId}
+            />
+
+            {(selectedStateId || selectedLgaId) && (
+              <button
+                onClick={() => {
+                  setSelectedStateId("");
+                  setSelectedLgaId("");
+                  setLocationLgas([]);
+                }}
+                className="px-4 py-2 text-[12px] font-bold text-red-500 hover:bg-red-50 rounded-full transition-colors flex items-center gap-1"
+              >
+                <span>✕</span> Clear Filters
+              </button>
+            )}
+          </div>
+        )}
 
         <div className="w-full mt-5">
           {pageError && (
