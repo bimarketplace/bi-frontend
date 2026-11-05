@@ -116,6 +116,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
     }
 
     const otherUser = conversation?.participants.find(p => p.username !== currentUsername) || conversation?.participants[0];
+    const isSendDisabled = !newMessage.trim() || !isWsOpen || !wsRef.current;
     const displayMessages = messages.length > 0
         ? messages
         : [
@@ -271,7 +272,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
 
                         <button
                             type="submit"
-                            disabled={!newMessage.trim() || !ws || !isWsOpen}
+                            disabled={isSendDisabled}
                             className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0a7a1d] text-white shadow-md shadow-green-900/20 transition-colors hover:bg-[#0c6f1d] disabled:cursor-not-allowed disabled:opacity-50"
                             aria-label="Send message"
                         >
