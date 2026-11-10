@@ -42,49 +42,37 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, onSelect }: ProductCardProps) => {
   const sellerName = product.seller?.username || "Seller";
-  const sellerBadgeText = sellerName.charAt(0).toUpperCase() || "S";
 
   return (
     <div
       onClick={() => onSelect(product)}
-      className="group w-full cursor-pointer"
+      className="group relative w-full bg-white rounded-xl overflow-hidden border border-transparent hover:border-gray-200 hover:shadow-xl transition-all duration-300 flex flex-col h-full cursor-pointer"
     >
-      <div className="overflow-hidden rounded-[18px] border border-zinc-200 bg-white shadow-[0_1px_0_rgba(0,0,0,0.02)] transition-colors hover:border-zinc-300">
-        <div className="relative aspect-[16/10] overflow-hidden bg-[#f3f4f6]">
-          <Image
-            src={product.image_url || "/assets/images/sale-fast.png"}
-            alt={product.name}
-            fill
-            className="object-cover"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "/assets/images/placeholder.png";
-            }}
-          />
-        </div>
+      <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
+        <Image
+          src={product.image_url || "/assets/images/placeholder.png"}
+          alt={product.name}
+          fill
+          className="object-cover"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "/assets/images/placeholder.png";
+          }}
+        />
+      </div>
 
-        <div className="space-y-2 p-3.5">
-          <h3 className="text-[15px] font-medium leading-snug text-zinc-950 line-clamp-2">
-            {product.name}
-          </h3>
-
-          <div className="text-[15px] font-bold text-zinc-950">
+      <div className="flex-1 p-3 flex flex-col gap-2">
+        <h3 className="text-[15px] font-normal text-gray-900 line-clamp-2 leading-snug hover:underline">
+          {product.name}
+        </h3>
+        <div className="mt-auto pt-2 flex flex-col">
+          <div className="text-lg font-bold text-gray-900">
             ₦{parseFloat(product.price || "0").toLocaleString()}
           </div>
-
-          <p className="text-[12px] text-zinc-600">
-            {product.category?.name || "Brand New (Sealed)"}
-          </p>
-
-          <p className="line-clamp-1 text-[12px] text-zinc-500">
-            {product.description || "14.2-inch Liquid Retina..."}
-          </p>
-
-          <div className="flex items-center gap-2 pt-1">
-            <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border border-zinc-200 bg-gradient-to-br from-green-100 to-emerald-200 text-[10px] font-bold text-[#008000]">
-              {sellerBadgeText}
-            </div>
-            <span className="text-[12px] font-medium text-zinc-700 truncate">
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-gray-900 truncate max-w-[120px]">
               {sellerName}
             </span>
           </div>
