@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { fetchProductsPage, deleteProduct, Product } from "@/lib/products";
 import Link from "next/link";
@@ -18,7 +18,8 @@ import {
   ArrowLeft02Icon,
   ArrowRight02Icon,
   IdVerifiedIcon,
-  CheckmarkBadge01Icon
+  CheckmarkBadge01Icon,
+  Logout01Icon
 } from "hugeicons-react";
 import { toast } from "react-hot-toast";
 import { fetchUserProfile } from "@/lib/auth";
@@ -208,13 +209,20 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
                 <button
                     onClick={() => setIsModalOpen(true)}
                     className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-gray-200 px-5 py-2.5 rounded-xl text-gray-700 text-[14px] font-bold hover:bg-gray-50 transition-all cursor-pointer"
                 >
                     <Settings01Icon size={18} />
                     Settings
+                </button>
+                <button
+                    onClick={() => signOut({ callbackUrl: "/auth/login" })}
+                    className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white border border-red-200 px-5 py-2.5 rounded-xl text-red-600 text-[14px] font-bold hover:bg-red-50 transition-all cursor-pointer"
+                >
+                    <Logout01Icon size={18} />
+                    Sign Out
                 </button>
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
