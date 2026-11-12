@@ -108,7 +108,7 @@ function LoginContent() {
                     </div>
                 </div>
 
-                <p className="mt-auto pt-8 text-center text-[9px] leading-[12px] text-[#aaa]">
+                <p className="mt-auto pt-8 text-center text-sm leading-5 text-[#aaa]">
                     Don&apos;t have a personal account?{' '}
                     <Link href="/auth/signup" className="font-semibold text-[#008000] no-underline">
                         Sign Up

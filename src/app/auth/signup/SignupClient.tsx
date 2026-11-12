@@ -157,7 +157,7 @@ export default function SignupPage() {
                         ariaLabel="Password"
                     />
 
-                    <p className="mt-[4px] px-1 text-[8px] leading-[11px] text-[#aaa]">
+                    <p className="mt-[4px] px-1 text-sm leading-5 text-[#aaa]">
                         By continuing, you agree to our{' '}
                         <Link href="/terms" className="text-[#008000] underline">Terms</Link>
                         {' '}&amp;{' '}
@@ -176,7 +176,7 @@ export default function SignupPage() {
                     </div>
                 </div>
 
-                <p className="mt-auto pt-8 text-center text-[9px] leading-[12px] text-[#aaa]">
+                <p className="mt-auto pt-8 text-center text-sm leading-5 text-[#aaa]">
                     Already have a personal account?{' '}
                     <Link href="/auth/login" className="font-semibold text-[#008000] no-underline">
                         Log In
