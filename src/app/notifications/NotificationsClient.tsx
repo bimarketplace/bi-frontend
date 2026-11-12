@@ -26,8 +26,8 @@ export default function NotificationsPage() {
                 </div>
                 <h1 className="text-xl font-bold text-zinc-900 mb-2">Please sign in</h1>
                 <p className="text-zinc-500 mb-6 font-medium">To view your activity and notifications, you need to be logged in.</p>
-                <Link 
-                    href="/auth/login" 
+                <Link
+                    href="/auth/account-type"
                     className="px-8 py-3 bg-[#008000] text-white rounded-xl font-bold shadow-lg shadow-[#008000]/20 hover:scale-[1.02] transition-transform"
                 >
                     Sign In

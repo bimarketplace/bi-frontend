@@ -2,37 +2,48 @@
 
 import AuthLayout from '@/components/auth/AuthLayout';
 import Link from 'next/link';
-import { Mail01Icon, ArrowLeft01Icon } from 'hugeicons-react';
+import { getAuthErrorMessage, requestPasswordReset } from '@/lib/auth';
 import { useState } from 'react';
+import { toast } from 'react-hot-toast';
 
 export default function ForgotPasswordPage() {
+    const [email, setEmail] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleSubmit = async (event: React.FormEvent) => {
+        event.preventDefault();
+        setIsLoading(true);
+        setErrorMessage('');
+
+        try {
+            await requestPasswordReset(email);
+            setIsSubmitted(true);
+        } catch (error: unknown) {
+            const message = getAuthErrorMessage(error, 'Could not send a reset link. Please try again.');
+            setErrorMessage(message);
+            toast.error(message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     if (isSubmitted) {
         return (
-            <AuthLayout
-                title="Check your email"
-                subtitle="We've sent a password reset link to your email address"
-            >
-                <div className="text-center space-y-6">
-                    <div className="mx-auto w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center text-primary-950 mb-4">
-                        <Mail01Icon size={32} />
-                    </div>
-                    <p className="text-sm text-gray-600">
-                        If you don't receive the email within a few minutes, please check your spam folder.
+            <AuthLayout title="A password reset link has been sent to your email.">
+                <div className="flex flex-1 flex-col items-center pt-[4px]">
+                    <a href={`mailto:${email}`} className="auth-primary-button no-underline">
+                        Open Email App
+                    </a>
+                    <p className="mt-[14px] text-center text-[9px] leading-[14px] text-[#aaa]">
+                        Check your inbox and spam folder for the reset link.
                     </p>
-                    <button
-                        onClick={() => setIsSubmitted(false)}
-                        className="w-full border border-gray-200 text-primary-950 rounded-[12px] py-3 text-sm font-semibold hover:bg-gray-50 transition-colors"
-                    >
-                        Try again
-                    </button>
                     <Link
                         href="/auth/login"
-                        className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-primary-950 transition-colors"
+                        className="mt-auto pb-[2px] text-[9px] leading-[12px] text-[#aaa] no-underline"
                     >
-                        <ArrowLeft01Icon size={18} />
-                        Back to login
+                        Back to Login
                     </Link>
                 </div>
             </AuthLayout>
@@ -40,41 +51,40 @@ export default function ForgotPasswordPage() {
     }
 
     return (
-        <AuthLayout
-            title="Forgot password?"
-            subtitle="No worries, we'll send you reset instructions"
-        >
-            <div className="space-y-6">
-                <form className="space-y-4" onSubmit={(e) => { e.preventDefault(); setIsSubmitted(true); }}>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                <Mail01Icon size={18} />
-                            </div>
-                            <input
-                                type="email"
-                                required
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
-                                placeholder="name@example.com"
-                            />
+        <AuthLayout title="Forgot Password?">
+            <div className="flex flex-1 flex-col pt-[12px]">
+                <form onSubmit={handleSubmit}>
+                    {errorMessage && (
+                        <div
+                            role="alert"
+                            className="mb-3 rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[10px] leading-[14px] text-red-600"
+                        >
+                            {errorMessage}
                         </div>
-                    </div>
-
+                    )}
+                    <input
+                        type="email"
+                        required
+                        autoComplete="email"
+                        aria-label="Email address"
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
+                        className="auth-input"
+                        placeholder="Enter Email Address"
+                    />
                     <button
                         type="submit"
-                        className="w-full bg-[#008000] text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10 mt-2"
+                        disabled={isLoading}
+                        className="auth-primary-button mt-[24px]"
                     >
-                        Reset password
+                        {isLoading ? 'Sending...' : 'Send Reset Link'}
                     </button>
                 </form>
-
                 <Link
                     href="/auth/login"
-                    className="flex items-center justify-center gap-2 text-sm font-semibold text-gray-500 hover:text-primary-950 transition-colors"
+                    className="mt-auto self-center pb-[2px] text-[9px] leading-[12px] text-[#aaa] no-underline"
                 >
-                    <ArrowLeft01Icon size={18} />
-                    Back to login
+                    Back to Login
                 </Link>
             </div>
         </AuthLayout>

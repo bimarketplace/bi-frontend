@@ -151,7 +151,7 @@ export default function ProfilePage() {
         <div className="text-center">
           <h1 className="text-4xl font-black tracking-tighter mb-4 italic">BIMARKETPLACE</h1>
           <p className="text-zinc-500 mb-8">Please sign in to view your profile</p>
-          <Link href="/auth/login" className="bg-[#008000] text-white px-8 py-3 rounded-[12px] font-bold">
+          <Link href="/auth/account-type" className="bg-[#008000] text-white px-8 py-3 rounded-[12px] font-bold">
             Sign In
           </Link>
         </div>

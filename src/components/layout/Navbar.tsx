@@ -109,9 +109,11 @@ export default function Navbar() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
-    const isAuthPage = pathname.startsWith('/auth/');
+    const isAuthPage = pathname.startsWith('/auth/') || pathname === '/reset-password';
     const isChatRoom = pathname.startsWith('/chat/') && pathname !== '/chat';
     const showMobileBottomNav = !isAuthPage && !isChatRoom;
+
+    if (isAuthPage) return null;
 
     const handleSearch = (value: string) => {
         setSearchQuery(value);
@@ -298,7 +300,7 @@ export default function Navbar() {
 
                         {!isLoggedIn ? (
                             <>
-                                <Link href="/auth/login" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-primary-950 font-bold hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all">
+                                <Link href="/auth/account-type" onClick={closeOffcanvas} className="flex items-center gap-3 py-3 px-4 text-primary-950 font-bold hover:bg-primary-50 hover:text-primary-700 rounded-xl transition-all">
                                     <Login01Icon size={20} />
                                     Sign In
                                 </Link>

@@ -1,38 +1,36 @@
 import React from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
 
 interface AuthLayoutProps {
     children: React.ReactNode;
     title: string;
-    subtitle: string;
+    subtitle?: string;
+    titleAlignment?: 'left' | 'center';
 }
 
-export default function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
+export default function AuthLayout({
+    children,
+    title,
+    subtitle,
+    titleAlignment = 'center',
+}: AuthLayoutProps) {
     return (
-        <div className="min-h-screen bg-zinc-50 flex flex-col justify-center items-center p-4 pt-[130px] md:pt-[90px]">
-            <div className="w-full max-w-md">
-                <div className="text-center mb-10">
-                    {/* <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
-                        <Image 
-                            src="/assets/images/bi.png" 
-                            alt="BIMARKETPLACE" 
-                            width={150} 
-                            height={40} 
-                            className="h-10 w-auto object-contain mx-auto"
-                        />
-                    </Link> */}
-                    <h2 className="text-2xl font-semibold text-gray-900 mt-6">{title}</h2>
-                    <p className="text-gray-500 mt-2">{subtitle}</p>
-                </div>
-
-                <div className="bg-white rounded-[20px] p-8 shadow-sm border border-gray-200/50">
+        <div
+            className="fixed inset-0 z-[100] overflow-y-auto bg-white text-[#171717]"
+            style={{
+                paddingTop: 'max(calc(env(safe-area-inset-top) + 10px), 62px)',
+                paddingBottom: 'max(env(safe-area-inset-bottom), 12px)',
+            }}
+        >
+            <div className="mx-auto flex min-h-full w-full max-w-[480px] flex-col px-[20px]">
+                <header className={titleAlignment === 'left' ? 'pl-[9px] text-left' : 'text-center'}>
+                    <h1 className="text-[18px] font-medium leading-[23px] text-[#111]">{title}</h1>
+                    {subtitle && (
+                        <p className="mt-2 text-[10px] leading-[14px] text-[#999]">{subtitle}</p>
+                    )}
+                </header>
+                <div className="mt-[24px] flex min-h-0 flex-1 flex-col">
                     {children}
                 </div>
-
-                <p className="text-center mt-8 text-sm text-gray-500">
-                    &copy; {new Date().getFullYear()} BI Marketplace. All rights reserved.
-                </p>
             </div>
         </div>
     );

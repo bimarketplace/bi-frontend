@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { verifyEmail } from '@/lib/auth';
+import { getAuthErrorMessage, verifyEmail } from '@/lib/auth';
 import AuthLayout from '@/components/auth/AuthLayout';
 import { CheckmarkCircle01Icon, AlertCircleIcon, Loading03Icon } from 'hugeicons-react';
 import Link from 'next/link';
@@ -31,9 +31,9 @@ function VerifyEmailContent() {
                 setTimeout(() => {
                     router.push('/auth/login?verified=true');
                 }, 3000);
-            } catch (error: any) {
+            } catch (error: unknown) {
                 setStatus('error');
-                const msg = error.response?.data?.detail || 'Verification failed. The key may be expired or invalid.';
+                const msg = getAuthErrorMessage(error, 'Verification failed. The key may be expired or invalid.');
                 setErrorMessage(msg);
                 toast.error(msg);
             }
@@ -66,7 +66,7 @@ function VerifyEmailContent() {
                     </p>
                     <Link
                         href="/auth/login"
-                        className="w-full bg-[#008000] text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10"
+                        className="auth-primary-button no-underline"
                     >
                         Sign in now
                     </Link>
@@ -85,7 +85,7 @@ function VerifyEmailContent() {
                     <div className="flex flex-col gap-3 w-full">
                         <Link
                             href="/auth/signup"
-                            className="w-full bg-[#008000] text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors"
+                            className="auth-primary-button no-underline"
                         >
                             Back to Register
                         </Link>

@@ -1,84 +1,112 @@
 "use client";
 
+import AuthDivider from '@/components/auth/AuthDivider';
 import AuthLayout from '@/components/auth/AuthLayout';
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
+import PasswordInput from '@/components/auth/PasswordInput';
 import Link from 'next/link';
-import { register } from '@/lib/auth';
-import { useRouter } from 'next/navigation';
-import { Mail01Icon, LockPasswordIcon, UserIcon, CheckmarkCircle01Icon, AlertCircleIcon, ViewIcon, ViewOffIcon } from 'hugeicons-react';
-import { useState } from 'react';
+import { getAuthErrorMessage, register, resendEmail } from '@/lib/auth';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 
 export default function SignupPage() {
-    const router = useRouter();
     const [formData, setFormData] = useState({
         username: '',
         email: '',
         password1: '',
-        password2: ''
+        password2: '',
     });
-    const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [isResending, setIsResending] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
+    const [resendSeconds, setResendSeconds] = useState(45);
+
+    useEffect(() => {
+        if (status !== 'success' || resendSeconds === 0) return;
+
+        const timer = window.setTimeout(() => {
+            setResendSeconds((seconds) => Math.max(seconds - 1, 0));
+        }, 1000);
+
+        return () => window.clearTimeout(timer);
+    }, [resendSeconds, status]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         setStatus('idle');
-        console.log('[SIGNUP] Form submitted, calling register...');
+        setErrorMessage('');
 
         try {
             await register({
                 username: formData.username,
                 email: formData.email,
                 password1: formData.password1,
-                password2: formData.password1
+                password2: formData.password2,
             });
             setStatus('success');
-            toast.success('Account created successfully! Check your email.', {
-                duration: 5000,
-            });
-            setTimeout(() => {
-                router.push('/auth/login');
-            }, 3000);
-        } catch (error: any) {
+            setResendSeconds(45);
+        } catch (error: unknown) {
             setStatus('error');
-            const errorData = error.response?.data;
-            let msg = 'Registration failed. Please try again.';
-            
-            if (errorData) {
-                if (typeof errorData === 'string') {
-                    msg = errorData;
-                } else if (errorData.detail) {
-                    msg = errorData.detail;
-                } else {
-                    msg = Object.entries(errorData)
-                        .map(([field, errors]) => `${field}: ${Array.isArray(errors) ? errors.join(' ') : errors}`)
-                        .join(' | ');
-                }
-            }
-            
-            setErrorMessage(msg);
-            toast.error(msg);
+            const message = getAuthErrorMessage(error, 'Registration failed. Please try again.');
+            setErrorMessage(message);
+            toast.error(message);
         } finally {
             setIsLoading(false);
         }
     };
 
+    const handleResend = async () => {
+        setIsResending(true);
+        setErrorMessage('');
+
+        try {
+            await resendEmail(formData.email);
+            setResendSeconds(45);
+        } catch (error: unknown) {
+            const message = getAuthErrorMessage(error, 'Could not resend the verification email.');
+            setErrorMessage(message);
+            toast.error(message);
+        } finally {
+            setIsResending(false);
+        }
+    };
+
     if (status === 'success') {
         return (
-            <AuthLayout title="Account created!" subtitle="We've sent a verification link to your email.">
-                <div className="flex flex-col items-center py-6 text-center">
-                    <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-4">
-                        <CheckmarkCircle01Icon className="text-green-500" size={32} />
+            <AuthLayout title="A verification link has been sent to your email.">
+                <div className="flex flex-1 flex-col items-center pt-[4px]">
+                    <a
+                        href={`mailto:${formData.email}`}
+                        className="auth-primary-button no-underline"
+                    >
+                        Open Email App
+                    </a>
+                    {errorMessage && (
+                        <p role="alert" className="mt-[10px] text-center text-[9px] leading-[14px] text-red-500">
+                            {errorMessage}
+                        </p>
+                    )}
+                    <div className="mt-[14px] min-h-[14px] text-center text-[9px] leading-[14px] text-[#aaa]">
+                        {resendSeconds > 0 ? (
+                            `Didn't receive the link? Resend in 0:${String(resendSeconds).padStart(2, '0')}`
+                        ) : (
+                            <button
+                                type="button"
+                                disabled={isResending}
+                                onClick={handleResend}
+                                className="text-[#aaa] underline disabled:opacity-60"
+                            >
+                                {isResending ? 'Resending...' : "Didn't receive the link? Resend"}
+                            </button>
+                        )}
                     </div>
-                    <p className="text-gray-600 mb-6">
-                        Registration successful! Please check your inbox and verify your email to get started.
-                        Redirecting to login...
-                    </p>
-                    <Link href="/auth/login" className="text-sm font-semibold text-primary-950 underline">
-                        Go to login now
+                    <Link
+                        href="/auth/signup"
+                        className="mt-auto pb-[2px] text-[9px] leading-[12px] text-[#aaa] no-underline"
+                    >
+                        Back to Sign Up
                     </Link>
                 </div>
             </AuthLayout>
@@ -86,113 +114,72 @@ export default function SignupPage() {
     }
 
     return (
-        <AuthLayout
-            title="Create an account"
-            subtitle="Join BI Marketplace to start trading"
-        >
-            <div className="space-y-6">
-                <GoogleLoginButton />
+        <AuthLayout title="Welcome to BI Marketplace.">
+            <div className="flex flex-1 flex-col pt-[3px]">
+                <form className="flex flex-col gap-[16px]" onSubmit={handleSubmit}>
+                    {status === 'error' && (
+                        <div
+                            role="alert"
+                            className="rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[10px] leading-[14px] text-red-600"
+                        >
+                            {errorMessage}
+                        </div>
+                    )}
+                    <input
+                        type="text"
+                        required
+                        autoComplete="username"
+                        aria-label="Username"
+                        value={formData.username}
+                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                        className="auth-input"
+                        placeholder="Enter Username"
+                    />
+                    <input
+                        type="email"
+                        required
+                        autoComplete="email"
+                        aria-label="Email address"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        className="auth-input"
+                        placeholder="Enter Email Address"
+                    />
+                    <PasswordInput
+                        value={formData.password1}
+                        onChange={(password1) => setFormData({
+                            ...formData,
+                            password1,
+                            password2: password1,
+                        })}
+                        placeholder="Enter Password"
+                        autoComplete="new-password"
+                        ariaLabel="Password"
+                    />
 
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <span className="w-full border-t border-gray-200"></span>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-white text-gray-500">or sign up with email</span>
+                    <p className="mt-[4px] px-1 text-[8px] leading-[11px] text-[#aaa]">
+                        By continuing, you agree to our{' '}
+                        <Link href="/terms" className="text-[#008000] underline">Terms</Link>
+                        {' '}&amp;{' '}
+                        <Link href="/privacy" className="text-[#008000] underline">Privacy Policy</Link>.
+                    </p>
+
+                    <button type="submit" disabled={isLoading} className="auth-primary-button -mt-[8px]">
+                        {isLoading ? 'Signing Up...' : 'Sign Up'}
+                    </button>
+                </form>
+
+                <div className="mt-[26px]">
+                    <AuthDivider />
+                    <div className="mt-[25px]">
+                        <GoogleLoginButton />
                     </div>
                 </div>
 
-                {status === 'error' && (
-                    <div className="bg-red-50 border border-red-100 text-red-600 text-sm p-4 rounded-[12px] flex items-start gap-3">
-                        <AlertCircleIcon size={18} className="mt-0.5 shrink-0" />
-                        <p>{errorMessage}</p>
-                    </div>
-                )}
-
-                <form className="space-y-4" onSubmit={handleSubmit}>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                <UserIcon size={18} />
-                            </div>
-                            <input
-                                type="text"
-                                required
-                                value={formData.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
-                                placeholder="johndoe"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                <Mail01Icon size={18} />
-                            </div>
-                            <input
-                                type="email"
-                                required
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
-                                placeholder="name@example.com"
-                            />
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
-                                <LockPasswordIcon size={18} />
-                            </div>
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                required
-                                value={formData.password1}
-                                onChange={(e) => setFormData({ ...formData, password1: e.target.value, password2: e.target.value })}
-                                className="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-[12px] focus:outline-none focus:ring-2 focus:ring-primary-600/5 focus:border-primary-600 transition-all text-sm"
-                                placeholder="••••••••"
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
-                            >
-                                {showPassword ? <ViewOffIcon size={18} /> : <ViewIcon size={18} />}
-                            </button>
-                        </div>
-                    </div>
-
-                    <p className="text-[11px] text-gray-500 leading-relaxed px-1">
-                        By creating an account, you agree to our{' '}
-                        <Link href="/terms" className="underline hover:text-primary-950 transition-colors">Terms of Service</Link>{' '}
-                        and{' '}
-                        <Link href="/privacy" className="underline hover:text-primary-950 transition-colors">Privacy Policy</Link>.
-                    </p>
-
-                    <button
-                        type="submit"
-                        disabled={isLoading}
-                        className="w-full bg-[#008000] text-white rounded-[12px] py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors shadow-lg shadow-primary-900/10 mt-2 disabled:opacity-50 flex justify-center items-center gap-2"
-                    >
-                        {isLoading ? (
-                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                        ) : 'Create account'}
-                    </button>
-                    <p className="text-[11px] text-gray-400 text-center mt-2 italic">
-                        * You will need to verify your email address after registration.
-                    </p>
-                </form>
-
-                <p className="text-center text-sm text-gray-600">
-                    Already have an account?{' '}
-                    <Link href="/auth/login" className="font-semibold text-primary-950 hover:underline">
-                        Sign in
+                <p className="mt-auto pt-8 text-center text-[9px] leading-[12px] text-[#aaa]">
+                    Already have a personal account?{' '}
+                    <Link href="/auth/login" className="font-semibold text-[#008000] no-underline">
+                        Log In
                     </Link>
                 </p>
             </div>
