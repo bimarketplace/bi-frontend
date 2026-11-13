@@ -9,6 +9,7 @@ import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
+import { PENDING_VERIFICATION_EMAIL_KEY } from '@/lib/auth';
 
 function LoginContent() {
     const router = useRouter();
@@ -45,6 +46,12 @@ function LoginContent() {
             });
 
             if (result?.error) {
+                if (result.error.toLowerCase().includes('not verified')) {
+                    sessionStorage.setItem(PENDING_VERIFICATION_EMAIL_KEY, formData.email.trim());
+                    router.push('/auth/verification-pending');
+                    return;
+                }
+
                 setError(result.error);
                 toast.error(result.error);
             } else if (result?.ok) {

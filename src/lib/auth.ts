@@ -2,6 +2,8 @@ import axios from 'axios';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'https://bi-backend-1tf6.onrender.com';
 
+export const PENDING_VERIFICATION_EMAIL_KEY = 'biMarketplace.pendingVerificationEmail';
+
 export const getAuthErrorMessage = (error: unknown, fallback: string): string => {
     if (!axios.isAxiosError(error)) return fallback;
 

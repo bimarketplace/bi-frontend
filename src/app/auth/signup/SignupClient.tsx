@@ -1,12 +1,13 @@
 "use client";
 
 import AuthDivider from '@/components/auth/AuthDivider';
+import EmailVerificationPending from '@/components/auth/EmailVerificationPending';
 import AuthLayout from '@/components/auth/AuthLayout';
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton';
 import PasswordInput from '@/components/auth/PasswordInput';
 import Link from 'next/link';
-import { getAuthErrorMessage, register, resendEmail } from '@/lib/auth';
-import { useState, useEffect } from 'react';
+import { getAuthErrorMessage, register } from '@/lib/auth';
+import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 export default function SignupPage() {
@@ -17,20 +18,8 @@ export default function SignupPage() {
         password2: '',
     });
     const [isLoading, setIsLoading] = useState(false);
-    const [isResending, setIsResending] = useState(false);
     const [status, setStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [errorMessage, setErrorMessage] = useState('');
-    const [resendSeconds, setResendSeconds] = useState(45);
-
-    useEffect(() => {
-        if (status !== 'success' || resendSeconds === 0) return;
-
-        const timer = window.setTimeout(() => {
-            setResendSeconds((seconds) => Math.max(seconds - 1, 0));
-        }, 1000);
-
-        return () => window.clearTimeout(timer);
-    }, [resendSeconds, status]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -46,7 +35,6 @@ export default function SignupPage() {
                 password2: formData.password2,
             });
             setStatus('success');
-            setResendSeconds(45);
         } catch (error: unknown) {
             setStatus('error');
             const message = getAuthErrorMessage(error, 'Registration failed. Please try again.');
@@ -57,59 +45,13 @@ export default function SignupPage() {
         }
     };
 
-    const handleResend = async () => {
-        setIsResending(true);
-        setErrorMessage('');
-
-        try {
-            await resendEmail(formData.email);
-            setResendSeconds(45);
-        } catch (error: unknown) {
-            const message = getAuthErrorMessage(error, 'Could not resend the verification email.');
-            setErrorMessage(message);
-            toast.error(message);
-        } finally {
-            setIsResending(false);
-        }
-    };
-
     if (status === 'success') {
         return (
-            <AuthLayout title="A verification link has been sent to your email.">
-                <div className="flex flex-1 flex-col items-center pt-[4px]">
-                    <a
-                        href={`mailto:${formData.email}`}
-                        className="auth-primary-button no-underline"
-                    >
-                        Open Email App
-                    </a>
-                    {errorMessage && (
-                        <p role="alert" className="mt-3 text-center text-[13px] leading-[18px] text-red-500">
-                            {errorMessage}
-                        </p>
-                    )}
-                    <div className="mt-4 min-h-[18px] text-center text-[13px] leading-[18px] text-zinc-500">
-                        {resendSeconds > 0 ? (
-                            `Didn't receive the link? Resend in 0:${String(resendSeconds).padStart(2, '0')}`
-                        ) : (
-                            <button
-                                type="button"
-                                disabled={isResending}
-                                onClick={handleResend}
-                                className="text-[#aaa] underline disabled:opacity-60"
-                            >
-                                {isResending ? 'Resending...' : "Didn't receive the link? Resend"}
-                            </button>
-                        )}
-                    </div>
-                    <Link
-                        href="/auth/signup"
-                        className="mt-auto pb-1 text-[13px] leading-[18px] text-zinc-500 no-underline"
-                    >
-                        Back to Sign Up
-                    </Link>
-                </div>
-            </AuthLayout>
+            <EmailVerificationPending
+                email={formData.email}
+                backHref="/auth/signup"
+                backLabel="Back to Sign Up"
+            />
         );
     }
 
