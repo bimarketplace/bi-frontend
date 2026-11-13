@@ -23,9 +23,9 @@ export default function AuthLayout({
         >
             <div className="mx-auto flex min-h-full w-full max-w-[480px] flex-col px-[20px]">
                 <header className={titleAlignment === 'left' ? 'pl-[9px] text-left' : 'text-center'}>
-                    <h1 className="text-[18px] font-medium leading-[23px] text-[#111]">{title}</h1>
+                    <h1 className="text-[22px] font-semibold leading-7 text-[#111]">{title}</h1>
                     {subtitle && (
-                        <p className="mt-2 text-[10px] leading-[14px] text-[#999]">{subtitle}</p>
+                        <p className="mt-2 text-sm leading-5 text-zinc-500">{subtitle}</p>
                     )}
                 </header>
                 <div className="mt-[24px] flex min-h-0 flex-1 flex-col">

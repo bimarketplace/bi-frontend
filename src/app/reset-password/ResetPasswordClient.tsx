@@ -61,7 +61,7 @@ function ResetPasswordContent() {
                     {errorMessage && (
                         <div
                             role="alert"
-                            className="mb-3 rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[10px] leading-[14px] text-red-600"
+                            className="mb-3 rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[13px] leading-[18px] text-red-600"
                         >
                             {errorMessage}
                         </div>
@@ -92,7 +92,7 @@ function ResetPasswordContent() {
                 </form>
                 <Link
                     href="/auth/login"
-                    className="mt-auto self-center pb-[2px] text-[9px] leading-[12px] text-[#aaa] no-underline"
+                    className="mt-auto self-center pb-1 text-[13px] leading-[18px] text-zinc-500 no-underline"
                 >
                     Back to Login
                 </Link>

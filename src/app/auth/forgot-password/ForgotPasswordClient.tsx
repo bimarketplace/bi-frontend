@@ -36,12 +36,12 @@ export default function ForgotPasswordPage() {
                     <a href={`mailto:${email}`} className="auth-primary-button no-underline">
                         Open Email App
                     </a>
-                    <p className="mt-[14px] text-center text-[9px] leading-[14px] text-[#aaa]">
+                    <p className="mt-4 text-center text-[13px] leading-[18px] text-zinc-500">
                         Check your inbox and spam folder for the reset link.
                     </p>
                     <Link
                         href="/auth/login"
-                        className="mt-auto pb-[2px] text-[9px] leading-[12px] text-[#aaa] no-underline"
+                        className="mt-auto pb-1 text-[13px] leading-[18px] text-zinc-500 no-underline"
                     >
                         Back to Login
                     </Link>
@@ -57,7 +57,7 @@ export default function ForgotPasswordPage() {
                     {errorMessage && (
                         <div
                             role="alert"
-                            className="mb-3 rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[10px] leading-[14px] text-red-600"
+                            className="mb-3 rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[13px] leading-[18px] text-red-600"
                         >
                             {errorMessage}
                         </div>
@@ -82,7 +82,7 @@ export default function ForgotPasswordPage() {
                 </form>
                 <Link
                     href="/auth/login"
-                    className="mt-auto self-center pb-[2px] text-[9px] leading-[12px] text-[#aaa] no-underline"
+                    className="mt-auto self-center pb-1 text-[13px] leading-[18px] text-zinc-500 no-underline"
                 >
                     Back to Login
                 </Link>

@@ -66,7 +66,7 @@ function LoginContent() {
                     {error && (
                         <div
                             role="alert"
-                            className="mb-3 rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[10px] leading-[14px] text-red-600"
+                            className="mb-3 rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[13px] leading-[18px] text-red-600"
                         >
                             {error}
                         </div>
@@ -92,7 +92,7 @@ function LoginContent() {
                     </div>
                     <Link
                         href="/auth/forgot-password"
-                        className="mt-[5px] self-end text-[8px] leading-[10px] text-[#aaa] no-underline"
+                        className="mt-2 self-end text-[13px] leading-[18px] text-zinc-500 no-underline"
                     >
                         Forgot password?
                     </Link>
@@ -108,7 +108,7 @@ function LoginContent() {
                     </div>
                 </div>
 
-                <p className="mt-auto pt-8 text-center text-sm leading-5 text-[#aaa]">
+                <p className="mt-auto pt-8 text-center text-sm leading-5 text-zinc-500">
                     Don&apos;t have a personal account?{' '}
                     <Link href="/auth/signup" className="font-semibold text-[#008000] no-underline">
                         Sign Up

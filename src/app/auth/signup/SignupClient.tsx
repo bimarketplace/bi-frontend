@@ -84,11 +84,11 @@ export default function SignupPage() {
                         Open Email App
                     </a>
                     {errorMessage && (
-                        <p role="alert" className="mt-[10px] text-center text-[9px] leading-[14px] text-red-500">
+                        <p role="alert" className="mt-3 text-center text-[13px] leading-[18px] text-red-500">
                             {errorMessage}
                         </p>
                     )}
-                    <div className="mt-[14px] min-h-[14px] text-center text-[9px] leading-[14px] text-[#aaa]">
+                    <div className="mt-4 min-h-[18px] text-center text-[13px] leading-[18px] text-zinc-500">
                         {resendSeconds > 0 ? (
                             `Didn't receive the link? Resend in 0:${String(resendSeconds).padStart(2, '0')}`
                         ) : (
@@ -104,7 +104,7 @@ export default function SignupPage() {
                     </div>
                     <Link
                         href="/auth/signup"
-                        className="mt-auto pb-[2px] text-[9px] leading-[12px] text-[#aaa] no-underline"
+                        className="mt-auto pb-1 text-[13px] leading-[18px] text-zinc-500 no-underline"
                     >
                         Back to Sign Up
                     </Link>
@@ -120,7 +120,7 @@ export default function SignupPage() {
                     {status === 'error' && (
                         <div
                             role="alert"
-                            className="rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[10px] leading-[14px] text-red-600"
+                            className="rounded-[12px] border border-red-100 bg-red-50 px-3 py-2 text-[13px] leading-[18px] text-red-600"
                         >
                             {errorMessage}
                         </div>
@@ -157,7 +157,7 @@ export default function SignupPage() {
                         ariaLabel="Password"
                     />
 
-                    <p className="mt-[4px] px-1 text-sm leading-5 text-[#aaa]">
+                    <p className="mt-1 px-1 text-[13px] leading-5 text-zinc-500">
                         By continuing, you agree to our{' '}
                         <Link href="/terms" className="text-[#008000] underline">Terms</Link>
                         {' '}&amp;{' '}
@@ -176,7 +176,7 @@ export default function SignupPage() {
                     </div>
                 </div>
 
-                <p className="mt-auto pt-8 text-center text-sm leading-5 text-[#aaa]">
+                <p className="mt-auto pt-8 text-center text-sm leading-5 text-zinc-500">
                     Already have a personal account?{' '}
                     <Link href="/auth/login" className="font-semibold text-[#008000] no-underline">
                         Log In

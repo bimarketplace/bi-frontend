@@ -54,7 +54,7 @@ export default function AccountTypePage() {
               />
             </svg>
           </Link>
-          <h1 className="text-[12px] font-semibold leading-none">
+          <h1 className="text-base font-semibold leading-5">
             Choose Account Type
           </h1>
         </header>
@@ -74,24 +74,24 @@ export default function AccountTypePage() {
                 role="radio"
                 aria-checked={isSelected}
                 onClick={() => setAccountType(option.id)}
-                className={`flex min-h-[61px] w-full items-center justify-between rounded-[14px] border px-[9px] py-[8px] text-left transition-colors ${
+                className={`flex min-h-[72px] w-full items-center justify-between rounded-[14px] border px-3 py-3 text-left transition-colors ${
                   isSelected ? "border-[#c9c9c9]" : "border-[#ededed]"
                 }`}
               >
                 <span className="min-w-0 pr-3">
-                  <span className="block text-[9px] font-semibold leading-[12px] text-[#171717]">
+                  <span className="block text-sm font-semibold leading-5 text-[#171717]">
                     {option.title}
                   </span>
-                  <span className="mt-[3px] block max-w-[170px] text-[9px] font-normal leading-[12px] text-[#858585]">
+                  <span className="mt-1 block max-w-[320px] text-xs font-normal leading-4 text-zinc-500">
                     {option.description}
                   </span>
                 </span>
                 <span
                   aria-hidden="true"
-                  className="flex h-[12px] w-[12px] shrink-0 items-center justify-center rounded-full border border-[#333]"
+                  className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-[#333]"
                 >
                   {isSelected && (
-                    <span className="h-[6px] w-[6px] rounded-full bg-[#008000]" />
+                    <span className="h-2 w-2 rounded-full bg-[#008000]" />
                   )}
                 </span>
               </button>
@@ -107,7 +107,7 @@ export default function AccountTypePage() {
           >
             Continue
           </button>
-          <p className="mt-[14px] text-[9px] leading-[12px] text-[#a2a2a2]">
+          <p className="mt-4 text-sm leading-5 text-zinc-500">
             Already have a personal account?{" "}
             <Link
               href="/auth/login"
