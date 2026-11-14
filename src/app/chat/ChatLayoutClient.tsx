@@ -3,54 +3,81 @@
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { fetchConversations, Conversation } from "@/lib/chat";
-import { Container } from "@/components/layout/Container";
 import Link from "next/link";
 import { Avatar } from "@/components/layout/Navbar";
 import { usePathname } from "next/navigation";
 import { Message02Icon } from "hugeicons-react";
 
 export default function ChatLayoutClient({ children }: { children: React.ReactNode }) {
-    const { data: session } = useSession();
+    const { data: session, status: sessionStatus } = useSession();
     const [conversations, setConversations] = useState<Conversation[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [conversationLoadError, setConversationLoadError] = useState("");
     const pathname = usePathname();
+    const accessToken = session?.access_token;
 
     useEffect(() => {
-        if (session?.access_token) {
-            fetchConversations((session as any).access_token)
+        if (sessionStatus === "loading") return;
+        if (!accessToken) {
+            setConversations([]);
+            setConversationLoadError("");
+            setIsLoading(false);
+            return;
+        }
+
+        let isActive = true;
+        setIsLoading(true);
+        setConversationLoadError("");
+        fetchConversations(accessToken)
+            .then((data) => {
+                if (isActive) setConversations(data);
+            })
+            .catch((err) => {
+                if (isActive) {
+                    console.error("Failed to fetch conversations", err);
+                    setConversationLoadError("Could not load conversations. Please try again.");
+                }
+            })
+            .finally(() => {
+                if (isActive) setIsLoading(false);
+            });
+
+        return () => {
+            isActive = false;
+        };
+    }, [accessToken, sessionStatus]);
+
+    // Refresh the conversation list every 10 seconds.
+    useEffect(() => {
+        if (!accessToken) return;
+        const interval = setInterval(() => {
+            fetchConversations(accessToken)
                 .then((data) => {
                     setConversations(data);
-                    setIsLoading(false);
+                    setConversationLoadError("");
                 })
-                .catch((err) => {
-                    console.error("Failed to fetch conversations", err);
-                    setIsLoading(false);
-                });
-        }
-    }, [session]);
-
-    // Refresh conversations every 10 seconds or when focusing back
-    useEffect(() => {
-        const interval = setInterval(() => {
-            if (session?.access_token) {
-                fetchConversations((session as any).access_token)
-                    .then(setConversations)
-                    .catch(console.error);
-            }
+                .catch((err) => console.error("Failed to refresh conversations", err));
         }, 10000);
         return () => clearInterval(interval);
-    }, [session]);
+    }, [accessToken]);
 
     const user = session?.user;
-    const currentUsername = user?.name || (user as any)?.username;
+    const currentUsername =
+        (user as { username?: string } | undefined)?.username || user?.name;
 
     // Determine if we are on a mobile view and viewing a specific chat
     const isMobileChatView = pathname !== '/chat' && pathname.startsWith('/chat/');
+    const pageClassName = isMobileChatView
+        ? "h-[100dvh] w-full overflow-hidden bg-white"
+        : "min-h-screen bg-[#FAFAFA] pt-[60px] pb-8 flex flex-col md:pt-20";
+    const contentClassName = isMobileChatView
+        ? "flex h-full min-h-0 w-full flex-col"
+        : "flex-1 flex flex-col w-full h-[calc(100vh-9rem)] max-h-[870px]";
 
     return (
-      <div className="min-h-screen bg-[#FAFAFA] pt-[60px] pb-8 flex flex-col md:pt-20">
-    <div className="flex-1 flex flex-col w-full h-[calc(100vh-9rem)] max-h-[870px]">
-        <div className="bg-white overflow-hidden border border-gray-100 shadow-xl shadow-zinc-200/50 flex flex-1 w-full h-full relative">
+      <div className={`${pageClassName} flex flex-col`}>
+    <div className={contentClassName}>
+        <div className={`relative flex h-full w-full flex-1 overflow-hidden bg-white ${isMobileChatView ? "" : "border border-gray-100 shadow-xl shadow-zinc-200/50"}`}>
             {/* Sidebar (Conversations List) */}
             <div className={`w-full md:w-[350px] lg:w-[400px] flex-shrink-0 border-r border-zinc-100 flex flex-col h-full bg-white transition-all ${isMobileChatView ? 'hidden md:flex' : 'flex'}`}>
                 <div className="p-6 border-b border-zinc-100 flex items-center gap-3">
@@ -60,6 +87,10 @@ export default function ChatLayoutClient({ children }: { children: React.ReactNo
                 <div className="flex-1 overflow-y-auto">
                     {isLoading ? (
                         <div className="p-6 text-center text-zinc-400 font-medium">Loading...</div>
+                    ) : conversationLoadError ? (
+                        <div role="alert" className="p-6 text-center text-sm text-red-600">
+                            {conversationLoadError}
+                        </div>
                     ) : conversations.length === 0 ? (
                         <div className="p-6 text-center text-zinc-500 font-medium">No conversations yet.</div>
                     ) : (
@@ -102,7 +133,7 @@ export default function ChatLayoutClient({ children }: { children: React.ReactNo
             </div>
 
             {/* Main Chat Area */}
-            <div className={`flex-1 flex-col h-full bg-zinc-50/30 ${isMobileChatView ? 'flex' : 'hidden md:flex'}`}>
+            <div className={`flex min-h-0 flex-1 flex-col h-full bg-zinc-50/30 ${isMobileChatView ? 'flex' : 'hidden md:flex'}`}>
                 {children}
             </div>
         </div>

@@ -10,6 +10,7 @@ import { submitCheckout } from "@/lib/checkout";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { startConversation } from "@/lib/chat";
+import { getAuthErrorMessage } from "@/lib/auth";
 
 interface ProductModalProps {
   product: ProductType;
@@ -98,13 +99,14 @@ const ProductModal = ({ product, onClose }: ProductModalProps) => {
       const conversation = await startConversation(
         product.seller.id,
         product.id,
-        (session as any).access_token
+        session.access_token
       );
       toast.success("Chat started", { id: toastId });
       handleClose();
       router.push(`/chat/${conversation.id}`);
     } catch (error) {
-      toast.error("Failed to start chat", { id: toastId });
+      console.error("Failed to start chat", error);
+      toast.error(getAuthErrorMessage(error, "Unable to start a conversation. Please try again."), { id: toastId });
       setIsStartingChat(false);
     }
   };

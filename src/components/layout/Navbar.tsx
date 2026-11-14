@@ -131,7 +131,7 @@ export default function Navbar() {
         setSearchQuery(searchParams.get('search') || '');
     }, [searchParams]);
 
-    if (isAuthPage) return null;
+    if (isAuthPage || isChatRoom) return null;
 
     return (
         <>

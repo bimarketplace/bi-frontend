@@ -1,6 +1,14 @@
 import axios from 'axios';
 
-const getApiUrl = () => process.env.NEXT_PUBLIC_API_URL || 'https://bi-backend-1tf6.onrender.com';
+const getApiUrl = () => (process.env.NEXT_PUBLIC_API_URL || 'https://bi-backend-1tf6.onrender.com').replace(/\/+$/, '');
+
+const getListResponse = <T,>(data: unknown): T[] => {
+    if (Array.isArray(data)) return data as T[];
+    if (typeof data === 'object' && data !== null && 'results' in data && Array.isArray(data.results)) {
+        return data.results as T[];
+    }
+    throw new Error('Chat API returned an invalid list response.');
+};
 
 export interface User {
     id: number;
@@ -38,11 +46,7 @@ export const fetchConversations = async (token: string): Promise<Conversation[]>
             'Authorization': `Bearer ${token}`
         }
     });
-    // Can be paginated depending on backend, let's assume it returns array or paginated response
-    if (response.data.results) {
-        return response.data.results;
-    }
-    return response.data;
+    return getListResponse<Conversation>(response.data);
 };
 
 export const fetchConversation = async (id: number, token: string): Promise<Conversation> => {
@@ -60,15 +64,12 @@ export const fetchMessages = async (conversationId: number, token: string): Prom
             'Authorization': `Bearer ${token}`
         }
     });
-    if (response.data.results) {
-        return response.data.results;
-    }
-    return response.data;
+    return getListResponse<Message>(response.data);
 };
 
 export const startConversation = async (sellerId: number, productId: number | null, token: string): Promise<Conversation> => {
-    const data: any = { seller_id: sellerId };
-    if (productId) {
+    const data: { seller_id: number; product_id?: number } = { seller_id: sellerId };
+    if (productId !== null) {
         data.product_id = productId;
     }
 

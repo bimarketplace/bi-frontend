@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { fetchProductById, addComment, castVote, shareProduct } from "@/lib/products";
 import { startConversation } from "@/lib/chat";
+import { getAuthErrorMessage } from "@/lib/auth";
 import { toast } from "react-hot-toast";
 import {
     ArrowLeft02Icon,
@@ -156,12 +157,13 @@ export default function ProductDetails({ initialProduct, id }: { initialProduct:
             const conversation = await startConversation(
                 product.seller.id,
                 product.id,
-                (session as any).access_token
+                session.access_token
             );
             toast.success("Chat started", { id: toastId });
             router.push(`/chat/${conversation.id}`);
         } catch (error) {
-            toast.error("Failed to start chat", { id: toastId });
+            console.error("Failed to start chat", error);
+            toast.error(getAuthErrorMessage(error, "Unable to start a conversation. Please try again."), { id: toastId });
             setIsStartingChat(false);
         }
     };
