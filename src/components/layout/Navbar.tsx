@@ -113,8 +113,6 @@ export default function Navbar() {
     const isChatRoom = pathname.startsWith('/chat/') && pathname !== '/chat';
     const showMobileBottomNav = !isAuthPage && !isChatRoom;
 
-    if (isAuthPage) return null;
-
     const handleSearch = (value: string) => {
         setSearchQuery(value);
         const params = new URLSearchParams(searchParams.toString());
@@ -132,6 +130,8 @@ export default function Navbar() {
     useEffect(() => {
         setSearchQuery(searchParams.get('search') || '');
     }, [searchParams]);
+
+    if (isAuthPage) return null;
 
     return (
         <>

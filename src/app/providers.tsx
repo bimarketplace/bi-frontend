@@ -1,7 +1,7 @@
 'use client';
 
 import { SessionProvider } from 'next-auth/react';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 import { Toaster } from 'react-hot-toast';
@@ -9,6 +9,43 @@ import { GridProvider } from '@/context/GridContext';
 import { CartProvider } from '@/context/CartContext';
 
 export function Providers({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development' || !('serviceWorker' in navigator)) return;
+
+    const clearStalePwaData = async () => {
+      const registrations = await navigator.serviceWorker.getRegistrations();
+      await Promise.all(
+        registrations
+          .filter((registration) => {
+            const scope = new URL(registration.scope);
+            return scope.origin === window.location.origin && scope.pathname === '/';
+          })
+          .map((registration) => registration.unregister()),
+      );
+
+      const pwaCachePrefixes = [
+        'workbox-',
+        'start-url',
+        'google-fonts-',
+        'static-',
+        'next-',
+        'apis',
+        'pages',
+        'cross-origin',
+      ];
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames
+          .filter((name) => pwaCachePrefixes.some((prefix) => name.startsWith(prefix)))
+          .map((name) => caches.delete(name)),
+      );
+    };
+
+    void clearStalePwaData().catch((error: unknown) => {
+      console.error('Failed to clear stale PWA data in development:', error);
+    });
+  }, []);
+
   return (
     <SessionProvider>
       <CartProvider>
