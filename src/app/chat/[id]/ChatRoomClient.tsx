@@ -217,7 +217,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
                             </div>
                             <Link
                                 href={`/products/${conversation.product.id}`}
-                                className="shrink-0 rounded-full border border-zinc-800 px-3 py-2 text-xs font-medium text-zinc-900 transition-colors hover:bg-zinc-800 hover:text-white"
+                                className="inline-flex min-h-[42px] shrink-0 items-center justify-center rounded-full border border-black bg-[#008000] px-5 text-sm font-semibold text-white shadow-[0_3px_0_#000] transition-transform active:translate-y-0.5"
                             >
                                 Buy Now
                             </Link>

@@ -22,7 +22,14 @@ export default function VerificationPendingClient() {
     }, []);
 
     if (!isReady) {
-        return <AuthLayout title="Preparing your verification email..." />;
+        return (
+            <AuthLayout title="Preparing your verification email...">
+                <div role="status" className="flex flex-1 justify-center pt-1">
+                    <span className="sr-only">Please wait</span>
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-200 border-t-[#008000]" />
+                </div>
+            </AuthLayout>
+        );
     }
 
     if (!email) {
