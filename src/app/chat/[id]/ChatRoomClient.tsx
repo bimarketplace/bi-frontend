@@ -286,7 +286,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
                                     type="button"
                                     disabled={!socketReady}
                                     onClick={() => sendMessage(reply)}
-                                    className="shrink-0 rounded-full bg-[#f0f7f0] px-3 py-1.5 text-[9px] leading-3 text-zinc-600 disabled:opacity-50"
+                                    className="shrink-0 rounded-[28px] bg-[#f0f7f0] px-4 py-3 text-[15px] leading-snug text-zinc-600 disabled:opacity-50"
                                 >
                                     {reply}
                                 </button>
