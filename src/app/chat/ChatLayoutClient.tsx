@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Avatar } from "@/components/layout/Navbar";
 import { usePathname } from "next/navigation";
 import { Message02Icon } from "hugeicons-react";
+import MessagePushNotifications from "@/components/chat/MessagePushNotifications";
 
 export default function ChatLayoutClient({ children }: { children: React.ReactNode }) {
     const { data: session, status: sessionStatus } = useSession();
@@ -83,6 +84,11 @@ export default function ChatLayoutClient({ children }: { children: React.ReactNo
                 <div className="p-6 border-b border-zinc-100 flex items-center gap-3">
                     <Message02Icon size={24} className="text-[#008000]" />
                     <h2 className="text-2xl font-black text-zinc-900">Messages</h2>
+                    {!isMobileChatView && (
+                        <div className="ml-auto">
+                            <MessagePushNotifications />
+                        </div>
+                    )}
                 </div>
                 <div className="flex-1 overflow-y-auto">
                     {isLoading ? (

@@ -6,6 +6,7 @@ import { fetchMessages, fetchConversation, getWebSocketUrl, Message, Conversatio
 import { ArrowLeft02Icon, SentIcon } from "hugeicons-react";
 import Link from "next/link";
 import Image from "next/image";
+import MessagePushNotifications from "@/components/chat/MessagePushNotifications";
 
 const formatDividerDate = (dateStr: string) => {
     const d = new Date(dateStr);
@@ -183,7 +184,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
     return (
         <div className="flex h-full min-h-0 w-full flex-col bg-white text-zinc-900">
             <div className="mx-auto flex h-full min-h-0 w-full max-w-[420px] flex-col bg-white">
-                <header className="flex h-12 shrink-0 items-center border-b border-zinc-200 bg-white px-4">
+                <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4">
                     <div className="flex items-center gap-3">
                         <Link href="/chat" className="text-zinc-700 transition-colors hover:text-zinc-900">
                             <ArrowLeft02Icon size={20} />
@@ -192,6 +193,7 @@ export default function ChatRoomClient({ conversationId }: { conversationId: num
                             Messaging {otherUser?.username || "Vendor"}
                         </h3>
                     </div>
+                    <MessagePushNotifications compact />
                 </header>
 
                 {conversation.product && (
